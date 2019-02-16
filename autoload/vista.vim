@@ -4,7 +4,7 @@
 
 " Skip special buffers, filetypes.
 function! vista#ShouldSkip() abort
-  let blacklist = ['vista', 'nerdtree', 'startify', 'tagbar']
+  let blacklist = ['vista', 'nerdtree', 'startify', 'tagbar', 'fzf']
 
   return !empty(&buftype)
         \ || empty(&filetype)
