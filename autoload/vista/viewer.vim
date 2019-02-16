@@ -1,0 +1,96 @@
+" Copyright (c) 2019 Liu-Cheng Xu
+" MIT License
+" vim: ts=2 sw=2 sts=2 et
+
+let s:default_icon = ["╰─▸ ", "├─▸ "]
+let s:viewer = {}
+
+function! s:viewer.init(data) abort
+  let self.rows = []
+  let self.data = a:data
+
+  let self.prefixes = get(g:, 'vista_icon_indent', s:default_icon)
+
+  " TODO improve me!
+  let up_gap = strwidth(self.prefixes[0])
+  " By default the gap is half of the second prefix.
+  " at least one
+  if up_gap >= 2 && up_gap < 4
+    let self.gap = up_gap
+  elseif up_gap >= 4
+    let self.gap = up_gap / 2
+  else
+    let self.gap = up_gap + strwidth(self.prefixes[1])/2
+  endif
+endfunction
+
+function! s:ContainWhitespaceOnly(str) abort
+  return a:str !~ '\S'
+endfunction
+
+function! s:Join(...) abort
+  return join(a:000, '')
+endfunction
+
+function! s:viewer.render() abort
+  let try_adjust = self.prefixes[0] != self.prefixes[1]
+
+  " prefixes[0] scope [children_num]
+  "   prefixes[1] tag:num
+  for [kind, v] in items(self.data)
+    let parent = self.prefixes[0] . kind . ' ['.len(v).']'
+    " Parent
+    call add(self.rows, parent)
+
+    if !empty(v)
+
+      " Children
+      for i in v
+        if len(i) > 0
+          let row = s:Join(
+                \ repeat(' ', self.gap),
+                \ self.prefixes[1],
+                \ i.text.':'.i.lnum
+                \ )
+          call add(self.rows, row)
+        endif
+      endfor
+
+      if !s:ContainWhitespaceOnly(self.prefixes[1]) && try_adjust
+        " Adjust the prefix of last item in each scope
+        let tag_colon_num = split(self.rows[-1], ' ')[1:]
+        let self.rows[-1] = repeat(' ', self.gap)
+              \ .self.prefixes[0]
+              \ .join(tag_colon_num, ' ')
+      endif
+    endif
+
+    call add(self.rows, '')
+  endfor
+
+  " Remove the needless last empty line
+  unlet self.rows[-1]
+
+  return self.rows
+endfunction
+
+function! s:Render(data) abort
+  if empty(a:data)
+    return []
+  endif
+  call s:viewer.init(a:data)
+  return s:viewer.render()
+endfunction
+
+" Render the extracted data to rows
+function! vista#viewer#Render(data) abort
+  return s:Render(a:data)
+endfunction
+
+function! vista#viewer#Display(data) abort
+  call vista#sidebar#OpenOrUpdate(s:Render(a:data))
+endfunction
+
+function! vista#viewer#prefixes() abort
+  return get(g:, 'vista_icon_indent', s:default_icon)
+endfunction
