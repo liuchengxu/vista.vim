@@ -141,6 +141,13 @@ let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
 " Executive used when opening vista sidebar without specifying it.
 " Avaliable: 'coc', 'ctags'. 'ctags' by default.
 let g:vista_default_executive = 'ctags'
+
+" A user provided map between filetypes and a comand that prints ctags to stdout.
+" The file path will be appened your custom command string
+" Non default example:
+" let g:vista_ctags_filetype_cmd = {
+"       \ 'haskell': 'hasktags -o - -c',
+"       \ }
 ```
 
 ## Contributing
