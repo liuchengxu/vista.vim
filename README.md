@@ -142,10 +142,10 @@ let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
 " Avaliable: 'coc', 'ctags'. 'ctags' by default.
 let g:vista_default_executive = 'ctags'
 
-" A user provided map between filetypes and a comand that prints ctags to stdout.
-" The file path will be appened your custom command string
-" Non default example:
-" let g:vista_ctags_filetype_cmd = {
+" Declare the command including the executable and options used to generate ctags output
+" for some certain filetypes.The file path will be appened to your custom command.
+" For example:
+" let g:vista_ctags_cmd = {
 "       \ 'haskell': 'hasktags -o - -c',
 "       \ }
 ```

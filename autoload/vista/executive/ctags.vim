@@ -62,26 +62,25 @@ let s:language_opt = map(s:language_opt,
 function! s:Cmd(file) abort
   let ft = &filetype
 
-  let custom_filetype_cmd = get(g:, 'vista_ctags_filetype_cmd', {})
-  let custom_cmd = get(custom_filetype_cmd, ft, -1)
-  if custom_cmd != -1
-    let cmd = printf('%s %s', custom_cmd, a:file)
-  else
-    if ft ==# 'cpp'
-      let opt = '--c++-kinds=+p'
-    else
-      let opt = printf('--language-force=%s', ft)
-    endif
-
-    if has_key(s:language_opt, ft)
-      let opt = s:language_opt[ft]
-    endif
-
-    " TODO vista_ctags_{filetype}_executable
-    let exe = get(g:, 'vista_ctags_executable', 'ctags')
-
-    let cmd = printf('%s --excmd=number --sort=no --fields=Ks %s -f- %s', exe, opt, a:file)
+  if exists('g:vista_ctags_cmd') && has_key(g:vista_ctags_cmd, ft)
+    let cmd = printf('%s %s', g:vista_ctags_cmd[ft], a:file)
+    return cmd
   endif
+
+  if ft ==# 'cpp'
+    let opt = '--c++-kinds=+p'
+  else
+    let opt = printf('--language-force=%s', ft)
+  endif
+
+  if has_key(s:language_opt, ft)
+    let opt = s:language_opt[ft]
+  endif
+
+  " TODO vista_ctags_{filetype}_executable
+  let exe = get(g:, 'vista_ctags_executable', 'ctags')
+
+  let cmd = printf('%s --excmd=number --sort=no --fields=Ks %s -f- %s', exe, opt, a:file)
   return cmd
 endfunction
 
