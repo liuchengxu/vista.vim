@@ -8,7 +8,7 @@ let s:should_display = v:false
 " Extract fruitful infomation from raw symbols
 function! s:Extract(symbols) abort
   if empty(a:symbols)
-    return vista#util#Warning("Empty document symbols from coc")
+    return
   endif
 
   let s:data = {}

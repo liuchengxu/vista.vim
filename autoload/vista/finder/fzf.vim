@@ -114,6 +114,8 @@ endfunction
 " Optional argument: executive, coc or ctags
 " Ctags is the default.
 function! vista#finder#fzf#Run(...) abort
+  " TODO when more executives added allow configuring this list
+  let executives = ['ctags', 'coc'] 
   if a:0 > 0
     let executive = a:1
   else
@@ -141,7 +143,12 @@ function! vista#finder#fzf#Run(...) abort
   endif
 
   if empty(s:data)
-    return vista#util#Warning("Empty data for finder")
+    let i = index(executives, executive)
+    let _ = remove(executives, i)
+    let s:data = vista#executive#{executives[0]}#Run(fpath)
+    if empty(s:data)
+      vista#util#Warning("Empty data for finder")
+    endif
   endif
 
   call s:Run()
