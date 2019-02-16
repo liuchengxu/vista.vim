@@ -58,7 +58,7 @@ function! s:viewer.render() abort
 
       if !s:ContainWhitespaceOnly(self.prefixes[1]) && try_adjust
         " Adjust the prefix of last item in each scope
-        let tag_colon_num = split(self.rows[-1], ' ')[1:]
+        let tag_colon_num = split(self.rows[-1], ' ')[0:]
         let self.rows[-1] = repeat(' ', self.gap)
               \ .self.prefixes[0]
               \ .join(tag_colon_num, ' ')
