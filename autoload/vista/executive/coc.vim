@@ -85,7 +85,7 @@ endfunction
 " Internal public APIs
 "
 " Run and RunAsync is for internal use.
-function! vista#executive#coc#Run() abort
+function! vista#executive#coc#Run(_fpath) abort
   return s:Extract(CocAction('documentSymbols'))
 endfunction
 

@@ -132,5 +132,9 @@ function! vista#finder#fzf#Run(...) abort
     let s:data = vista#executive#{executive}#Run(fpath)
   endif
 
+  if empty(s:data)
+    return vista#util#Warning("Empty data for finder")
+  endif
+
   call s:Run()
 endfunction
