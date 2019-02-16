@@ -121,13 +121,21 @@ function! vista#finder#fzf#Run(...) abort
   endif
 
   let cache = vista#executive#{executive}#Cache()
-  let fpath = expand('%:p')
+  let skip = vista#ShouldSkip()
+  if skip
+    let t:vista.source = get(t:vista, 'source', {})
+    let fpath = t:vista.source.fpath 
+  else
+    let fpath = expand('%:p')
+  endif
 
   if s:IsUsable(cache, fpath)
     let s:data = cache[fpath]
   else
-    let [bufnr, winnr, fname] = [bufnr('%'), winnr(), expand('%')]
-    call vista#source#Update(bufnr, winnr, fname, fpath)
+    if !skip      
+      let [bufnr, winnr, fname] = [bufnr('%'), winnr(), expand('%')]
+      call vista#source#Update(bufnr, winnr, fname, fpath)
+    endif
     " In this case, we normally want to run synchronously IMO.
     let s:data = vista#executive#{executive}#Run(fpath)
   endif
