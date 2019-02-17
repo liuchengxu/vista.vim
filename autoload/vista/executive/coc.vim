@@ -82,18 +82,38 @@ function! vista#executive#coc#Cache() abort
   return get(s:, 'cache', {})
 endfunction
 
+function! s:HasPrerequsite() abort
+  if !exists('*CocActionAsync')
+    call vista#util#Error('You must have coc.nvim installed to continue.')
+    return v:false
+  endif
+  return v:true
+endfunction
+
 " Internal public APIs
 "
 " Run and RunAsync is for internal use.
 function! vista#executive#coc#Run(_fpath) abort
+  if !s:HasPrerequsite()
+    return
+  endif
+
   return s:Extract(CocAction('documentSymbols'))
 endfunction
 
 function! vista#executive#coc#RunAsync() abort
+  if !s:HasPrerequsite()
+    return
+  endif
+
   call CocActionAsync('documentSymbols', function('s:Cb'))
 endfunction
 
 function! vista#executive#coc#Execute(bang, should_display) abort
+  if !s:HasPrerequsite()
+    return
+  endif
+
   call vista#source#Update(bufnr('%'), winnr(), expand('%'), expand('%:p'))
 
   if a:bang

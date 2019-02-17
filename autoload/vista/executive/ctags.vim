@@ -242,7 +242,20 @@ function! s:Execute(bang, fpath) abort
   endif
 endfunction
 
+function! s:HasPrerequsite() abort
+  " FIXME other executables, e.g., hasktags
+  if !executable('ctags')
+    call vista#util#Error('You must have ctags installed to continue.')
+    return v:false
+  endif
+  return v:true
+endfunction
+
 function! vista#executive#ctags#Run(fpath) abort
+  if !s:HasPrerequsite()
+    return
+  endif
+
   let file = s:IntoTemp(a:fpath)
   if empty(file)
     return
@@ -258,6 +271,10 @@ endfunction
 
 " Run ctags given the cmd asynchronously
 function! vista#executive#ctags#RunAsync(fpath) abort
+  if !s:HasPrerequsite()
+    return
+  endif
+
   let file = s:IntoTemp(a:fpath)
   if empty(file)
     return
@@ -278,6 +295,10 @@ endfunction
 
 " Execute ctags on file asynchronously
 function! vista#executive#ctags#Execute(bang, should_display) abort
+  if !s:HasPrerequsite()
+    return
+  endif
+
   let s:should_display = a:should_display
   let s:fpath = expand('%:p')
   call s:Execute(a:bang, s:fpath)
