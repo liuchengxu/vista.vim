@@ -242,14 +242,6 @@ function! s:ApplyExecute(bang, fpath) abort
   endif
 endfunction
 
-function! s:HasPrerequsite() abort
-  if !executable('ctags')
-    call vista#util#Error('You must have ctags installed to continue.')
-    return v:false
-  endif
-  return v:true
-endfunction
-
 function! s:Run(fpath) abort
   let file = s:IntoTemp(a:fpath)
   if empty(file)
@@ -304,6 +296,7 @@ function! s:Dispatch(F, ...) abort
   return call(a:F, a:000)
 endfunction
 
+" Run ctags given the cmd synchronously
 function! vista#executive#ctags#Run(fpath) abort
   call s:Dispatch(function('s:Run'), a:fpath)
 endfunction
@@ -313,7 +306,6 @@ function! vista#executive#ctags#RunAsync(fpath) abort
   call s:Dispatch(function('s:RunAsync'), a:fpath)
 endfunction
 
-" Execute ctags on file asynchronously
 function! vista#executive#ctags#Execute(bang, should_display) abort
   call s:Dispatch(function('s:Execute'), a:bang, a:should_display)
 endfunction
