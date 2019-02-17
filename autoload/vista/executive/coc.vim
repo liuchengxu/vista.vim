@@ -88,7 +88,7 @@ function! s:Dispatch(F, ...) abort
     return
   endif
 
-  call call(a:F, a:000)
+  return call(a:F, a:000)
 endfunction
 
 function! s:Run() abort
@@ -122,7 +122,7 @@ endfunction
 "
 " Run and RunAsync is for internal use.
 function! vista#executive#coc#Run(_fpath) abort
-  call s:Dispatch(function('s:Run'))
+  return s:Dispatch(function('s:Run'))
 endfunction
 
 function! vista#executive#coc#RunAsync() abort
