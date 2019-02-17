@@ -122,7 +122,7 @@ endfunction
 "
 " Run and RunAsync is for internal use.
 function! vista#executive#coc#Run(_fpath) abort
-  call s:Dispatch(function('s:Run'))
+  return s:Dispatch(function('s:Run'))
 endfunction
 
 function! vista#executive#coc#RunAsync() abort
@@ -130,5 +130,5 @@ function! vista#executive#coc#RunAsync() abort
 endfunction
 
 function! vista#executive#coc#Execute(bang, should_display) abort
-  call s:Dispatch(function('s:Execute'), a:bang, a:should_display)
+  return s:Dispatch(function('s:Execute'), a:bang, a:should_display)
 endfunction

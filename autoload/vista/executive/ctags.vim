@@ -298,7 +298,7 @@ endfunction
 
 " Run ctags given the cmd synchronously
 function! vista#executive#ctags#Run(fpath) abort
-  call s:Dispatch(function('s:Run'), a:fpath)
+  return s:Dispatch(function('s:Run'), a:fpath)
 endfunction
 
 " Run ctags given the cmd asynchronously
@@ -307,5 +307,5 @@ function! vista#executive#ctags#RunAsync(fpath) abort
 endfunction
 
 function! vista#executive#ctags#Execute(bang, should_display) abort
-  call s:Dispatch(function('s:Execute'), a:bang, a:should_display)
+  return s:Dispatch(function('s:Execute'), a:bang, a:should_display)
 endfunction
