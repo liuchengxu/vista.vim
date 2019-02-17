@@ -111,22 +111,34 @@ function! s:IsUsable(cache, fpath) abort
         \ && !getbufvar(a:cache.bufnr, '&mod')
 endfunction
 
+" Try other alternative executives when the data given by the specified one is empty.
+" Return v:true if some alternative brings us some data, or else v:false.
+function! s:TryAlternatives(tried, fpath) abort
+  " TODO when more executives added allow configuring this list
+  let executives = ['ctags', 'coc']
+
+  let alternatives = filter(executives, 'v:val != a:tried')
+
+  for alternative in alternatives
+    let s:data = vista#executive#{alternative}#Run(a:fpath)
+    if !empty(s:data)
+      return v:true
+    endif
+  endfor
+
+  return v:false
+endfunction
+
 " Optional argument: executive, coc or ctags
 " Ctags is the default.
 function! vista#finder#fzf#Run(...) abort
-  " TODO when more executives added allow configuring this list
-  let executives = ['ctags', 'coc'] 
-  if a:0 > 0
-    let executive = a:1
-  else
-    let executive = 'ctags'
-  endif
+  let executive = a:0 > 0 ? a:1 : 'ctags'
 
   let cache = vista#executive#{executive}#Cache()
   let skip = vista#ShouldSkip()
   if skip
     let t:vista.source = get(t:vista, 'source', {})
-    let fpath = t:vista.source.fpath 
+    let fpath = t:vista.source.fpath
   else
     let fpath = expand('%:p')
   endif
@@ -134,7 +146,7 @@ function! vista#finder#fzf#Run(...) abort
   if s:IsUsable(cache, fpath)
     let s:data = cache[fpath]
   else
-    if !skip      
+    if !skip
       let [bufnr, winnr, fname] = [bufnr('%'), winnr(), expand('%')]
       call vista#source#Update(bufnr, winnr, fname, fpath)
     endif
@@ -142,13 +154,8 @@ function! vista#finder#fzf#Run(...) abort
     let s:data = vista#executive#{executive}#Run(fpath)
   endif
 
-  if empty(s:data)
-    let i = index(executives, executive)
-    let _ = remove(executives, i)
-    let s:data = vista#executive#{executives[0]}#Run(fpath)
-    if empty(s:data)
-      vista#util#Warning("Empty data for finder")
-    endif
+  if empty(s:data) && !s:TryAlternatives(executive, fpath)
+    return vista#util#Warning("Empty data for finder")
   endif
 
   call s:Run()
