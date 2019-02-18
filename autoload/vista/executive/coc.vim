@@ -41,7 +41,6 @@ function! s:Cb(error, response) abort
     " Refer to coc.nvim 79cb11e
     " No document symbol provider exists when response is null.
     if a:response is# v:null
-      call vista#util#Warning('No avaliable document symbol provider')
       return
     endif
     call s:Extract(a:response)
@@ -82,18 +81,15 @@ function! vista#executive#coc#Cache() abort
   return get(s:, 'cache', {})
 endfunction
 
-" Internal public APIs
-"
-" Run and RunAsync is for internal use.
-function! vista#executive#coc#Run(_fpath) abort
+function! s:Run() abort
   return s:Extract(CocAction('documentSymbols'))
 endfunction
 
-function! vista#executive#coc#RunAsync() abort
+function! s:RunAsync() abort
   call CocActionAsync('documentSymbols', function('s:Cb'))
 endfunction
 
-function! vista#executive#coc#Execute(bang, should_display) abort
+function! s:Execute(bang, should_display) abort
   call vista#source#Update(bufnr('%'), winnr(), expand('%'), expand('%:p'))
 
   if a:bang
@@ -110,4 +106,28 @@ function! vista#executive#coc#Execute(bang, should_display) abort
     call s:InitAutocmd()
     let s:did_init_autocmd = 1
   endif
+endfunction
+
+function! s:Dispatch(F, ...) abort
+  if !exists('*CocActionAsync')
+    call vista#util#Error('You must have coc.nvim installed to continue.')
+    return
+  endif
+
+  return call(a:F, a:000)
+endfunction
+
+" Internal public APIs
+"
+" Run and RunAsync is for internal use.
+function! vista#executive#coc#Run(_fpath) abort
+  return s:Dispatch(function('s:Run'))
+endfunction
+
+function! vista#executive#coc#RunAsync() abort
+  call s:Dispatch(function('s:RunAsync'))
+endfunction
+
+function! vista#executive#coc#Execute(bang, should_display) abort
+  return s:Dispatch(function('s:Execute'), a:bang, a:should_display)
 endfunction

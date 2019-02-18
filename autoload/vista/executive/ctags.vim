@@ -58,12 +58,21 @@ let s:language_opt = {
 let s:language_opt = map(s:language_opt,
       \ 'printf("--language-force=%s --%s-types=%s", v:val[0], v:val[0], v:val[1])')
 
+function! s:GetCustomCmd(ft) abort
+  if exists('g:vista_ctags_cmd') && has_key(g:vista_ctags_cmd, a:ft)
+    return g:vista_ctags_cmd[a:ft]
+  endif
+  return v:null
+endfunction
+
 " FIXME support all languages that ctags does
 function! s:Cmd(file) abort
   let ft = &filetype
 
-  if exists('g:vista_ctags_cmd') && has_key(g:vista_ctags_cmd, ft)
-    let cmd = printf('%s %s', g:vista_ctags_cmd[ft], a:file)
+  let custom_cmd = s:GetCustomCmd(ft)
+
+  if custom_cmd isnot v:null
+    let cmd = printf('%s %s', custom_cmd, a:file)
     return cmd
   endif
 
@@ -138,11 +147,11 @@ function! s:AutoUpdate(fpath) abort
   call vista#source#Update(bufnr, winnr, fname, a:fpath)
 
   let s:reload_only = v:true
-  call s:Execute(v:false, a:fpath)
+  call s:ApplyExecute(v:false, a:fpath)
 endfunction
 
 " Run ctags synchronously given the cmd
-function! s:Run(cmd) abort
+function! s:ApplyRun(cmd) abort
   let output = system(a:cmd)
   if v:shell_error
     return vista#util#Error('Fail to run ctags: '.a:cmd)
@@ -155,7 +164,7 @@ function! s:Run(cmd) abort
 endfunction
 
 " Run ctags asynchronously given the cmd
-function! s:RunAsync(cmd) abort
+function! s:ApplyRunAsync(cmd) abort
   if has('nvim')
     " job is job id in neovim
     let jobid = jobstart(a:cmd, {
@@ -219,7 +228,7 @@ function! vista#executive#ctags#Cache() abort
   return get(s:, 'cache', {})
 endfunction
 
-function! s:Execute(bang, fpath) abort
+function! s:ApplyExecute(bang, fpath) abort
   let file = s:IntoTemp(a:fpath)
   if empty(file)
     return
@@ -228,13 +237,13 @@ function! s:Execute(bang, fpath) abort
   let cmd = s:Cmd(file)
 
   if a:bang
-    call s:Run(cmd)
+    call s:ApplyRun(cmd)
   else
     if exists('s:id')
       call vista#util#JobStop(s:id)
     endif
 
-    let s:id = s:RunAsync(cmd)
+    let s:id = s:ApplyRunAsync(cmd)
 
     if s:id == 0
       call vista#util#Error('Fail to execute ctags on file: '.a:fpath)
@@ -242,7 +251,7 @@ function! s:Execute(bang, fpath) abort
   endif
 endfunction
 
-function! vista#executive#ctags#Run(fpath) abort
+function! s:Run(fpath) abort
   let file = s:IntoTemp(a:fpath)
   if empty(file)
     return
@@ -251,13 +260,12 @@ function! vista#executive#ctags#Run(fpath) abort
   let s:fpath = a:fpath
 
   let cmd = s:Cmd(file)
-  call s:Run(cmd)
+  call s:ApplyRun(cmd)
 
   return s:data
 endfunction
 
-" Run ctags given the cmd asynchronously
-function! vista#executive#ctags#RunAsync(fpath) abort
+function! s:RunAsync(fpath) abort
   let file = s:IntoTemp(a:fpath)
   if empty(file)
     return
@@ -269,21 +277,48 @@ function! vista#executive#ctags#RunAsync(fpath) abort
     call vista#util#JobStop(s:id)
   endif
 
-  let s:id = s:RunAsync(cmd)
+  let s:id = s:ApplyRunAsync(cmd)
 
   if !s:id
     call vista#util#Error('Fail to execute ctags on file: '.a:fpath)
   endif
 endfunction
 
-" Execute ctags on file asynchronously
-function! vista#executive#ctags#Execute(bang, should_display) abort
+function! s:Execute(bang, should_display) abort
   let s:should_display = a:should_display
   let s:fpath = expand('%:p')
-  call s:Execute(a:bang, s:fpath)
+  call s:ApplyExecute(a:bang, s:fpath)
 
   if !exists('s:did_init_autocmd')
     call s:InitAutocmd()
     let s:did_init_autocmd = 1
   endif
+endfunction
+
+function! s:Dispatch(F, ...) abort
+  let ft = &filetype
+  let custom_cmd = s:GetCustomCmd(ft)
+
+  let exe = custom_cmd isnot v:null ? split(custom_cmd)[0] : 'ctags'
+
+  if !executable(exe)
+    call vista#util#Error('You must have '.exe.' installed for '.ft.' to continue.')
+    return
+  endif
+
+  return call(a:F, a:000)
+endfunction
+
+" Run ctags given the cmd synchronously
+function! vista#executive#ctags#Run(fpath) abort
+  return s:Dispatch(function('s:Run'), a:fpath)
+endfunction
+
+" Run ctags given the cmd asynchronously
+function! vista#executive#ctags#RunAsync(fpath) abort
+  call s:Dispatch(function('s:RunAsync'), a:fpath)
+endfunction
+
+function! vista#executive#ctags#Execute(bang, should_display) abort
+  return s:Dispatch(function('s:Execute'), a:bang, a:should_display)
 endfunction
