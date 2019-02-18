@@ -91,11 +91,11 @@ function! s:Run(...) abort
 endfunction
 
 function! s:Highlight() abort
-  syntax match FZFVistaBracket /\[\|\]/ contained
   syntax match FZFVistaNumber /^\s*\zs\d*:\ze\w/
-  syntax match FZFVistaTag    /^\s.*\ze\[/ contains=FZFVistaNumber
-  syntax match FZFVistaScope  /^\s.*\[.*\]\ze\s/ contains=FZFVistaTag,FZFVistaBracket
-  syntax match FZFVista /^.*$/ contains=FZFVistaBracket,FZFVistaNumber,FZFVistaTag,FZFVistaScope
+  syntax match FZFVistaTag    /^[^\[]*\(\[\)\@=/ contains=FZFVistaNumber
+  syntax match FZFVistaScope  /^[^]]*]/ contains=FZFVistaTag,FZFVistaBracket
+  syntax match FZFVista /^[^│┌└]*/ contains=FZFVistaBracket,FZFVistaNumber,FZFVistaTag,FZFVistaScope
+  syntax match FZFVistaBracket /\[\|\]/ contained
 
   hi default link FZFVistaBracket  SpecialKey
   hi default link FZFVistaNumber   Number
