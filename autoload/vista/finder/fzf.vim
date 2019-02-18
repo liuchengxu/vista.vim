@@ -6,15 +6,11 @@
 function! s:FindMaxLen() abort
   let [max_len_scope, max_len_lnum_and_text] = [-1, -1]
 
-  let s:num = 0
-
   for [kind, v] in items(s:data)
     let scope_len = strwidth(kind)
     if scope_len > max_len_scope
       let max_len_scope = scope_len
     endif
-
-    let s:num += len(v)
 
     for item in v
       let lnum_and_text = printf("%s:%s", item.lnum, item.text)
@@ -60,7 +56,7 @@ function! s:Run(...) abort
   let opts = {
           \ 'source': source,
           \ 'sink': function('s:sink'),
-          \ 'options': '--prompt "('.s:num.') > "',
+          \ 'options': '--prompt "['.s:cur_executive.'] > "',
           \ }
 
   echo "\r"
@@ -122,6 +118,7 @@ function! s:TryAlternatives(tried, fpath) abort
   for alternative in alternatives
     let s:data = vista#executive#{alternative}#Run(a:fpath)
     if !empty(s:data)
+      let s:cur_executive = alternative
       return v:true
     endif
   endfor
@@ -153,6 +150,8 @@ function! vista#finder#fzf#Run(...) abort
     " In this case, we normally want to run synchronously IMO.
     let s:data = vista#executive#{executive}#Run(fpath)
   endif
+
+  let s:cur_executive = executive
 
   if empty(s:data) && !s:TryAlternatives(executive, fpath)
     return vista#util#Warning("Empty data for finder")
