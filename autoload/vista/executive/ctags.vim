@@ -58,12 +58,21 @@ let s:language_opt = {
 let s:language_opt = map(s:language_opt,
       \ 'printf("--language-force=%s --%s-types=%s", v:val[0], v:val[0], v:val[1])')
 
+function! s:GetCustomCmd(ft) abort
+  if exists('g:vista_ctags_cmd') && has_key(g:vista_ctags_cmd, a:ft)
+    return g:vista_ctags_cmd[a:ft]
+  endif
+  return v:null
+endfunction
+
 " FIXME support all languages that ctags does
 function! s:Cmd(file) abort
   let ft = &filetype
 
-  if exists('g:vista_ctags_cmd') && has_key(g:vista_ctags_cmd, ft)
-    let cmd = printf('%s %s', g:vista_ctags_cmd[ft], a:file)
+  let custom_cmd = s:GetCustomCmd(ft)
+
+  if custom_cmd isnot v:null
+    let cmd = printf('%s %s', custom_cmd, a:file)
     return cmd
   endif
 
@@ -287,9 +296,13 @@ function! s:Execute(bang, should_display) abort
 endfunction
 
 function! s:Dispatch(F, ...) abort
-  " FIXME other executables, e.g., hasktags
-  if !executable('ctags')
-    call vista#util#Error('You must have ctags installed to continue.')
+  let ft = &filetype
+  let custom_cmd = s:GetCustomCmd(ft)
+
+  let exe = custom_cmd isnot v:null ? split(custom_cmd)[0] : 'ctags'
+
+  if !executable(exe)
+    call vista#util#Error('You must have '.exe.' installed for '.ft.' to continue.')
     return
   endif
 
