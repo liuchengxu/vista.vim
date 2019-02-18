@@ -56,7 +56,7 @@ function! s:Run(...) abort
   let opts = {
           \ 'source': source,
           \ 'sink': function('s:sink'),
-          \ 'options': '--prompt "'.s:cur_executive.'> "',
+          \ 'options': ['--prompt', '"'.s:cur_executive.'> "'] + get(g:, 'vista_fzf_opt', []),
           \ }
 
   echo "\r"
