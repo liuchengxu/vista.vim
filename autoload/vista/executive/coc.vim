@@ -41,7 +41,6 @@ function! s:Cb(error, response) abort
     " Refer to coc.nvim 79cb11e
     " No document symbol provider exists when response is null.
     if a:response is# v:null
-      call vista#util#Warning('No avaliable document symbol provider')
       return
     endif
     call s:Extract(a:response)
