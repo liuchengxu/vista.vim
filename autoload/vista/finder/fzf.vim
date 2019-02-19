@@ -56,11 +56,12 @@ function! s:Run(...) abort
   let opts = {
           \ 'source': source,
           \ 'sink': function('s:sink'),
-          \ 'options': ['--prompt', '"'.s:cur_executive.'> "'] + get(g:, 'vista_fzf_opt', []),
+          \ 'options': ['--prompt', s:cur_executive.'> '] + get(g:, 'vista_fzf_opt', []),
           \ }
+
   if exists('g:vista_fzf_preview')
     let preview_opts = call('fzf#vim#with_preview', g:vista_fzf_preview).options
-    let preview_opts[-1] = preview_opts[-1][0:-3] . expand('%S') . ':'.'{}'
+    let preview_opts[-1] = preview_opts[-1][0:-3] . expand('%S') . ':{}'
     call extend(opts.options, preview_opts)
   endif
 
