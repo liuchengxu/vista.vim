@@ -148,6 +148,13 @@ let g:vista_default_executive = 'ctags'
 " let g:vista_ctags_cmd = {
 "       \ 'haskell': 'hasktags -o - -c',
 "       \ }
+
+" To enable fzf's preview window set g:vista_fzf_preview.
+" The elements of g:vista_fzf_preview will be passed as arguments to fzf#vim#with_preview()
+" For example:
+" let g:vista_fzf_preview=['right:60%'] 
+
+" Use the g:vista_fzf_opt list to add anyother option to fzf.
 ```
 
 ## Contributing

@@ -56,8 +56,14 @@ function! s:Run(...) abort
   let opts = {
           \ 'source': source,
           \ 'sink': function('s:sink'),
-          \ 'options': '--prompt "'.s:cur_executive.'> "',
+          \ 'options': ['--prompt', s:cur_executive.'> '] + get(g:, 'vista_fzf_opt', []),
           \ }
+
+  if exists('g:vista_fzf_preview')
+    let preview_opts = call('fzf#vim#with_preview', g:vista_fzf_preview).options
+    let preview_opts[-1] = preview_opts[-1][0:-3] . expand('%S') . ':{}'
+    call extend(opts.options, preview_opts)
+  endif
 
   echo "\r"
 
@@ -86,11 +92,11 @@ function! s:Run(...) abort
 endfunction
 
 function! s:Highlight() abort
-  syntax match FZFVistaBracket /\[\|\]/ contained
   syntax match FZFVistaNumber /^\s*\zs\d*:\ze\w/
-  syntax match FZFVistaTag    /^\s.*\ze\[/ contains=FZFVistaNumber
-  syntax match FZFVistaScope  /^\s.*\[.*\]\ze\s/ contains=FZFVistaTag,FZFVistaBracket
-  syntax match FZFVista /^.*$/ contains=FZFVistaBracket,FZFVistaNumber,FZFVistaTag,FZFVistaScope
+  syntax match FZFVistaTag    /^[^\[]*\(\[\)\@=/ contains=FZFVistaNumber
+  syntax match FZFVistaScope  /^[^]]*]/ contains=FZFVistaTag,FZFVistaBracket
+  syntax match FZFVista /^[^│┌└]*/ contains=FZFVistaBracket,FZFVistaNumber,FZFVistaTag,FZFVistaScope
+  syntax match FZFVistaBracket /\[\|\]/ contained
 
   hi default link FZFVistaBracket  SpecialKey
   hi default link FZFVistaNumber   Number
