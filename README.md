@@ -145,16 +145,20 @@ let g:vista_default_executive = 'ctags'
 " Declare the command including the executable and options used to generate ctags output
 " for some certain filetypes.The file path will be appened to your custom command.
 " For example:
-" let g:vista_ctags_cmd = {
-"       \ 'haskell': 'hasktags -o - -c',
-"       \ }
+let g:vista_ctags_cmd = {
+      \ 'haskell': 'hasktags -o - -c',
+      \ }
 
 " To enable fzf's preview window set g:vista_fzf_preview.
 " The elements of g:vista_fzf_preview will be passed as arguments to fzf#vim#with_preview()
 " For example:
-" let g:vista_fzf_preview=['right:60%'] 
+let g:vista_fzf_preview = ['right:50%']
 
 " Use the g:vista_fzf_opt list to add anyother option to fzf.
+
+" Fall back to other executives if the specified one gives empty data.
+" By default it's all the provided executives excluding the tried one.
+" let g:vista_finder_alternative_executives = ['coc']
 ```
 
 ## Contributing

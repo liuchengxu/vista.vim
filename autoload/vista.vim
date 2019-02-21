@@ -3,7 +3,7 @@
 " vim: ts=2 sw=2 sts=2 et
 
 let s:cur_dir = fnamemodify(resolve(expand('<sfile>:p')), ':h')
-let s:executives = map(
+let g:vista#executives = map(
       \ split(globpath(s:cur_dir.'/vista/executive', '*'), '\n'),
       \ 'fnamemodify(v:val, ":t:r")')
 
@@ -41,7 +41,7 @@ function! vista#(bang, ...) abort
   let [bufnr, winnr, fname, fpath] = [bufnr('%'), winnr(), expand('%'), expand('%:p')]
 
   if a:0 == 1
-    if index(s:executives, a:1) > -1
+    if index(g:vista#executives, a:1) > -1
       call vista#source#Update(bufnr, winnr, fname, fpath)
       call vista#executive#{a:1}#Execute(v:false, v:true)
     elseif a:1 == 'finder'
