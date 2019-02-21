@@ -37,16 +37,9 @@ function! s:GetInfoUnderCursor() abort
   return [tag, source_line]
 endfunction
 
-" Show the detail of current tag/symbol under cursor.
-function! s:ShowDetail() abort
-  let [tag, line] = s:GetInfoUnderCursor()
-
-  if empty(tag) || empty(line)
-    echo "\r"
-    return
-  endif
-
-  let msg = vista#util#Truncate(line)
+" Echo the tag with detailed info in the cmdline
+function! s:EchoInCmdline(msg, tag) abort
+  let [msg, tag] = [a:msg, a:tag]
 
   let [_, start, end] = matchstrpos(msg, '\C'.tag)
 
@@ -59,7 +52,7 @@ function! s:ShowDetail() abort
   " Try highlighting the scope of current tag
   let linenr = vista#util#LowerIndentLineNr()
 
-  " If the scope is found
+  " Echo the scope of current tag if found
   if linenr != 0
     let pieces = split(getline(linenr), ' ')
     if !empty(pieces)
@@ -73,6 +66,20 @@ function! s:ShowDetail() abort
 
   echohl Search    | echon msg[start:end-1] | echohl NONE
   echohl Statement | echon msg[end:]        | echohl NONE
+endfunction
+
+" Show the detail of current tag/symbol under cursor.
+function! s:ShowDetail() abort
+  let [tag, line] = s:GetInfoUnderCursor()
+
+  if empty(tag) || empty(line)
+    echo "\r"
+    return
+  endif
+
+  let msg = vista#util#Truncate(line)
+
+  call s:EchoInCmdline(msg, tag)
 endfunction
 
 function! vista#cursor#ShowDetail(_timer) abort

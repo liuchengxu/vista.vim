@@ -114,20 +114,20 @@ function! s:Dispatch(F, ...) abort
     return
   endif
 
-  return call(a:F, a:000)
+  return call(function(a:F), a:000)
 endfunction
 
 " Internal public APIs
 "
 " Run and RunAsync is for internal use.
 function! vista#executive#coc#Run(_fpath) abort
-  return s:Dispatch(function('s:Run'))
+  return s:Dispatch('s:Run')
 endfunction
 
 function! vista#executive#coc#RunAsync() abort
-  call s:Dispatch(function('s:RunAsync'))
+  call s:Dispatch('s:RunAsync')
 endfunction
 
 function! vista#executive#coc#Execute(bang, should_display) abort
-  return s:Dispatch(function('s:Execute'), a:bang, a:should_display)
+  return s:Dispatch('s:Execute', a:bang, a:should_display)
 endfunction

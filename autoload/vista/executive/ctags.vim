@@ -306,19 +306,19 @@ function! s:Dispatch(F, ...) abort
     return
   endif
 
-  return call(a:F, a:000)
+  return call(function(a:F), a:000)
 endfunction
 
 " Run ctags given the cmd synchronously
 function! vista#executive#ctags#Run(fpath) abort
-  return s:Dispatch(function('s:Run'), a:fpath)
+  return s:Dispatch('s:Run', a:fpath)
 endfunction
 
 " Run ctags given the cmd asynchronously
 function! vista#executive#ctags#RunAsync(fpath) abort
-  call s:Dispatch(function('s:RunAsync'), a:fpath)
+  call s:Dispatch('s:RunAsync', a:fpath)
 endfunction
 
 function! vista#executive#ctags#Execute(bang, should_display) abort
-  return s:Dispatch(function('s:Execute'), a:bang, a:should_display)
+  return s:Dispatch('s:Execute', a:bang, a:should_display)
 endfunction
