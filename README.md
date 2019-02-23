@@ -96,6 +96,8 @@ $ git clone https://github.com/liuchengxu/vista.vim.git --depth=1 ~/.local/share
 
 ## Usage
 
+The following instructions are not complete, please see help via `:help vista` for more detailed usage.
+
 ### Commands
 
 Command   | Description
@@ -154,8 +156,6 @@ let g:vista_ctags_cmd = {
 " For example:
 let g:vista_fzf_preview = ['right:50%']
 
-" Use the g:vista_fzf_opt list to add anyother option to fzf.
-
 " Fall back to other executives if the specified one gives empty data.
 " By default it's all the provided executives excluding the tried one.
 " let g:vista_finder_alternative_executives = ['coc']
@@ -168,3 +168,5 @@ Vista.vim is still in beta, please [file an issue](https://github.com/liuchengxu
 ## License
 
 MIT
+
+Copyright (c) 2019 Liu-Cheng Xu
