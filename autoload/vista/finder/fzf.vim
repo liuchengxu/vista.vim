@@ -53,10 +53,11 @@ endfunction
 
 function! s:Run(...) abort
   let source = s:AlignSource()
+  let prompt = (get(s:, 'using_alternative', v:false) ? '*' : '').s:cur_executive.'> '
   let opts = {
           \ 'source': source,
           \ 'sink': function('s:sink'),
-          \ 'options': ['--prompt', s:cur_executive.'> '] + get(g:, 'vista_fzf_opt', []),
+          \ 'options': ['--prompt', prompt] + get(g:, 'vista_fzf_opt', []),
           \ }
 
   if exists('g:vista_fzf_preview')
@@ -125,6 +126,7 @@ function! s:TryAlternatives(tried, fpath) abort
     let s:data = vista#executive#{alternative}#Run(a:fpath)
     if !empty(s:data)
       let s:cur_executive = alternative
+      let s:using_alternative = v:true
       return v:true
     endif
   endfor
