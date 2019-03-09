@@ -46,6 +46,8 @@ function! vista#(bang, ...) abort
       call vista#executive#{a:1}#Execute(v:false, v:true)
     elseif a:1 == 'finder'
       call vista#finder#fzf#Run('coc')
+    elseif a:1 == 'finder!'
+      call vista#finder#fzf#ProjectRun()
     else
       return vista#util#Error("Invalid args. expected: Vista [EXECUTIVE | finder]")
     endif

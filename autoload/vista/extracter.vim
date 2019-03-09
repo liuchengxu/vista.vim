@@ -34,6 +34,24 @@ function! vista#extracter#ExtractTag(line, container) abort
   endif
 endfunction
 
+function! vista#extracter#ExtractProjectTag(line, container) abort
+  let g:line = a:line
+  let lnum_idx = match(a:line, '\<\d\+\>')
+  let lnum = matchstr(a:line, '\<\d\+\>')
+  let [tagname, scope] = filter(split(a:line[:lnum_idx-1], '\s'), '!empty(v:val)')
+  let rest = split(a:line[lnum_idx+len(lnum):], '\s')
+  let tagfile = rest[0]
+  let taginfo = join(rest[1:])
+
+  let picked = {'lnum': lnum, 'text': tagname, 'tagfile': tagfile, 'taginfo': taginfo}
+
+  if has_key(a:container, scope)
+    call add(a:container[scope], picked)
+  else
+    let a:container[scope] = [picked]
+  endif
+endfunction
+
 " https://microsoft.github.io/language-server-protocol/specification#textDocument_documentSymbol
 function! vista#extracter#ExtractSymbol(symbol, container) abort
   let symbol = a:symbol

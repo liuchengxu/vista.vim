@@ -295,6 +295,20 @@ function! s:Execute(bang, should_display) abort
   endif
 endfunction
 
+function! vista#executive#ctags#ProjectRun() abort
+  let cmd = 'ctags -R -x'
+
+  let output = system(cmd)
+  if v:shell_error
+    return vista#util#Error('Fail to run ctags: '.cmd)
+  endif
+
+  let s:data = {}
+  call map(split(output, "\n"), 'vista#extracter#ExtractProjectTag(v:val, s:data)')
+
+  return s:data
+endfunction
+
 function! s:Dispatch(F, ...) abort
   let ft = &filetype
   let custom_cmd = s:GetCustomCmd(ft)

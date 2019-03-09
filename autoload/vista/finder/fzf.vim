@@ -31,7 +31,19 @@ function! s:AlignSource() abort
 
   for [kind, v] in items(s:data)
     for item in v
-      let line = vista#source#Line(item.lnum)
+      " FIXME handle ctags -R better
+      try
+        let line = vista#source#Line(item.lnum)
+      catch
+        if has_key(item, 'tagfile')
+          let line = item.tagfile
+          if has_key(item, 'taginfo')
+            let line .= "\t".item.taginfo
+          endif
+        else
+          let line = ''
+        endif
+      endtry
       let lnum_and_text = printf("%s:%s", item.lnum, item.text)
       let row = printf("%s%s\t[%s]%s\t%s",
             \ lnum_and_text, repeat(' ', max_len_lnum_and_text- strwidth(lnum_and_text)),
@@ -51,6 +63,34 @@ function! s:sink(line) abort
   normal! zz
 endfunction
 
+" Actually call fzf#run() with a highlighter given the opts
+function! s:ApplyRun(opts, Hi) abort
+  echo "\r"
+
+  try
+    " fzf_colors may interfere custom syntax.
+    " Unlet and restore it later.
+    if exists('g:fzf_colors')
+      let old_fzf_colors = g:fzf_colors
+      unlet g:fzf_colors
+    endif
+
+    call fzf#run(fzf#wrap(a:opts))
+  finally
+    if exists('l:old_fzf_colors')
+      let g:fzf_colors = old_fzf_colors
+    endif
+  endtry
+
+  call call(function(a:Hi), [])
+
+  " https://unix.stackexchange.com/questions/149209/refresh-changed-content-of-file-opened-in-vim
+  " Vim Highlight does not work at times
+  if !has('nvim')
+    edit
+  endif
+endfunction
+
 function! s:Run(...) abort
   let source = s:AlignSource()
   let prompt = (get(s:, 'using_alternative', v:false) ? '*' : '').s:cur_executive.'> '
@@ -66,30 +106,28 @@ function! s:Run(...) abort
     call extend(opts.options, preview_opts)
   endif
 
-  echo "\r"
+  call s:ApplyRun(opts, 's:Highlight')
+endfunction
 
-  try
-    " fzf_colors may interfere custom syntax.
-    " Unlet and restore it later.
-    if exists('g:fzf_colors')
-      let old_fzf_colors = g:fzf_colors
-      unlet g:fzf_colors
-    endif
+function! s:project_sink(line) abort
+  let parts = split(a:line, '\t')
+  let lnum = split(parts[0], ':')[0]
+  let relpath = parts[2]
+  execute 'edit' relpath
+  call cursor(lnum, 1)
+  normal! zz
+endfunction
 
-    call fzf#run(fzf#wrap(opts))
-  finally
-    if exists('l:old_fzf_colors')
-      let g:fzf_colors = old_fzf_colors
-    endif
-  endtry
+function! s:ProjectRun(...) abort
+  let source = s:AlignSource()
+  let prompt = (get(s:, 'using_alternative', v:false) ? '*' : '').s:cur_executive.'> '
+  let opts = {
+          \ 'source': source,
+          \ 'sink': function('s:project_sink'),
+          \ 'options': ['--prompt', prompt] + get(g:, 'vista_fzf_opt', []),
+          \ }
 
-  call s:Highlight()
-
-  " https://unix.stackexchange.com/questions/149209/refresh-changed-content-of-file-opened-in-vim
-  " Vim Highlight does not work at times
-  if !has('nvim')
-    edit
-  endif
+  call s:ApplyRun(opts, 's:Highlight')
 endfunction
 
 function! s:Highlight() abort
@@ -132,6 +170,18 @@ function! s:TryAlternatives(tried, fpath) abort
   endfor
 
   return v:false
+endfunction
+
+function! vista#finder#fzf#ProjectRun() abort
+  let executive = 'ctags'
+  let s:data = vista#executive#{executive}#ProjectRun()
+  let s:cur_executive = executive
+
+  if empty(s:data)
+    return vista#util#Warning("Empty data for finder")
+  endif
+
+  call s:ProjectRun()
 endfunction
 
 " Optional argument: executive, coc or ctags
