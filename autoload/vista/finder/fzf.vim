@@ -2,6 +2,58 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
+let s:cols_layout = {}
+let s:aligner = {}
+
+function! s:cols_layout.project_ctags() abort
+  let [max_len_scope, max_len_lnum_and_text, max_len_relpath] = [-1, -1, -1]
+
+  for [kind, v] in items(s:data)
+    let scope_len = strwidth(kind)
+    if scope_len > max_len_scope
+      let max_len_scope = scope_len
+    endif
+
+    for item in v
+      let lnum_and_text = printf("%s:%s", item.lnum, item.text)
+      let len_lnum_and_text = strwidth(lnum_and_text)
+      if len_lnum_and_text > max_len_lnum_and_text
+        let max_len_lnum_and_text = len_lnum_and_text
+      endif
+
+      let relpath = item.tagfile
+      let len_relpath = strwidth(relpath)
+      if len_relpath > max_len_relpath
+        let max_len_relpath = len_relpath
+      endif
+    endfor
+  endfor
+
+  return [max_len_scope, max_len_lnum_and_text, max_len_relpath]
+endfunction
+
+function! s:aligner.project_ctags() abort
+  let source = []
+
+  let [max_len_scope, max_len_lnum_and_text, max_len_relpath] = s:cols_layout.project_ctags()
+
+  for [kind, v] in items(s:data)
+    for item in v
+      " FIXME handle ctags -R better
+      let lnum_and_text = printf("%s:%s", item.lnum, item.text)
+      let relpath = item.tagfile
+      let row = printf("%s%s\t[%s]%s\t%s%s\t%s",
+            \ lnum_and_text, repeat(' ', max_len_lnum_and_text- strwidth(lnum_and_text)),
+            \ kind, repeat(' ', max_len_scope - strwidth(kind)),
+            \ relpath, repeat(' ', max_len_relpath - strwidth(relpath)),
+            \ item.taginfo)
+      call add(source, row)
+    endfor
+  endfor
+
+  return source
+endfunction
+
 " Find the maximum length of each column of items to be displayed
 function! s:FindMaxLen() abort
   let [max_len_scope, max_len_lnum_and_text] = [-1, -1]
@@ -31,19 +83,7 @@ function! s:AlignSource() abort
 
   for [kind, v] in items(s:data)
     for item in v
-      " FIXME handle ctags -R better
-      try
-        let line = vista#source#Line(item.lnum)
-      catch
-        if has_key(item, 'tagfile')
-          let line = item.tagfile
-          if has_key(item, 'taginfo')
-            let line .= "\t".item.taginfo
-          endif
-        else
-          let line = ''
-        endif
-      endtry
+      let line = vista#source#Line(item.lnum)
       let lnum_and_text = printf("%s:%s", item.lnum, item.text)
       let row = printf("%s%s\t[%s]%s\t%s",
             \ lnum_and_text, repeat(' ', max_len_lnum_and_text- strwidth(lnum_and_text)),
@@ -119,7 +159,7 @@ function! s:project_sink(line) abort
 endfunction
 
 function! s:ProjectRun(...) abort
-  let source = s:AlignSource()
+  let source = s:aligner.project_ctags()
   let prompt = (get(s:, 'using_alternative', v:false) ? '*' : '').s:cur_executive.'> '
   let opts = {
           \ 'source': source,
