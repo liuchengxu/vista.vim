@@ -134,7 +134,7 @@ endfunction
 
 function! s:ExtractLinewise(raw_data) abort
   let s:data = {}
-  call map(a:raw_data, 'vista#extracter#ExtractTag(v:val, s:data)')
+  call map(a:raw_data, 'vista#parser#ctags#ExtractTag(v:val, s:data)')
 endfunction
 
 function! s:AutoUpdate(fpath) abort
@@ -304,7 +304,7 @@ function! vista#executive#ctags#ProjectRun() abort
   endif
 
   let s:data = {}
-  call map(split(output, "\n"), 'vista#extracter#ExtractProjectTag(v:val, s:data)')
+  call map(split(output, "\n"), 'vista#parser#ctags#ExtractProjectTag(v:val, s:data)')
 
   return s:data
 endfunction

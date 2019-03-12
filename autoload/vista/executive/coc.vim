@@ -12,7 +12,7 @@ function! s:Extract(symbols) abort
   endif
 
   let s:data = {}
-  call map(a:symbols, 'vista#extracter#ExtractSymbol(v:val, s:data)')
+  call map(a:symbols, 'vista#parser#lsp#ExtractSymbol(v:val, s:data)')
 
   if empty(s:data)
     return
