@@ -37,7 +37,16 @@ endfunction
 function! vista#parser#ctags#ExtractProjectTag(line, container) abort
   " let cmd = "ctags -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
 
+  if a:line =~ '^ctags: Warning: ignoring null tag'
+    return
+  endif
+
   let items = split(a:line, '++++')
+
+  if len(items) != 5
+    call vista#util#Error('Splitted items is not expected: '.string(items))
+    return
+  endif
 
   call map(items, 'vista#util#Trim(v:val)')
 
