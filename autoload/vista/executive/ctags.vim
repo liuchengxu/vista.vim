@@ -37,7 +37,7 @@ let s:language_opt = {
       \ 'python'     : ['python'     , 'cmf']           ,
       \ 'rexx'       : ['rexx'       , 's']             ,
       \ 'ruby'       : ['ruby'       , 'cfFm']          ,
-      \ 'rust'       : ['rust'       , 'fTgsmctid']     ,
+      \ 'rust'       : ['rust'       , 'fgsmcti']     ,
       \ 'scheme'     : ['scheme'     , 'sf']            ,
       \ 'sh'         : ['sh'         , 'f']             ,
       \ 'csh'        : ['sh'         , 'f']             ,
@@ -134,7 +134,7 @@ endfunction
 
 function! s:ExtractLinewise(raw_data) abort
   let s:data = {}
-  call map(a:raw_data, 'vista#extracter#ExtractTag(v:val, s:data)')
+  call map(a:raw_data, 'vista#parser#ctags#ExtractTag(v:val, s:data)')
 endfunction
 
 function! s:AutoUpdate(fpath) abort
@@ -293,6 +293,27 @@ function! s:Execute(bang, should_display) abort
     call s:InitAutocmd()
     let s:did_init_autocmd = 1
   endif
+endfunction
+
+function! vista#executive#ctags#ProjectRun() abort
+  " https://github.com/universal-ctags/ctags/issues/2042
+  let exe = get(g:, 'vista_ctags_executable', 'ctags')
+  " Currently we use the `__xformat` option to be able to parse the output
+  " correctly. Once the `--output-format=json` of ctags installed by brew
+  " is supported by default, we should switch to more reliable json format.
+  let cmd = exe." -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
+
+  let output = system(cmd)
+  if v:shell_error
+    return vista#util#Error('Fail to run ctags: '.cmd)
+  endif
+
+  let Parser = function('vista#parser#ctags#ExtractProjectTag')
+
+  let s:data = {}
+  call map(split(output, "\n"), 'call(Parser, [v:val, s:data])')
+
+  return s:data
 endfunction
 
 function! s:Dispatch(F, ...) abort

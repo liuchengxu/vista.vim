@@ -14,7 +14,7 @@
 "   'text': 'testnet_genesis',
 " }
 "
-function! vista#extracter#ExtractTag(line, container) abort
+function! vista#parser#ctags#ExtractTag(line, container) abort
   " {tagname}<Tab>{tagfile}<Tab>{tagaddress}[;"<Tab>{tagfield}..]
   " {tagname}<Tab>{tagfile}<Tab>{tagaddress};"<Tab>{kind}<Tab>{scope}
   " ['vista#executive#ctags#Execute', '/Users/xlc/.vim/plugged/vista.vim/autoload/vista/executive/ctags.vim', '84;"', 'function']
@@ -34,15 +34,38 @@ function! vista#extracter#ExtractTag(line, container) abort
   endif
 endfunction
 
-" https://microsoft.github.io/language-server-protocol/specification#textDocument_documentSymbol
-function! vista#extracter#ExtractSymbol(symbol, container) abort
-  let symbol = a:symbol
+function! vista#parser#ctags#ExtractProjectTag(line, container) abort
+  " let cmd = "ctags -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
 
-  let picked = {'lnum': symbol.lnum, 'col': symbol.col, 'text': symbol.text}
+  if a:line =~ '^ctags: Warning: ignoring null tag'
+    return
+  endif
 
-  if has_key(a:container, symbol.kind)
-    call add(a:container[symbol.kind], picked)
+  let items = split(a:line, '++++')
+
+  if len(items) != 5
+    call vista#util#Error('Splitted items is not expected: '.string(items))
+    return
+  endif
+
+  call map(items, 'vista#util#Trim(v:val)')
+
+  " TAGNAME:
+  let tagname = items[0][8:]
+  " KIND:
+  let kind = items[1][5:]
+  " LINE:
+  let lnum = items[2][5:]
+  " INPUT-FILE:
+  let relpath = items[3][11:]
+  " PATTERN:
+  let pattern = items[4][8:]
+
+  let picked = {'lnum': lnum, 'text': tagname, 'tagfile': relpath, 'taginfo': pattern[2:-3]}
+
+  if has_key(a:container, kind)
+    call add(a:container[kind], picked)
   else
-    let a:container[symbol.kind] = [picked]
+    let a:container[kind] = [picked]
   endif
 endfunction
