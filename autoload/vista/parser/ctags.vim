@@ -38,17 +38,18 @@ function! vista#parser#ctags#ExtractProjectTag(line, container) abort
   " let cmd = "ctags -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
 
   let items = split(a:line, '++++')
+
   call map(items, 'vista#util#Trim(v:val)')
-  "'TAGNAME:'
+
+  " TAGNAME:
   let tagname = items[0][8:]
-  "'KIND:'
+  " KIND:
   let kind = items[1][5:]
-  "'LINE:'
+  " LINE:
   let lnum = items[2][5:]
-  "'INPUT-FILE:'
+  " INPUT-FILE:
   let relpath = items[3][11:]
-  let extention = fnamemodify(relpath, ':e')
-  "'PATTERN:'
+  " PATTERN:
   let pattern = items[4][8:]
 
   let picked = {'lnum': lnum, 'text': tagname, 'tagfile': relpath, 'taginfo': pattern[2:-3]}

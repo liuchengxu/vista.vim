@@ -296,7 +296,13 @@ function! s:Execute(bang, should_display) abort
 endfunction
 
 function! vista#executive#ctags#ProjectRun() abort
-  let cmd = "ctags -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
+  " https://github.com/universal-ctags/ctags/issues/2042
+  let exe = get(g:, 'vista_ctags_executable', 'ctags')
+  " Currently we use the `__xformat` option to be able to parse the output
+  " correctly. Once the `--output-format=json` of ctags installed by brew
+  " is supported by default, we should switch to more reliable json format.
+  let cmd = exe." -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
+
   let output = system(cmd)
   if v:shell_error
     return vista#util#Error('Fail to run ctags: '.cmd)

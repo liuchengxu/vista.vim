@@ -99,9 +99,20 @@ Vista                                                                      *Vist
 
   Open vista window for viewing tags or LSP symbols.
 
-  `:Vista [EXECUTIVE]` open vista window for ctags/coc.
+  `:Vista`: same with `:Vista ctags` .
 
-  `:Vista finder [EXECUTIVE]`: search tags/symbols generated from ctags/coc.
+  `:Vista ctags`: open vista window based on ctags.
+
+  `:Vista coc`: open vista window based on coc.nvim.
+
+  `:Vista finder`: same with `:Vista finder ctags` .
+
+  `:Vista finder!`: search tags recursively. Note: it's still experimental.
+  What's more, it may be very slow to generate all tags in a whole project.
+
+  `:Vista finder ctags`: search tags provided by ctags.
+
+  `:Vista finder coc`: search symbols provided by coc.nvim.
 
 Vista!                                                                    *Vista!*
 
