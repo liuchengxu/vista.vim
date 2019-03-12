@@ -35,19 +35,27 @@ function! vista#parser#ctags#ExtractTag(line, container) abort
 endfunction
 
 function! vista#parser#ctags#ExtractProjectTag(line, container) abort
-  let g:line = a:line
-  let lnum_idx = match(a:line, '\<\d\+\>')
-  let lnum = matchstr(a:line, '\<\d\+\>')
-  let [tagname, scope] = filter(split(a:line[:lnum_idx-1], '\s'), '!empty(v:val)')
-  let rest = split(a:line[lnum_idx+len(lnum):], '\s')
-  let tagfile = rest[0]
-  let taginfo = join(rest[1:])
+  " let cmd = "ctags -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
 
-  let picked = {'lnum': lnum, 'text': tagname, 'tagfile': tagfile, 'taginfo': taginfo}
+  let items = split(a:line, '++++')
+  call map(items, 'vista#util#Trim(v:val)')
+  "'TAGNAME:'
+  let tagname = items[0][8:]
+  "'KIND:'
+  let kind = items[1][5:]
+  "'LINE:'
+  let lnum = items[2][5:]
+  "'INPUT-FILE:'
+  let relpath = items[3][11:]
+  let extention = fnamemodify(relpath, ':e')
+  "'PATTERN:'
+  let pattern = items[4][8:]
 
-  if has_key(a:container, scope)
-    call add(a:container[scope], picked)
+  let picked = {'lnum': lnum, 'text': tagname, 'tagfile': relpath, 'taginfo': pattern[2:-3]}
+
+  if has_key(a:container, kind)
+    call add(a:container[kind], picked)
   else
-    let a:container[scope] = [picked]
+    let a:container[kind] = [picked]
   endif
 endfunction

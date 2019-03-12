@@ -296,15 +296,16 @@ function! s:Execute(bang, should_display) abort
 endfunction
 
 function! vista#executive#ctags#ProjectRun() abort
-  let cmd = 'ctags -R -x'
-
+  let cmd = "ctags -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
   let output = system(cmd)
   if v:shell_error
     return vista#util#Error('Fail to run ctags: '.cmd)
   endif
 
+  let Parser = function('vista#parser#ctags#ExtractProjectTag')
+
   let s:data = {}
-  call map(split(output, "\n"), 'vista#parser#ctags#ExtractProjectTag(v:val, s:data)')
+  call map(split(output, "\n"), 'call(Parser, [v:val, s:data])')
 
   return s:data
 endfunction
