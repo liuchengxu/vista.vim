@@ -154,7 +154,7 @@ endfunction
 function! s:ApplyRun(cmd) abort
   let output = system(a:cmd)
   if v:shell_error
-    return vista#util#Error('Fail to run ctags: '.a:cmd)
+    return vista#error#('Fail to run ctags: '.a:cmd)
   endif
 
   let s:cache = get(s:, 'cache', {})
@@ -220,7 +220,7 @@ function! s:IntoTemp(...) abort
   if writefile(lines, tmp) == 0
     return tmp
   else
-    return vista#util#Error('Fail to write into a temp file.')
+    return vista#error#('Fail to write into a temp file.')
   endif
 endfunction
 
@@ -246,7 +246,7 @@ function! s:ApplyExecute(bang, fpath) abort
     let s:id = s:ApplyRunAsync(cmd)
 
     if s:id == 0
-      call vista#util#Error('Fail to execute ctags on file: '.a:fpath)
+      call vista#error#('Fail to execute ctags on file: '.a:fpath)
     endif
   endif
 endfunction
@@ -280,7 +280,7 @@ function! s:RunAsync(fpath) abort
   let s:id = s:ApplyRunAsync(cmd)
 
   if !s:id
-    call vista#util#Error('Fail to execute ctags on file: '.a:fpath)
+    call vista#error#('Fail to execute ctags on file: '.a:fpath)
   endif
 endfunction
 
@@ -305,7 +305,7 @@ function! vista#executive#ctags#ProjectRun() abort
 
   let output = system(cmd)
   if v:shell_error
-    return vista#util#Error('Fail to run ctags: '.cmd)
+    return vista#error#('Fail to run ctags: '.cmd)
   endif
 
   let Parser = function('vista#parser#ctags#ExtractProjectTag')
@@ -323,7 +323,7 @@ function! s:Dispatch(F, ...) abort
   let exe = custom_cmd isnot v:null ? split(custom_cmd)[0] : 'ctags'
 
   if !executable(exe)
-    call vista#util#Error('You must have '.exe.' installed for '.ft.' to continue.')
+    call vista#error#Need(exe)
     return
   endif
 
