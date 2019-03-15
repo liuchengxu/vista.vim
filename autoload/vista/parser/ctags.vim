@@ -44,7 +44,7 @@ function! vista#parser#ctags#ExtractProjectTag(line, container) abort
   let items = split(a:line, '++++')
 
   if len(items) != 5
-    call vista#util#Error('Splitted items is not expected: '.string(items))
+    call vista#error#('Splitted items is not expected: '.string(items))
     return
   endif
 

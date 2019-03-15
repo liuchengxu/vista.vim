@@ -198,7 +198,7 @@ function! s:TryAlternatives(tried, fpath) abort
   " TODO when more executives added allow configuring this list
   let executives = get(g:, 'vista_finder_alternative_executives', g:vista#executives)
 
-  let alternatives = filter(executives, 'v:val != a:tried')
+  let alternatives = filter(copy(executives), 'v:val != a:tried')
 
   for alternative in alternatives
     let s:data = vista#executive#{alternative}#Run(a:fpath)
@@ -228,11 +228,16 @@ endfunction
 " Ctags is the default.
 function! vista#finder#fzf#Run(...) abort
   if !exists('*fzf#run')
-    call vista#util#Error('You must have fzf installed to continue.')
+    call vista#error#Need('fzf')
     return
   endif
 
   let executive = a:0 > 0 ? a:1 : 'ctags'
+
+  if index(g:vista#executives, executive) == -1
+    call vista#error#InvalidExecutive(executive)
+    return
+  endif
 
   let cache = vista#executive#{executive}#Cache()
   let skip = vista#ShouldSkip()

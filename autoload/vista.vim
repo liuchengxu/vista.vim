@@ -26,10 +26,10 @@ function! vista#(bang, ...) abort
         call vista#sidebar#Toggle()
         return
       else
-        return vista#util#Error('Invalid args. expected: Vista!!')
+        return vista#error#Expect('Vista!!')
       endif
     else
-      return vista#util#Error('Invalid args. expected: Vista![!]')
+      return vista#error#Expect('Vista![!]')
     endif
   endif
 
@@ -49,16 +49,16 @@ function! vista#(bang, ...) abort
     elseif a:1 == 'finder!'
       call vista#finder#fzf#ProjectRun()
     else
-      return vista#util#Error("Invalid args. expected: Vista [EXECUTIVE | finder]")
+      return vista#error#Expect("Vista [EXECUTIVE | finder]")
     endif
   elseif a:0 == 2
     if a:1 !=# 'finder'
-      return vista#util#Error("Invalid args. expected: Vista finder [EXECUTIVE]")
+      return vista#error#Expect("Vista finder [EXECUTIVE]")
     endif
     call vista#finder#fzf#Run(a:2)
     return
   else
-    return vista#util#Error("Too many arguments for Vista")
+    return vista#error#("Too many arguments for Vista")
   endif
 endfunction
 

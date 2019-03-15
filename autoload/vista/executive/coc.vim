@@ -45,7 +45,7 @@ function! s:Cb(error, response) abort
     endif
     call s:Extract(a:response)
   else
-    call vista#util#Warning("Error when calling CocActionAsync('documentSymbols')")
+    call vista#error#("Error when calling CocActionAsync('documentSymbols')")
   endif
 endfunction
 
@@ -110,7 +110,7 @@ endfunction
 
 function! s:Dispatch(F, ...) abort
   if !exists('*CocActionAsync')
-    call vista#util#Error('You must have coc.nvim installed to continue.')
+    call vista#error#Need('coc.nvim')
     return
   endif
 

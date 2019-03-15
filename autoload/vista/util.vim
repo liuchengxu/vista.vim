@@ -93,12 +93,6 @@ function! vista#util#Warning(msg) abort
   echohl NONE
 endfunction
 
-function! vista#util#Error(msg) abort
-  echohl ErrorMsg
-  echom '[vista.vim] '.a:msg
-  echohl NONE
-endfunction
-
 function! vista#util#Complete(A, L, P) abort
   let cmd = ['coc', 'ctags', 'finder']
   let args = split(a:L)
