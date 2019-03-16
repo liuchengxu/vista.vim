@@ -79,7 +79,18 @@ function! s:ShowDetail() abort
 
   let msg = vista#util#Truncate(line)
 
-  call s:EchoInCmdline(msg, tag)
+  if exists('*nvim_open_win')
+    silent! call timer_stop(s:floating_timer)
+
+    " TODO the msg could be more fruitful when using floating window
+    let delay = get(g:, 'vista_floating_delay', 100)
+    let s:floating_timer = timer_start(
+          \ delay,
+          \ { -> vista#floating#Display(msg)},
+          \ )
+  else
+    call s:EchoInCmdline(msg, tag)
+  endif
 endfunction
 
 function! vista#cursor#ShowDetail(_timer) abort
