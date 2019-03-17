@@ -149,6 +149,18 @@ g:vista_cursor_delay                                        *g:vista_cursor_dela
 
   Time delay for showing detailed symbol info at current cursor.
 
+g:vista_echo_cursor_strategy                         *g:vista_echo_cursor_strategy*
+  Type: |String|
+  Default: `echo`
+
+  How to show the detailed formation of current cursor symbol. Avaliable
+  options:
+
+  `echo`         - echo in the cmdline.
+  `floating_win` - display in neovim's floating window. See if you have the
+  floating window support via `:echo exists(*nvim_open_win)` .
+  `both`         - both `echo` and `floating_win` will be used.
+
 g:vista_close_on_jump                                      *g:vista_close_on_jump*
   Type: |Number|
   Default: `0`
@@ -220,6 +232,7 @@ g:vista_finder_alternative_executives       *g:vista_finder_alternative_executiv
 
   Fall back to other executives if the specified one gives empty data.
   By default it's all the provided executives excluding the tried one.
+
 
 --------------------------------------------------------------------------------
 CONTRIBUTING                                                  *vista-contributing*
