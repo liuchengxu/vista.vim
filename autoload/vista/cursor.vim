@@ -79,10 +79,19 @@ function! s:ShowDetail() abort
 
   let msg = vista#util#Truncate(line)
 
-  if exists('*nvim_open_win') && get(g:, 'vista_use_floating_win', 0)
+  let strategy = get(g:, 'vista_echo_cursor_strategy', 'echo')
+  let avaliable = ['echo', 'floating_win', 'both']
+  if strategy == avaliable[0]
+    call s:EchoInCmdline(msg, tag)
+  elseif strategy == avaliable[1]
+    if exists('*nvim_open_win')
+      call vista#floating#Display(getline('.'), tag)
+    endif
+  elseif strategy == avaliable[2]
+    call s:EchoInCmdline(msg, tag)
     call vista#floating#Display(getline('.'), tag)
   else
-    call s:EchoInCmdline(msg, tag)
+    call vista#error#InvalidOption('g:vista_echo_cursor_strategy', avaliable)
   endif
 endfunction
 

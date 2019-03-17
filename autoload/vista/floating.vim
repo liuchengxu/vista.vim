@@ -5,9 +5,9 @@
 let s:floating_timer = -1
 
 " Vista sidebar window usually sits at the right side.
-function! s:CalculatePosition(lines, pos) abort
+function! s:CalculatePosition(lines) abort
   let lines = a:lines
-  let pos = a:pos
+  let pos = s:floating_opened_pos
 
   let width = -1
 
@@ -52,45 +52,39 @@ function! s:CalculatePosition(lines, pos) abort
 endfunction
 
 function! s:CloseOnCursorMoved() abort
-  if exists('s:floating_win_id')
-    " To avoid closing floating window immediately, check the cursor
-    " was really moved
-    if getpos('.') == s:floating_opened_pos
-      return
-    endif
-
-    autocmd! VistaFloatingWin
-
-    let winnr = win_id2win(s:floating_win_id)
-
-    if winnr == 0
-      return
-    endif
-
-    execute winnr.'wincmd c'
-    unlet s:floating_win_id
+  " To avoid closing floating window immediately, check the cursor
+  " was really moved
+  if getpos('.') == s:floating_opened_pos
+    return
   endif
+
+  autocmd! VistaFloatingWin
+
+  let winnr = win_id2win(s:floating_win_id)
+
+  if winnr == 0
+    return
+  endif
+
+  execute winnr.'wincmd c'
 endfunction
 
 function! s:CloseOnWinEnter() abort
-  if exists('s:floating_win_id')
-    let winnr = win_id2win(s:floating_win_id)
+  let winnr = win_id2win(s:floating_win_id)
 
-    " Floating window has been closed already.
-    if winnr == 0
-      autocmd! VistaFloatingWin
-      return
-    endif
-
-    " We are just in the floating window. Do not close it
-    if winnr == winnr()
-      return
-    endif
-
+  " Floating window has been closed already.
+  if winnr == 0
     autocmd! VistaFloatingWin
-    execute winnr.'wincmd c'
-    unlet s:floating_win_id
+    return
   endif
+
+  " We are just in the floating window. Do not close it
+  if winnr == winnr()
+    return
+  endif
+
+  autocmd! VistaFloatingWin
+  execute winnr.'wincmd c'
 endfunction
 
 function! s:Display(msg) abort
@@ -102,10 +96,13 @@ function! s:Display(msg) abort
     let s:floating_bufnr = nvim_create_buf(v:false, v:false)
   endif
 
-  let [width, height, anchor, row, col] = s:CalculatePosition(a:msg, s:floating_opened_pos)
+  let [width, height, anchor, row, col] = s:CalculatePosition(a:msg)
 
-  let s:floating_win_id = nvim_open_win(
-        \ s:floating_bufnr, v:true, width, height, {
+  " silent is neccessary for the both strategy!
+  silent let s:floating_win_id = nvim_open_win(
+        \ s:floating_bufnr, v:true, {
+        \   'width': width,
+        \   'height': height,
         \   'relative': 'cursor',
         \   'anchor': anchor,
         \   'row': row + 0.4,
@@ -134,8 +131,7 @@ function! s:Display(msg) abort
   augroup VistaFloatingWin
     autocmd!
     autocmd CursorMoved <buffer> call s:CloseOnCursorMoved()
-    autocmd WinLeave * call s:CloseOnWinEnter()
-    autocmd WinEnter * call s:CloseOnWinEnter()
+    autocmd BufEnter,WinEnter,WinLeave  * call s:CloseOnWinEnter()
   augroup END
 endfunction
 
