@@ -18,9 +18,9 @@ endfunction
 function! vista#source#GotoWin() abort
   let winnr = t:vista.source.winnr
   noautocmd execute winnr."wincmd w"
-  " Floating window relys on WinEnter event to be closed automatically.
+  " Floating window relys on BufEnter event to be closed automatically.
   if exists('*nvim_open_win')
-    doautocmd WinEnter VistaFloatingWin
+    doautocmd BufEnter VistaFloatingWin
   endif
 endfunction
 
