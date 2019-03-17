@@ -111,7 +111,7 @@ function! s:Display(msg) abort
 
   call nvim_buf_set_lines(s:floating_bufnr, 0, -1, 0, a:msg)
 
-  if exists('s:lnum')
+  if exists('s:start')
     call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:lnum, s:start-2, s:end)
   endif
 
