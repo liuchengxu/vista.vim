@@ -80,7 +80,7 @@ function! s:ShowDetail() abort
   let msg = vista#util#Truncate(line)
 
   if exists('*nvim_open_win')
-    call vista#floating#Display(msg)
+    call vista#floating#Display(getline('.'), tag)
   else
     call s:EchoInCmdline(msg, tag)
   endif

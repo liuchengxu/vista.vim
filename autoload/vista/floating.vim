@@ -36,12 +36,15 @@ function! s:CalculatePosition(lines, pos) abort
     let row = 0
   endif
 
+  " TODO should be tweaked accroding to the position of vista sidebar
+  let hors = ['E', 'W']
+
   " West first, fallback into East if there is no enough space.
   if pos[2] + width <= &columns
-    let hor = 'W'
+    let hor = hors[0]
     let col = 0
   else
-    let hor = 'E'
+    let hor = hors[1]
     let col = 1
   endif
 
@@ -99,7 +102,7 @@ function! s:Display(msg) abort
     let s:floating_bufnr = nvim_create_buf(v:false, v:false)
   endif
 
-  let [width, height, anchor, row, col] = s:CalculatePosition([a:msg], s:floating_opened_pos)
+  let [width, height, anchor, row, col] = s:CalculatePosition(a:msg, s:floating_opened_pos)
 
   let s:floating_win_id = nvim_open_win(
         \ s:floating_bufnr, v:true, width, height, {
@@ -109,14 +112,18 @@ function! s:Display(msg) abort
         \   'col': col - 5,
         \ })
 
-  call nvim_buf_set_lines(s:floating_bufnr, 0, -1, 0, [a:msg])
+  call nvim_buf_set_lines(s:floating_bufnr, 0, -1, 0, a:msg)
 
-  setlocal number
+  if exists('s:lnum')
+    call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:lnum, s:start-2, s:end)
+  endif
+
   setlocal
         \ winhl=Normal:Pmenu
         \ buftype=nofile
         \ nobuflisted
         \ bufhidden=hide
+        \ nonumber
         \ norelativenumber
         \ signcolumn=no
 
@@ -127,17 +134,35 @@ function! s:Display(msg) abort
   augroup VistaFloatingWin
     autocmd!
     autocmd CursorMoved <buffer> call s:CloseOnCursorMoved()
+    autocmd WinLeave * call s:CloseOnWinEnter()
     autocmd WinEnter * call s:CloseOnWinEnter()
   augroup END
 endfunction
 
-function! vista#floating#Display(msg) abort
+function! vista#floating#Display(msg, tag) abort
   silent! call timer_stop(s:floating_timer)
+  silent! unlet s:start s:end s:lnum
+
+  let [_, start, end] = matchstrpos(a:msg, '\C'.a:tag)
+  if start != -1
+    let [s:start, s:end] = [start, end]
+  endif
+
+  let lnum = str2nr(split(a:msg, ':')[-1])
+
+  " FIXME correct tag height
+  if lnum < 6
+    let s:lnum = lnum
+  else
+    let s:lnum = 5
+  endif
+
+  let lines = getbufline(t:vista.source.bufnr, lnum-5 > 1 ? lnum -5 : 1, lnum+5)
 
   " TODO the msg could be more fruitful when using floating window
   let delay = get(g:, 'vista_floating_delay', 100)
   let s:floating_timer = timer_start(
         \ delay,
-        \ { -> s:Display(a:msg)},
+        \ { -> s:Display(lines)},
         \ )
 endfunction
