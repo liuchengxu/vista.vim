@@ -2,6 +2,8 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
+let s:floating_timer = -1
+
 " Vista sidebar window usually sits at the right side.
 function! s:CalculatePosition(lines, pos) abort
   let lines = a:lines
@@ -88,7 +90,8 @@ function! s:CloseOnWinEnter() abort
   endif
 endfunction
 
-function! vista#floating#Display(msg) abort
+function! s:Display(msg) abort
+  let msg = a:msg
 
   let s:floating_opened_pos = getpos('.')
 
@@ -126,5 +129,15 @@ function! vista#floating#Display(msg) abort
     autocmd CursorMoved <buffer> call s:CloseOnCursorMoved()
     autocmd WinEnter * call s:CloseOnWinEnter()
   augroup END
+endfunction
 
+function! vista#floating#Display(msg) abort
+  silent! call timer_stop(s:floating_timer)
+
+  " TODO the msg could be more fruitful when using floating window
+  let delay = get(g:, 'vista_floating_delay', 100)
+  let s:floating_timer = timer_start(
+        \ delay,
+        \ { -> s:Display(a:msg)},
+        \ )
 endfunction
