@@ -5,6 +5,7 @@
 let s:floating_timer = -1
 
 " Vista sidebar window usually sits at the right side.
+" TODO improve me!
 function! s:CalculatePosition(lines) abort
   let lines = a:lines
   let pos = s:floating_opened_pos
@@ -53,7 +54,7 @@ endfunction
 
 function! s:CloseOnCursorMoved() abort
   " To avoid closing floating window immediately, check the cursor
-  " was really moved
+  " was really moved.
   if getpos('.') == s:floating_opened_pos
     return
   endif
@@ -90,12 +91,11 @@ endfunction
 function! s:Display(msg) abort
   let msg = a:msg
 
-  let s:floating_opened_pos = getpos('.')
-
   if !exists('s:floating_bufnr') || !bufexists(s:floating_bufnr)
     let s:floating_bufnr = nvim_create_buf(v:false, v:false)
   endif
 
+  let s:floating_opened_pos = getpos('.')
   let [width, height, anchor, row, col] = s:CalculatePosition(a:msg)
 
   " silent is neccessary for the both strategy!
@@ -111,6 +111,7 @@ function! s:Display(msg) abort
 
   call nvim_buf_set_lines(s:floating_bufnr, 0, -1, 0, a:msg)
 
+  " FIXME current highlight is problematic.
   if exists('s:start')
     call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:lnum, s:start-2, s:end)
   endif
@@ -140,6 +141,7 @@ function! vista#floating#Display(msg, tag) abort
   silent! unlet s:start s:end s:lnum
 
   let [_, start, end] = matchstrpos(a:msg, '\C'.a:tag)
+
   if start != -1
     let [s:start, s:end] = [start, end]
   endif
@@ -147,13 +149,9 @@ function! vista#floating#Display(msg, tag) abort
   let lnum = str2nr(split(a:msg, ':')[-1])
 
   " FIXME correct tag height
-  if lnum < 6
-    let s:lnum = lnum
-  else
-    let s:lnum = 5
-  endif
+  let s:lnum = lnum < 6 ? lnum : 5
 
-  let lines = getbufline(t:vista.source.bufnr, lnum-5 > 1 ? lnum -5 : 1, lnum+5)
+  let lines = getbufline(t:vista.source.bufnr, lnum - 5 > 1 ? lnum - 5 : 1, lnum + 5)
 
   " TODO the msg could be more fruitful when using floating window
   let delay = get(g:, 'vista_floating_delay', 100)
