@@ -249,7 +249,7 @@ function! s:ApplyExecute(bang, fpath) abort
     let s:id = s:ApplyRunAsync(cmd)
 
     if s:id == 0
-      call vista#error#('Fail to execute ctags on file: '.a:fpath)
+      call vista#error#RunCtags(cmd)
     endif
   endif
 endfunction
@@ -298,30 +298,6 @@ function! s:Execute(bang, should_display) abort
   endif
 endfunction
 
-function! vista#executive#ctags#ProjectRun() abort
-  if s:support_json_format
-    let cmd = s:ctags." -R -x --output-format=json --fields=+n"
-    let Parser = function('vista#parser#ctags#ProjectTagFromJSON')
-  else
-    " https://github.com/universal-ctags/ctags/issues/2042
-    " Currently we use the `__xformat` option to be able to parse the output
-    " correctly. Once the `--output-format=json` of ctags installed by brew
-    " is supported by default, we should switch to more reliable json format.
-    let cmd = s:ctags." -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
-    let Parser = function('vista#parser#ctags#ProjectTagFromXformat')
-  endif
-
-  let output = system(cmd)
-  if v:shell_error
-    return vista#error#RunCtags(cmd)
-  endif
-
-  let s:data = {}
-  call map(split(output, "\n"), 'call(Parser, [v:val, s:data])')
-
-  return s:data
-endfunction
-
 function! s:Dispatch(F, ...) abort
   let ft = &filetype
   let custom_cmd = s:GetCustomCmd(ft)
@@ -348,4 +324,28 @@ endfunction
 
 function! vista#executive#ctags#Execute(bang, should_display) abort
   return s:Dispatch('s:Execute', a:bang, a:should_display)
+endfunction
+
+function! vista#executive#ctags#ProjectRun() abort
+  if s:support_json_format
+    let cmd = s:ctags." -R -x --output-format=json --fields=+n"
+    let Parser = function('vista#parser#ctags#ProjectTagFromJSON')
+  else
+    " https://github.com/universal-ctags/ctags/issues/2042
+    " Currently we use the `__xformat` option to be able to parse the output
+    " correctly. Once the `--output-format=json` of ctags installed by brew
+    " is supported by default, we should switch to more reliable json format.
+    let cmd = s:ctags." -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
+    let Parser = function('vista#parser#ctags#ProjectTagFromXformat')
+  endif
+
+  let output = system(cmd)
+  if v:shell_error
+    return vista#error#RunCtags(cmd)
+  endif
+
+  let s:data = {}
+  call map(split(output, "\n"), 'call(Parser, [v:val, s:data])')
+
+  return s:data
 endfunction
