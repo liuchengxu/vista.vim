@@ -69,3 +69,25 @@ function! vista#parser#ctags#ExtractProjectTag(line, container) abort
     let a:container[kind] = [picked]
   endif
 endfunction
+
+function! vista#parser#ctags#FromJSON(line, container) abort
+  " {
+  "  "_type":"tag",
+  "  "name":"vista#source#Update",
+  "  "path":"autoload/vista/source.vim",
+  "  "pattern":"/^function! vista#source#Update(bufnr, winnr, ...) abort$/",
+  "  "line":29,
+  "  "kind":"function"
+  " }
+  let line = json_decode(a:line)
+
+  let kind = line.kind
+
+  let picked = {'lnum': line.line, 'text': line.name, 'tagfile': line.path, 'taginfo': line.pattern[2:-3]}
+
+  if has_key(a:container, kind)
+    call add(a:container[kind], picked)
+  else
+    let a:container[kind] = [picked]
+  endif
+endfunction
