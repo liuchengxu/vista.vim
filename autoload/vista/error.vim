@@ -35,6 +35,12 @@ function! vista#error#InvalidExecutive(exe) abort
   call s:Echon('Underlined', string(g:vista#executives))
 endfunction
 
+function! vista#error#RunCtags(cmd) abort
+  call s:Echom('ErrorMsg', '[vista.vim]')
+  call s:Echon('Normal', 'Fail to run ctags given the command: ')
+  call s:Echon('Underlined', a:cmd)
+endfunction
+
 function! vista#error#ParseError() abort
 endfunction
 

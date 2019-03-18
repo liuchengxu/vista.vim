@@ -34,7 +34,7 @@ function! vista#parser#ctags#ExtractTag(line, container) abort
   endif
 endfunction
 
-function! vista#parser#ctags#ExtractProjectTag(line, container) abort
+function! vista#parser#ctags#ProjectTagFromXformat(line, container) abort
   " let cmd = "ctags -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
 
   if a:line =~ '^ctags: Warning: ignoring null tag'
@@ -70,7 +70,7 @@ function! vista#parser#ctags#ExtractProjectTag(line, container) abort
   endif
 endfunction
 
-function! vista#parser#ctags#FromJSON(line, container) abort
+function! vista#parser#ctags#ProjectTagFromJSON(line, container) abort
   " {
   "  "_type":"tag",
   "  "name":"vista#source#Update",

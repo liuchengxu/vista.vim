@@ -96,7 +96,7 @@ $ git clone https://github.com/liuchengxu/vista.vim.git --depth=1 ~/.local/share
 
 ## Usage
 
-The following instructions are not complete, please see help via `:help vista` for more detailed usage.
+:warning: The following instructions are not complete, **please see the help via `:help vista` for more detailed usage**.
 
 ### Commands
 
