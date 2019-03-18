@@ -68,6 +68,14 @@ function! s:EchoInCmdline(msg, tag) abort
   echohl Statement | echon msg[end:]        | echohl NONE
 endfunction
 
+function! s:DisplayInFloatingWin(...) abort
+  if exists('*nvim_open_win')
+    call call('vista#floating#Display', a:000)
+  else
+    call vista#error#Need('neovim compiled with floating window support')
+  endif
+endfunction
+
 " Show the detail of current tag/symbol under cursor.
 function! s:ShowDetail() abort
   let [tag, line] = s:GetInfoUnderCursor()
@@ -79,7 +87,18 @@ function! s:ShowDetail() abort
 
   let msg = vista#util#Truncate(line)
 
-  call s:EchoInCmdline(msg, tag)
+  let strategy = get(g:, 'vista_echo_cursor_strategy', 'echo')
+  let avaliable = ['echo', 'floating_win', 'both']
+  if strategy == avaliable[0]
+    call s:EchoInCmdline(msg, tag)
+  elseif strategy == avaliable[1]
+    call s:DisplayInFloatingWin(getline('.'), tag)
+  elseif strategy == avaliable[2]
+    call s:EchoInCmdline(msg, tag)
+    call s:DisplayInFloatingWin(getline('.'), tag)
+  else
+    call vista#error#InvalidOption('g:vista_echo_cursor_strategy', avaliable)
+  endif
 endfunction
 
 function! vista#cursor#ShowDetail(_timer) abort

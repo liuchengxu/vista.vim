@@ -38,6 +38,12 @@ endfunction
 function! vista#error#ParseError() abort
 endfunction
 
+function! vista#error#InvalidOption(opt, ...) abort
+  call s:Echom('ErrorMsg', '[vista.vim]')
+  call s:Echon('Normal', ' Invalid option '.a:opt.'. Avaliable: ')
+  call s:Echon('Underlined', a:0 > 0 ? string(a:1) : '')
+endfunction
+
 function! vista#error#(msg) abort
   call s:Echom('ErrorMsg', '[vista.vim]')
   call s:Echon('Normal', a:msg)

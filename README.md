@@ -43,7 +43,7 @@ Vista.vim can also be a symbol navigator similar to [ctrlp-funky](https://github
     - [ ] [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
 - [x] Finder for tags and LSP symbols.
     - [x] [fzf](https://github.com/junegunn/fzf)
-- [x] Display decent detailed symbol info in cmdline.
+- [x] Display decent detailed symbol info in cmdline, also supports neovim's floating window.
 - [x] Jump to the tag/symbol from vista sidebar with a blink.
 - [x] Update automatically when switching between buffers.
 - [x] Update asynchonously in the background when `+job` avaliable.

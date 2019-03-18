@@ -107,7 +107,7 @@ function! s:close_cb(channel)
 
   while ch_status(a:channel, {'part': 'out'}) ==# 'buffered'
     let line = ch_read(a:channel)
-    call vista#extracter#ExtractTag(line, s:data)
+    call vista#parser#ctags#ExtractTag(line, s:data)
   endwhile
 
   call s:ApplyExtracted()
