@@ -110,11 +110,11 @@ function! vista#cursor#ShowDetail(_timer) abort
   " scope line
   if cur_line[-1:] ==# ']'
     let splitted = split(cur_line)
-    " Join the scope parts in case of they contains spaces, e.g., structure names 
+    " Join the scope parts in case of they contains spaces, e.g., structure names
     let scope = join(splitted[1:-2], ' ')
-    let count = matchstr(splitted[-1], '\d\+') 
+    let cnt = matchstr(splitted[-1], '\d\+')
     echohl Keyword  | echo '['.scope.']: ' | echohl NONE
-    echohl Function | echon count          | echohl NONE
+    echohl Function | echon cnt          | echohl NONE
     return
   endif
 
