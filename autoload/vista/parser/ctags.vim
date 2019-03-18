@@ -34,6 +34,20 @@ function! vista#parser#ctags#ExtractTag(line, container) abort
   endif
 endfunction
 
+function! vista#parser#ctags#TagFromJSON(line, container) abort
+  let line = json_decode(a:line)
+
+  let kind = line.kind
+
+  let picked = {'lnum': line.line, 'text': line.name }
+
+  if has_key(a:container, kind)
+    call add(a:container[kind], picked)
+  else
+    let a:container[kind] = [picked]
+  endif
+endfunction
+
 function! vista#parser#ctags#ProjectTagFromXformat(line, container) abort
   " let cmd = "ctags -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
 

@@ -91,7 +91,13 @@ function! s:Cmd(file) abort
   endif
 
   " TODO vista_ctags_{filetype}_executable
-  let cmd = printf('%s --excmd=number --sort=no --fields=Ks %s -f- %s', s:ctags, opt, a:file)
+  if s:support_json_format
+    let cmd = printf('%s --excmd=number --sort=no --fields=Ks  --fields=+n --output-format=json %s -f- %s', s:ctags, opt, a:file)
+    let s:TagParser = function('vista#parser#ctags#TagFromJSON')
+  else
+    let cmd = printf('%s --excmd=number --sort=no --fields=Ks %s -f- %s', s:ctags, opt, a:file)
+    let s:TagParser = function('vista#parser#ctags#ExtractTag')
+  endif
 
   return cmd
 endfunction
@@ -110,7 +116,7 @@ function! s:close_cb(channel)
 
   while ch_status(a:channel, {'part': 'out'}) ==# 'buffered'
     let line = ch_read(a:channel)
-    call vista#parser#ctags#ExtractTag(line, s:data)
+    call call(s:TagParser, [line, s:data])
   endwhile
 
   call s:ApplyExtracted()
@@ -137,7 +143,7 @@ endfunction
 
 function! s:ExtractLinewise(raw_data) abort
   let s:data = {}
-  call map(a:raw_data, 'vista#parser#ctags#ExtractTag(v:val, s:data)')
+  call map(a:raw_data, 'call(s:TagParser, [v:val, s:data])')
 endfunction
 
 function! s:AutoUpdate(fpath) abort
