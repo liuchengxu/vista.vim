@@ -58,10 +58,15 @@ function! s:EchoInCmdline(msg, tag) abort
     if !empty(pieces)
       let scope = pieces[1]
       echohl Function  | echo '['.scope.'] '  | echohl NONE
-      echohl Statement | echon msg[0:start-1] | echohl NONE
+      " if start is 0, msg[0:-1] will display the redundant whole msg.
+      if start != 0
+        echohl Statement | echon msg[0:start-1] | echohl NONE
+      endif
     endif
   else
-    echohl Statement | echo msg[0:start-1] | echohl NONE
+    if start != 0
+      echohl Statement | echo msg[0:start-1] | echohl NONE
+    endif
   endif
 
   echohl Search    | echon msg[start:end-1] | echohl NONE
