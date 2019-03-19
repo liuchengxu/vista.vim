@@ -16,6 +16,17 @@ function! vista#ShouldSkip() abort
         \ || index(blacklist, &filetype) > -1
 endfunction
 
+function! vista#statusline() abort
+  let fname = get(t:vista.source, 'fname', '')
+  " TODO show current provider
+  let provider = get(t:vista, 'provider', '')
+  if !empty(provider)
+    return '[Vista] '.provider.' %<'.fname
+  else
+    return '[Vista] %<'.fname
+  endif
+endfunction
+
 function! vista#(bang, ...) abort
   if a:bang
     if a:0 == 0
@@ -60,19 +71,4 @@ function! vista#(bang, ...) abort
   else
     return vista#error#("Too many arguments for Vista")
   endif
-endfunction
-
-function! vista#statusline() abort
-  let fname = get(t:vista.source, 'fname', '')
-  " TODO show current provider
-  let provider = get(t:vista, 'provider', '')
-  if !empty(provider)
-    return '[Vista] '.provider.' %<'.fname
-  else
-    return '[Vista] %<'.fname
-  endif
-endfunction
-
-function! vista#SetStatusLine() abort
-  let &l:statusline = vista#statusline()
 endfunction

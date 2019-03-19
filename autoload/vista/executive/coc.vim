@@ -58,7 +58,7 @@ function! s:InitAutocmd() abort
 
   augroup VistaCoc
     autocmd!
-    autocmd WinEnter,WinLeave __vista__ call vista#SetStatusLine()
+    autocmd WinEnter,WinLeave __vista__ let &l:statusline = vista#statusline()
     autocmd BufWritePost,BufReadPost,CursorHold * call
                 \ s:AutoUpdate(fnamemodify(expand('<afile>'), ':p'))
   augroup END

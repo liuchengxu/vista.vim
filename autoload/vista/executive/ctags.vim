@@ -198,14 +198,12 @@ function! s:InitAutocmd() abort
   endif
 
   augroup VistaCtags
-  autocmd!
-
-  autocmd WinEnter,WinLeave __vista__ call vista#SetStatusLine()
-  " BufReadPost is needed for reloading the current buffer if the file
-  " was changed by an external command;
-  autocmd BufWritePost,BufReadPost,CursorHold * call
-              \ s:AutoUpdate(fnamemodify(expand('<afile>'), ':p'))
-
+    autocmd!
+    autocmd WinEnter,WinLeave __vista__ let &l:statusline = vista#statusline()
+    " BufReadPost is needed for reloading the current buffer if the file
+    " was changed by an external command;
+    autocmd BufWritePost,BufReadPost,CursorHold * call
+                \ s:AutoUpdate(fnamemodify(expand('<afile>'), ':p'))
   augroup END
 endfunction
 
@@ -289,7 +287,7 @@ function! s:RunAsync(fpath) abort
   let s:id = s:ApplyRunAsync(cmd)
 
   if !s:id
-    call vista#error#('Fail to execute ctags on file: '.a:fpath)
+    call vista#error#RunCtags(cmd)
   endif
 endfunction
 
@@ -333,14 +331,15 @@ function! vista#executive#ctags#Execute(bang, should_display) abort
 endfunction
 
 function! vista#executive#ctags#ProjectRun() abort
+  " https://github.com/universal-ctags/ctags/issues/2042
+  "
+  " If ctags has the json format feature, we should use the
+  " `--output-format=json` option, which is easier to parse and more reliable.
+  " Otherwise we will use the `--_xformat` option.
   if s:support_json_format
     let cmd = s:ctags." -R -x --output-format=json --fields=+n"
     let Parser = function('vista#parser#ctags#ProjectTagFromJSON')
   else
-    " https://github.com/universal-ctags/ctags/issues/2042
-    " Currently we use the `__xformat` option to be able to parse the output
-    " correctly. Once the `--output-format=json` of ctags installed by brew
-    " is supported by default, we should switch to more reliable json format.
     let cmd = s:ctags." -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
     let Parser = function('vista#parser#ctags#ProjectTagFromXformat')
   endif
@@ -351,6 +350,7 @@ function! vista#executive#ctags#ProjectRun() abort
   endif
 
   let s:data = {}
+
   call map(split(output, "\n"), 'call(Parser, [v:val, s:data])')
 
   return s:data
