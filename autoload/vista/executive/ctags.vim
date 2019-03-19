@@ -5,6 +5,10 @@
 let s:reload_only = v:false
 let s:should_display = v:false
 
+let s:ctags = get(g:, 'vista_ctags_executable', 'ctags')
+let s:support_json_format =
+      \ len(filter(split(system(s:ctags.' --list-features'), '\n'), 'v:val =~ "^json"')) > 0
+
 let s:language_opt = {
       \ 'ant'        : ['ant'        , 'pt']            ,
       \ 'asm'        : ['asm'        , 'dlmt']          ,
@@ -87,9 +91,14 @@ function! s:Cmd(file) abort
   endif
 
   " TODO vista_ctags_{filetype}_executable
-  let exe = get(g:, 'vista_ctags_executable', 'ctags')
+  if s:support_json_format
+    let cmd = printf('%s --excmd=number --sort=no --fields=Ks  --fields=+n --output-format=json %s -f- %s', s:ctags, opt, a:file)
+    let s:TagParser = function('vista#parser#ctags#TagFromJSON')
+  else
+    let cmd = printf('%s --excmd=number --sort=no --fields=Ks %s -f- %s', s:ctags, opt, a:file)
+    let s:TagParser = function('vista#parser#ctags#ExtractTag')
+  endif
 
-  let cmd = printf('%s --excmd=number --sort=no --fields=Ks %s -f- %s', exe, opt, a:file)
   return cmd
 endfunction
 
@@ -107,7 +116,7 @@ function! s:close_cb(channel)
 
   while ch_status(a:channel, {'part': 'out'}) ==# 'buffered'
     let line = ch_read(a:channel)
-    call vista#parser#ctags#ExtractTag(line, s:data)
+    call call(s:TagParser, [line, s:data])
   endwhile
 
   call s:ApplyExtracted()
@@ -134,7 +143,7 @@ endfunction
 
 function! s:ExtractLinewise(raw_data) abort
   let s:data = {}
-  call map(a:raw_data, 'vista#parser#ctags#ExtractTag(v:val, s:data)')
+  call map(a:raw_data, 'call(s:TagParser, [v:val, s:data])')
 endfunction
 
 function! s:AutoUpdate(fpath) abort
@@ -189,14 +198,12 @@ function! s:InitAutocmd() abort
   endif
 
   augroup VistaCtags
-  autocmd!
-
-  autocmd WinEnter,WinLeave __vista__ call vista#SetStatusLine()
-  " BufReadPost is needed for reloading the current buffer if the file
-  " was changed by an external command;
-  autocmd BufWritePost,BufReadPost,CursorHold * call
-              \ s:AutoUpdate(fnamemodify(expand('<afile>'), ':p'))
-
+    autocmd!
+    autocmd WinEnter,WinLeave __vista__ let &l:statusline = vista#statusline()
+    " BufReadPost is needed for reloading the current buffer if the file
+    " was changed by an external command;
+    autocmd BufWritePost,BufReadPost,CursorHold * call
+                \ s:AutoUpdate(fnamemodify(expand('<afile>'), ':p'))
   augroup END
 endfunction
 
@@ -246,7 +253,7 @@ function! s:ApplyExecute(bang, fpath) abort
     let s:id = s:ApplyRunAsync(cmd)
 
     if s:id == 0
-      call vista#error#('Fail to execute ctags on file: '.a:fpath)
+      call vista#error#RunCtags(cmd)
     endif
   endif
 endfunction
@@ -280,7 +287,7 @@ function! s:RunAsync(fpath) abort
   let s:id = s:ApplyRunAsync(cmd)
 
   if !s:id
-    call vista#error#('Fail to execute ctags on file: '.a:fpath)
+    call vista#error#RunCtags(cmd)
   endif
 endfunction
 
@@ -293,27 +300,6 @@ function! s:Execute(bang, should_display) abort
     call s:InitAutocmd()
     let s:did_init_autocmd = 1
   endif
-endfunction
-
-function! vista#executive#ctags#ProjectRun() abort
-  " https://github.com/universal-ctags/ctags/issues/2042
-  let exe = get(g:, 'vista_ctags_executable', 'ctags')
-  " Currently we use the `__xformat` option to be able to parse the output
-  " correctly. Once the `--output-format=json` of ctags installed by brew
-  " is supported by default, we should switch to more reliable json format.
-  let cmd = exe." -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
-
-  let output = system(cmd)
-  if v:shell_error
-    return vista#error#('Fail to run ctags: '.cmd)
-  endif
-
-  let Parser = function('vista#parser#ctags#ExtractProjectTag')
-
-  let s:data = {}
-  call map(split(output, "\n"), 'call(Parser, [v:val, s:data])')
-
-  return s:data
 endfunction
 
 function! s:Dispatch(F, ...) abort
@@ -342,4 +328,30 @@ endfunction
 
 function! vista#executive#ctags#Execute(bang, should_display) abort
   return s:Dispatch('s:Execute', a:bang, a:should_display)
+endfunction
+
+function! vista#executive#ctags#ProjectRun() abort
+  " https://github.com/universal-ctags/ctags/issues/2042
+  "
+  " If ctags has the json format feature, we should use the
+  " `--output-format=json` option, which is easier to parse and more reliable.
+  " Otherwise we will use the `--_xformat` option.
+  if s:support_json_format
+    let cmd = s:ctags." -R -x --output-format=json --fields=+n"
+    let Parser = function('vista#parser#ctags#ProjectTagFromJSON')
+  else
+    let cmd = s:ctags." -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
+    let Parser = function('vista#parser#ctags#ProjectTagFromXformat')
+  endif
+
+  let output = system(cmd)
+  if v:shell_error
+    return vista#error#RunCtags(cmd)
+  endif
+
+  let s:data = {}
+
+  call map(split(output, "\n"), 'call(Parser, [v:val, s:data])')
+
+  return s:data
 endfunction
