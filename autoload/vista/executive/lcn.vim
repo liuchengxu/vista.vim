@@ -69,18 +69,10 @@ function s:Handler(output) abort
 
   let s:data = {}
 
-  for line in lines
-    let picked = {'lnum': line.lnum, 'text': line.text}
-    let kind = line.kind
-
-    if has_key(s:data, kind)
-      call add(s:data[kind], picked)
-    else
-      let s:data[kind] = [picked]
-    endif
-  endfor
+  call map(lines, 'vista#parser#lsp#ExtractSymbol(v:val, s:data)')
 
   if s:should_display
+    let s:should_display = v:false
     call vista#viewer#Display(s:data)
   endif
 endfunction
@@ -100,5 +92,6 @@ endfunction
 
 function! vista#executive#lcn#Execute(bang, should_display) abort
   let t:vista.provider = 'lcn'
+  let s:should_display = a:should_display
   call s:RunAsync()
 endfunction
