@@ -1,4 +1,5 @@
-let s:symbol_kinds = {
+" https://microsoft.github.io/language-server-protocol/specification#textDocument_documentSymbol
+let s:symbol_kind = {
     \ '1': 'File',
     \ '2': 'Module',
     \ '3': 'Namespace',
@@ -17,10 +18,18 @@ let s:symbol_kinds = {
     \ '16': 'Number',
     \ '17': 'Boolean',
     \ '18': 'Array',
+    \ '19': 'Object',
+    \ '20': 'Key',
+    \ '21': 'Null',
+    \ '22': 'EnumMember',
+    \ '23': 'Struct',
+    \ '24': 'Event',
+    \ '25': 'Operator',
+    \ '26': 'TypeParameter'
     \ }
 
 function! s:Kind2SymbolText(kind) abort
-  return has_key(s:symbol_kinds, a:kind) ? s:symbol_kinds[a:kind] : 'Unknown kind '.a:kind
+  return has_key(s:symbol_kind, a:kind) ? s:symbol_kind[a:kind] : 'Unknown kind '.a:kind
 endfunction
 
 function! s:IsFileUri(uri) abort
@@ -35,17 +44,17 @@ function s:Handler(output) abort
 
   let result = a:output.result
 
-  let lists = []
+  let lines = []
 
   for symbol in result
     let location = symbol.location
     if s:IsFileUri(location.uri)
       let lnum = location.range.start.line + 1
       let col = location.range.start.character + 1
-      call add(l:lists, {
+      call add(lines, {
           \ 'lnum': lnum,
           \ 'col': col,
-          \ 'kind': s:Kind2SymbolText(l:symbol['kind']),
+          \ 'kind': s:Kind2SymbolText(symbol.kind),
           \ 'text': symbol.name,
           \ })
     endif
@@ -53,7 +62,7 @@ function s:Handler(output) abort
 
   let s:data = {}
 
-  for line in lists
+  for line in lines
     let picked = {'lnum': line.lnum, 'text': line.text}
     let kind = line.kind
 
@@ -67,15 +76,20 @@ function s:Handler(output) abort
   call vista#viewer#Display(s:data)
 endfunction
 
+function! s:RunAsync() abort
+  call LanguageClient#textDocument_documentSymbol(
+        \ {'handle': v:false}, function('s:Handler'))
+endfunction
+
 function! vista#executive#lcn#Run(_fpath) abort
-  call LanguageClient#textDocument_documentSymbol({'handle': v:false}, function('s:Handler'))
+  call s:RunAsync()
 endfunction
 
 function! vista#executive#lcn#RunAsync() abort
-  call LanguageClient#textDocument_documentSymbol({'handle': v:false}, function('s:Handler'))
+  call s:RunAsync()
 endfunction
 
 function! vista#executive#lcn#Execute(bang, should_display) abort
   let t:vista.provider = 'lcn'
-  call LanguageClient#textDocument_documentSymbol({'handle': v:false}, function('s:Handler'))
+  call s:RunAsync()
 endfunction
