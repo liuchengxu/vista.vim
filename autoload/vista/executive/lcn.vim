@@ -45,7 +45,7 @@ endfunction
 
 function s:Handler(output) abort
   if !has_key(a:output, 'result')
-    echom "No result"
+    call vista#error#("No result via LanguageClient#textDocument_documentSymbol()")
     return
   endif
 
@@ -71,10 +71,29 @@ function s:Handler(output) abort
 
   call map(lines, 'vista#parser#lsp#ExtractSymbol(v:val, s:data)')
 
+  if s:reload_only
+    call vista#sidebar#Reload(s:data)
+    let s:reload_only = v:false
+    return
+  endif
+
   if s:should_display
     let s:should_display = v:false
     call vista#viewer#Display(s:data)
   endif
+endfunction
+
+function! s:AutoUpdate(fpath) abort
+  if vista#ShouldSkip()
+    return
+  endif
+
+  let [bufnr, winnr, fname] = [bufnr('%'), winnr(), expand('%')]
+
+  call vista#source#Update(bufnr, winnr, fname, a:fpath)
+
+  let s:reload_only = v:true
+  call s:RunAsync()
 endfunction
 
 function! s:RunAsync() abort
@@ -83,6 +102,9 @@ function! s:RunAsync() abort
 endfunction
 
 function! vista#executive#lcn#Run(_fpath) abort
+  echohl WarningMsg
+  echom "Retriving document symbols ..."
+  echohl NONE
   call s:RunAsync()
 endfunction
 
@@ -90,8 +112,9 @@ function! vista#executive#lcn#RunAsync() abort
   call s:RunAsync()
 endfunction
 
-function! vista#executive#lcn#Execute(bang, should_display) abort
+function! vista#executive#lcn#Execute(_bang, should_display) abort
   let t:vista.provider = 'lcn'
   let s:should_display = a:should_display
+  call vista#autocmd#Init('VistaLCN', function('s:AutoUpdate'))
   call s:RunAsync()
 endfunction

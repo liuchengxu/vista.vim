@@ -191,22 +191,6 @@ function! s:ApplyRunAsync(cmd) abort
   return jobid > 0 ? jobid : 0
 endfunction
 
-function! s:InitAutocmd() abort
-
-  if exists('#VistaCoc')
-    autocmd! VistaCoc
-  endif
-
-  augroup VistaCtags
-    autocmd!
-    autocmd WinEnter,WinLeave __vista__ let &l:statusline = vista#statusline()
-    " BufReadPost is needed for reloading the current buffer if the file
-    " was changed by an external command;
-    autocmd BufWritePost,BufReadPost,CursorHold * call
-                \ s:AutoUpdate(fnamemodify(expand('<afile>'), ':p'))
-  augroup END
-endfunction
-
 " Use a temporary files for ctags processing instead of the original one.
 " This allows using Tagbar for files accessed with netrw, and also doesn't
 " slow down Tagbar for files that sit on slow network drives.
@@ -292,10 +276,7 @@ function! s:Execute(bang, should_display) abort
   let s:fpath = expand('%:p')
   call s:ApplyExecute(a:bang, s:fpath)
 
-  if !exists('s:did_init_autocmd')
-    call s:InitAutocmd()
-    let s:did_init_autocmd = 1
-  endif
+  call vista#autocmd#Init('VistaCtags', function('s:AutoUpdate'))
 endfunction
 
 function! s:Dispatch(F, ...) abort

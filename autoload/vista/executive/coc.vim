@@ -49,21 +49,6 @@ function! s:Cb(error, response) abort
   endif
 endfunction
 
-function! s:InitAutocmd() abort
-
-  " TODO handle multiple augroup better
-  if exists('#VistaCtags')
-    autocmd! VistaCtags
-  endif
-
-  augroup VistaCoc
-    autocmd!
-    autocmd WinEnter,WinLeave __vista__ let &l:statusline = vista#statusline()
-    autocmd BufWritePost,BufReadPost,CursorHold * call
-                \ s:AutoUpdate(fnamemodify(expand('<afile>'), ':p'))
-  augroup END
-endfunction
-
 function! s:AutoUpdate(fpath) abort
   if vista#ShouldSkip()
     return
@@ -98,10 +83,7 @@ function! s:Execute(bang, should_display) abort
     call CocActionAsync('documentSymbols', function('s:Cb'))
   endif
 
-  if !exists('s:did_init_autocmd')
-    call s:InitAutocmd()
-    let s:did_init_autocmd = 1
-  endif
+  call vista#autocmd#Init('VistaCoc', function('s:AutoUpdate'))
 endfunction
 
 function! s:Dispatch(F, ...) abort
