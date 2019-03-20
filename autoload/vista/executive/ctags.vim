@@ -231,10 +231,6 @@ function! s:IntoTemp(...) abort
   endif
 endfunction
 
-function! vista#executive#ctags#Cache() abort
-  return get(s:, 'cache', {})
-endfunction
-
 function! s:ApplyExecute(bang, fpath) abort
   let file = s:IntoTemp(a:fpath)
   if empty(file)
@@ -314,6 +310,10 @@ function! s:Dispatch(F, ...) abort
   endif
 
   return call(function(a:F), a:000)
+endfunction
+
+function! vista#executive#ctags#Cache() abort
+  return get(s:, 'cache', {})
 endfunction
 
 " Run ctags given the cmd synchronously

@@ -77,10 +77,6 @@ function! s:AutoUpdate(fpath) abort
   call CocActionAsync('documentSymbols', function('s:Cb'))
 endfunction
 
-function! vista#executive#coc#Cache() abort
-  return get(s:, 'cache', {})
-endfunction
-
 function! s:Run() abort
   return s:Extract(CocAction('documentSymbols'))
 endfunction
@@ -115,6 +111,10 @@ function! s:Dispatch(F, ...) abort
   endif
 
   return call(function(a:F), a:000)
+endfunction
+
+function! vista#executive#coc#Cache() abort
+  return get(s:, 'cache', {})
 endfunction
 
 " Internal public APIs

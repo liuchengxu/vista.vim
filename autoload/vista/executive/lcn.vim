@@ -1,3 +1,10 @@
+" Copyright (c) 2019 Liu-Cheng Xu
+" MIT License
+" vim: ts=2 sw=2 sts=2 et
+
+let s:reload_only = v:false
+let s:should_display = v:false
+
 " https://microsoft.github.io/language-server-protocol/specification#textDocument_documentSymbol
 let s:symbol_kind = {
     \ '1': 'File',
@@ -25,10 +32,10 @@ let s:symbol_kind = {
     \ '23': 'Struct',
     \ '24': 'Event',
     \ '25': 'Operator',
-    \ '26': 'TypeParameter'
+    \ '26': 'TypeParameter',
     \ }
 
-function! s:Kind2SymbolText(kind) abort
+function! s:Kind2Symbol(kind) abort
   return has_key(s:symbol_kind, a:kind) ? s:symbol_kind[a:kind] : 'Unknown kind '.a:kind
 endfunction
 
@@ -54,7 +61,7 @@ function s:Handler(output) abort
       call add(lines, {
           \ 'lnum': lnum,
           \ 'col': col,
-          \ 'kind': s:Kind2SymbolText(symbol.kind),
+          \ 'kind': s:Kind2Symbol(symbol.kind),
           \ 'text': symbol.name,
           \ })
     endif
@@ -73,7 +80,9 @@ function s:Handler(output) abort
     endif
   endfor
 
-  call vista#viewer#Display(s:data)
+  if s:should_display
+    call vista#viewer#Display(s:data)
+  endif
 endfunction
 
 function! s:RunAsync() abort
