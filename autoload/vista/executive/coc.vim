@@ -103,5 +103,7 @@ function! vista#executive#coc#RunAsync() abort
 endfunction
 
 function! vista#executive#coc#Execute(bang, should_display) abort
+  let t:vista.provider = 'coc'
+  call vista#SetStatusline()
   return s:Dispatch('s:Execute', a:bang, a:should_display)
 endfunction

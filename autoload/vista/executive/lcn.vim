@@ -116,6 +116,7 @@ endfunction
 
 function! vista#executive#lcn#Execute(bang, should_display) abort
   let t:vista.provider = 'lcn'
+  call vista#SetStatusline()
   let s:should_display = a:should_display
   call vista#autocmd#Init('VistaLCN', function('s:AutoUpdate'))
   if a:bang

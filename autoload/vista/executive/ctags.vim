@@ -300,6 +300,8 @@ function! vista#executive#ctags#RunAsync(fpath) abort
 endfunction
 
 function! vista#executive#ctags#Execute(bang, should_display) abort
+  let t:vista.provider = 'ctags'
+  call vista#SetStatusline()
   return s:Dispatch('s:Execute', a:bang, a:should_display)
 endfunction
 
