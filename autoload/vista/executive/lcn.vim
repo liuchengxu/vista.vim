@@ -92,12 +92,7 @@ function! s:AutoUpdate(fpath) abort
   call s:RunAsync()
 endfunction
 
-function! s:RunAsync() abort
-  call LanguageClient#textDocument_documentSymbol(
-        \ {'handle': v:false}, function('s:Handler'))
-endfunction
-
-function! vista#executive#lcn#Run(_fpath) abort
+function! s:Run() abort
   call s:RunAsync()
   let s:fetching = v:true
   while s:fetching
@@ -106,15 +101,28 @@ function! vista#executive#lcn#Run(_fpath) abort
   return get(s:, 'data', {})
 endfunction
 
+function! s:RunAsync() abort
+  call LanguageClient#textDocument_documentSymbol(
+        \ {'handle': v:false}, function('s:Handler'))
+endfunction
+
+function! vista#executive#lcn#Run(_fpath) abort
+  return s:Run()
+endfunction
+
 function! vista#executive#lcn#RunAsync() abort
   call s:RunAsync()
 endfunction
 
-function! vista#executive#lcn#Execute(_bang, should_display) abort
+function! vista#executive#lcn#Execute(bang, should_display) abort
   let t:vista.provider = 'lcn'
   let s:should_display = a:should_display
   call vista#autocmd#Init('VistaLCN', function('s:AutoUpdate'))
-  call s:RunAsync()
+  if a:bang
+    return s:Run()
+  else
+    call s:RunAsync()
+  endif
 endfunction
 
 function! vista#executive#lcn#Cache() abort
