@@ -201,6 +201,7 @@ function! s:TryAlternatives(tried, fpath) abort
   let alternatives = filter(copy(executives), 'v:val != a:tried')
 
   for alternative in alternatives
+    " FIXME when running synchornously, no need to add extra check.
     let s:data = vista#executive#{alternative}#Run(a:fpath)
     if !empty(s:data)
       let s:cur_executive = alternative
@@ -260,6 +261,7 @@ function! vista#finder#fzf#Run(...) abort
   endif
 
   let s:cur_executive = executive
+  let s:using_alternative = v:false
 
   if empty(s:data) && !s:TryAlternatives(executive, fpath)
     return vista#util#Warning("Empty data for finder")

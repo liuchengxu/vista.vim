@@ -38,9 +38,9 @@ Vista.vim can also be a symbol navigator similar to [ctrlp-funky](https://github
 
 - [x] View tags and LSP symbols in a sidebar.
     - [x] [ctags](https://github.com/universal-ctags/ctags)
-    - [x] [coc.nvim](https://github.com/neoclide/coc.nvim)
     - [ ] [vim-lsp](https://github.com/prabirshrestha/vim-lsp)
-    - [ ] [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
+    - [x] [coc.nvim](https://github.com/neoclide/coc.nvim)
+    - [x] [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
 - [x] Finder for tags and LSP symbols.
     - [x] [fzf](https://github.com/junegunn/fzf)
 - [x] Display decent detailed symbol info in cmdline, also supports neovim's floating window.
@@ -60,7 +60,7 @@ Notes:
 
 ## Requirement
 
-I don't know the mimimal supported version. But if you only care about the ctags related feature, vim 7.4+ should be enough.
+I don't know the mimimal supported version. But if you only care about the ctags related feature, vim 7.4.1154+ should be enough.
 
 Otherwise, if you want to try any LSP related features, then you certainly need some plugins to retrive the LSP symbols, e.g., [coc.nvim](https://github.com/neoclide/coc.nvim). When you have these LSP plugins set up, vista.vim should be ok to go as well.
 
@@ -106,9 +106,9 @@ Command   | Description
 `Vista!`  | Close vista view window if already opened
 `Vista!!` | Toggle vista view window
 
-`:Vista [EXECUTIVE]`: open vista window for ctags/coc.
+`:Vista [EXECUTIVE]`: open vista window powered by EXECUTIVE.
 
-`:Vista finder [EXECUTIVE]`: search tags/symbols generated from ctags/coc.
+`:Vista finder [EXECUTIVE]`: search tags/symbols generated from EXECUTIVE.
 
 ### Options
 

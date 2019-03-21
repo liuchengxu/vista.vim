@@ -147,14 +147,6 @@ function! s:ExtractLinewise(raw_data) abort
 endfunction
 
 function! s:AutoUpdate(fpath) abort
-  if vista#ShouldSkip()
-    return
-  endif
-
-  let [bufnr, winnr, fname] = [bufnr('%'), winnr(), expand('%')]
-
-  call vista#source#Update(bufnr, winnr, fname, a:fpath)
-
   let s:reload_only = v:true
   call s:ApplyExecute(v:false, a:fpath)
 endfunction
@@ -191,22 +183,6 @@ function! s:ApplyRunAsync(cmd) abort
   return jobid > 0 ? jobid : 0
 endfunction
 
-function! s:InitAutocmd() abort
-
-  if exists('#VistaCoc')
-    autocmd! VistaCoc
-  endif
-
-  augroup VistaCtags
-    autocmd!
-    autocmd WinEnter,WinLeave __vista__ let &l:statusline = vista#statusline()
-    " BufReadPost is needed for reloading the current buffer if the file
-    " was changed by an external command;
-    autocmd BufWritePost,BufReadPost,CursorHold * call
-                \ s:AutoUpdate(fnamemodify(expand('<afile>'), ':p'))
-  augroup END
-endfunction
-
 " Use a temporary files for ctags processing instead of the original one.
 " This allows using Tagbar for files accessed with netrw, and also doesn't
 " slow down Tagbar for files that sit on slow network drives.
@@ -229,10 +205,6 @@ function! s:IntoTemp(...) abort
   else
     return vista#error#('Fail to write into a temp file.')
   endif
-endfunction
-
-function! vista#executive#ctags#Cache() abort
-  return get(s:, 'cache', {})
 endfunction
 
 function! s:ApplyExecute(bang, fpath) abort
@@ -296,10 +268,7 @@ function! s:Execute(bang, should_display) abort
   let s:fpath = expand('%:p')
   call s:ApplyExecute(a:bang, s:fpath)
 
-  if !exists('s:did_init_autocmd')
-    call s:InitAutocmd()
-    let s:did_init_autocmd = 1
-  endif
+  call vista#autocmd#Init('VistaCtags', function('s:AutoUpdate'))
 endfunction
 
 function! s:Dispatch(F, ...) abort
@@ -316,6 +285,10 @@ function! s:Dispatch(F, ...) abort
   return call(function(a:F), a:000)
 endfunction
 
+function! vista#executive#ctags#Cache() abort
+  return get(s:, 'cache', {})
+endfunction
+
 " Run ctags given the cmd synchronously
 function! vista#executive#ctags#Run(fpath) abort
   return s:Dispatch('s:Run', a:fpath)
@@ -327,6 +300,8 @@ function! vista#executive#ctags#RunAsync(fpath) abort
 endfunction
 
 function! vista#executive#ctags#Execute(bang, should_display) abort
+  let t:vista.provider = 'ctags'
+  call vista#SetStatusline()
   return s:Dispatch('s:Execute', a:bang, a:should_display)
 endfunction
 

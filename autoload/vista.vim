@@ -27,6 +27,12 @@ function! vista#statusline() abort
   endif
 endfunction
 
+function! vista#SetStatusline() abort
+  if has_key(t:vista, 'bufnr')
+    call setbufvar(t:vista.bufnr, '&statusline', vista#statusline())
+  endif
+endfunction
+
 function! vista#(bang, ...) abort
   if a:bang
     if a:0 == 0

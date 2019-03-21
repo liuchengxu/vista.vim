@@ -49,36 +49,9 @@ function! s:Cb(error, response) abort
   endif
 endfunction
 
-function! s:InitAutocmd() abort
-
-  " TODO handle multiple augroup better
-  if exists('#VistaCtags')
-    autocmd! VistaCtags
-  endif
-
-  augroup VistaCoc
-    autocmd!
-    autocmd WinEnter,WinLeave __vista__ let &l:statusline = vista#statusline()
-    autocmd BufWritePost,BufReadPost,CursorHold * call
-                \ s:AutoUpdate(fnamemodify(expand('<afile>'), ':p'))
-  augroup END
-endfunction
-
-function! s:AutoUpdate(fpath) abort
-  if vista#ShouldSkip()
-    return
-  endif
-
-  let [bufnr, winnr, fname] = [bufnr('%'), winnr(), expand('%')]
-
-  call vista#source#Update(bufnr, winnr, fname, a:fpath)
-
+function! s:AutoUpdate(_fpath) abort
   let s:reload_only = v:true
   call CocActionAsync('documentSymbols', function('s:Cb'))
-endfunction
-
-function! vista#executive#coc#Cache() abort
-  return get(s:, 'cache', {})
 endfunction
 
 function! s:Run() abort
@@ -102,10 +75,7 @@ function! s:Execute(bang, should_display) abort
     call CocActionAsync('documentSymbols', function('s:Cb'))
   endif
 
-  if !exists('s:did_init_autocmd')
-    call s:InitAutocmd()
-    let s:did_init_autocmd = 1
-  endif
+  call vista#autocmd#Init('VistaCoc', function('s:AutoUpdate'))
 endfunction
 
 function! s:Dispatch(F, ...) abort
@@ -117,11 +87,17 @@ function! s:Dispatch(F, ...) abort
   return call(function(a:F), a:000)
 endfunction
 
+function! vista#executive#coc#Cache() abort
+  return get(s:, 'cache', {})
+endfunction
+
 " Internal public APIs
 "
 " Run and RunAsync is for internal use.
 function! vista#executive#coc#Run(_fpath) abort
-  return s:Dispatch('s:Run')
+  if exists('*CocAction')
+    return s:Run()
+  endif
 endfunction
 
 function! vista#executive#coc#RunAsync() abort
@@ -129,5 +105,7 @@ function! vista#executive#coc#RunAsync() abort
 endfunction
 
 function! vista#executive#coc#Execute(bang, should_display) abort
+  let t:vista.provider = 'coc'
+  call vista#SetStatusline()
   return s:Dispatch('s:Execute', a:bang, a:should_display)
 endfunction
