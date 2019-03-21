@@ -95,7 +95,9 @@ endfunction
 "
 " Run and RunAsync is for internal use.
 function! vista#executive#coc#Run(_fpath) abort
-  return s:Dispatch('s:Run')
+  if exists('*CocAction')
+    return s:Run()
+  endif
 endfunction
 
 function! vista#executive#coc#RunAsync() abort
