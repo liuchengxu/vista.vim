@@ -50,9 +50,9 @@ FEATURES                                                          *vista-feature
 
 *   [x] View tags and LSP symbols in a sidebar.
     *   [x] ctags (https://github.com/universal-ctags/ctags)
-    *   [x] coc.nvim (https://github.com/neoclide/coc.nvim)
     *   [ ] vim-lsp (https://github.com/prabirshrestha/vim-lsp)
-    *   [ ] LanguageClient-neovim (https://github.com/autozimu/LanguageClient-neovim)
+    *   [x] coc.nvim (https://github.com/neoclide/coc.nvim)
+    *   [x] LanguageClient-neovim (https://github.com/autozimu/LanguageClient-neovim)
 *   [x] Finder for tags and LSP symbols.
     *   [x] fzf (https://github.com/junegunn/fzf)
 *   [x] Display decent detailed symbol info in cmdline.
@@ -79,7 +79,7 @@ may be on the TODOs forever :(.
 REQUIREMENT                                                    *vista-requirement*
 
 I don't know the mimimal supported version. But if you only care about the ctags
-related feature, vim 7.4+ should be enough.
+related feature, vim 7.4.1154+ should be enough.
 
 Otherwise, if you want to try any LSP related features, then you certainly need
 some plugins to retrive the LSP symbols, e.g., coc.nvim. When you have these

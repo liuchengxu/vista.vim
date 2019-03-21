@@ -4,6 +4,7 @@
 
 let s:reload_only = v:false
 let s:should_display = v:false
+let s:fetching = v:true
 
 " https://microsoft.github.io/language-server-protocol/specification#textDocument_documentSymbol
 let s:symbol_kind = {
@@ -46,6 +47,7 @@ endfunction
 function s:Handler(output) abort
   if !has_key(a:output, 'result')
     call vista#error#("No result via LanguageClient#textDocument_documentSymbol()")
+    let s:fetching = v:false
     return
   endif
 
@@ -71,6 +73,8 @@ function s:Handler(output) abort
 
   call map(lines, 'vista#parser#lsp#ExtractSymbol(v:val, s:data)')
 
+  let s:fetching = v:false
+
   if s:reload_only
     call vista#sidebar#Reload(s:data)
     let s:reload_only = v:false
@@ -94,10 +98,12 @@ function! s:RunAsync() abort
 endfunction
 
 function! vista#executive#lcn#Run(_fpath) abort
-  echohl WarningMsg
-  echom "Retriving document symbols ..."
-  echohl NONE
   call s:RunAsync()
+  let s:fetching = v:true
+  while s:fetching
+    sleep 100m
+  endwhile
+  return get(s:, 'data', {})
 endfunction
 
 function! vista#executive#lcn#RunAsync() abort
@@ -109,4 +115,8 @@ function! vista#executive#lcn#Execute(_bang, should_display) abort
   let s:should_display = a:should_display
   call vista#autocmd#Init('VistaLCN', function('s:AutoUpdate'))
   call s:RunAsync()
+endfunction
+
+function! vista#executive#lcn#Cache() abort
+  return get(s:, 'data', {})
 endfunction
