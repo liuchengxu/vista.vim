@@ -84,14 +84,6 @@ function s:Handler(output) abort
 endfunction
 
 function! s:AutoUpdate(fpath) abort
-  if vista#ShouldSkip()
-    return
-  endif
-
-  let [bufnr, winnr, fname] = [bufnr('%'), winnr(), expand('%')]
-
-  call vista#source#Update(bufnr, winnr, fname, a:fpath)
-
   let s:reload_only = v:true
   call s:RunAsync()
 endfunction
