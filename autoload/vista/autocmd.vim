@@ -4,9 +4,9 @@
 
 let s:registered = []
 
-function! s:ClearOtherEvents() abort
+function! s:ClearOtherEvents(group) abort
   for augroup in s:registered
-    if exists('#'.augroup)
+    if augroup != a:group && exists('#'.augroup)
       execute 'autocmd!' augroup
     endif
   endfor
@@ -29,13 +29,23 @@ endfunction
 " interacting with other.
 function! vista#autocmd#Init(group_name, AUF) abort
 
-  call s:ClearOtherEvents()
+  call s:ClearOtherEvents(a:group_name)
 
   if index(s:registered, a:group_name) == -1
     call add(s:registered, a:group_name)
   endif
 
   let s:ApplyAutoUpdate = a:AUF
+
+  if exists('#'.a:group_name)
+    let group = ''
+    redir => group
+    silent execute 'autocmd' a:group_name
+    redir END
+    if len(split(group, '\n')) > 1
+      return
+    endif
+  endif
 
   execute 'augroup' a:group_name
     autocmd!
