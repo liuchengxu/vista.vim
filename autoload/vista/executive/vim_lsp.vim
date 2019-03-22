@@ -2,7 +2,7 @@ let s:reload_only = v:false
 let s:should_display = v:false
 let s:last_req_id = 0
 
-function! s:handle_symbol(server, req_id, type, data) abort
+function! s:Handler(_server, _req_id, _type, data) abort
   if !has_key(a:data.response, 'result')
     let s:fetching = v:false
     return []
@@ -57,7 +57,7 @@ function! s:RunAsync(servers) abort
         \ 'params': {
         \   'textDocument': lsp#get_text_document_identifier(),
         \ },
-        \ 'on_notification': function('s:handle_symbol', [server, s:last_req_id, 'documentSymbol']),
+        \ 'on_notification': function('s:Handler', [server, s:last_req_id, 'documentSymbol']),
         \ })
     let s:fetching = v:true
   endfor
