@@ -27,7 +27,8 @@ function! vista#statusline() abort
   endif
 endfunction
 
-function! vista#SetStatusline() abort
+function! vista#SetProvider(provider) abort
+  let t:vista.provider = a:provider
   if has_key(t:vista, 'bufnr')
     call setbufvar(t:vista.bufnr, '&statusline', vista#statusline())
   endif

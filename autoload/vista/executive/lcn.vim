@@ -2,6 +2,8 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
+let s:provider = fnamemodify(resolve(expand('<sfile>')), ':t:r')
+
 let s:reload_only = v:false
 let s:should_display = v:false
 let s:fetching = v:true
@@ -65,10 +67,10 @@ function! vista#executive#lcn#RunAsync() abort
 endfunction
 
 function! vista#executive#lcn#Execute(bang, should_display) abort
-  let t:vista.provider = 'lcn'
-  call vista#SetStatusline()
-  let s:should_display = a:should_display
+  call vista#SetProvider(s:provider)
   call vista#autocmd#Init('VistaLCN', function('s:AutoUpdate'))
+
+  let s:should_display = a:should_display
   if a:bang
     return s:Run()
   else

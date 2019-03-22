@@ -1,3 +1,9 @@
+" Copyright (c) 2019 Liu-Cheng Xu
+" MIT License
+" vim: ts=2 sw=2 sts=2 et
+
+let s:provider = fnamemodify(resolve(expand('<sfile>')), ':t:r')
+
 let s:reload_only = v:false
 let s:should_display = v:false
 let s:last_req_id = 0
@@ -85,8 +91,7 @@ function! vista#executive#vim_lsp#Execute(bang, should_display) abort
   endif
 
   let s:should_display = a:should_display
-  let t:vista.provider = 'vim_lsp'
-  call vista#SetStatusline()
+  call vista#SetProvider(s:provider)
   call vista#autocmd#Init('VistaVimLsp', function('s:AutoUpdate'))
   if a:bang
     call s:Run(servers)
