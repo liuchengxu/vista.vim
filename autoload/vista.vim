@@ -18,7 +18,6 @@ endfunction
 
 function! vista#statusline() abort
   let fname = get(t:vista.source, 'fname', '')
-  " TODO show current provider
   let provider = get(t:vista, 'provider', '')
   if !empty(provider)
     return '[Vista] '.provider.' %<'.fname
