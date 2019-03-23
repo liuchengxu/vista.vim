@@ -58,12 +58,15 @@ function! vista#parser#lsp#FromKindToSymbol(line, container) abort
   endif
 endfunction
 
-
 " https://microsoft.github.io/language-server-protocol/specification#textDocument_documentSymbol
 function! vista#parser#lsp#ExtractSymbol(symbol, container) abort
   let symbol = a:symbol
 
   let picked = {'lnum': symbol.lnum, 'col': symbol.col, 'text': symbol.text}
+
+  if symbol.kind ==? 'Method' || symbol.kind ==? 'Function'
+    call add(t:vista.functions, symbol)
+  endif
 
   if has_key(a:container, symbol.kind)
     call add(a:container[symbol.kind], picked)

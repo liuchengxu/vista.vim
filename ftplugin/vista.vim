@@ -37,9 +37,10 @@ nnoremap <buffer> <silent> q    :close<CR>
 nnoremap <buffer> <silent> <CR> :<c-u>call vista#cursor#FoldOrJump()<CR>
 nnoremap <buffer> <silent> /    :<c-u>call vista#finder#fzf#Run()<CR>
 
-if get(g:, 'vista_echo_cursor', 1)
-  augroup VistaCursor
-    autocmd!
+augroup VistaCursor
+  autocmd!
+  if get(g:, 'vista_echo_cursor', 1)
     autocmd CursorMoved <buffer> call vista#cursor#ShowDetailWithDelay()
-  augroup END
-endif
+  endif
+  autocmd CursorMoved * call vista#cursor#FindNearestMethodOrFunction()
+augroup END

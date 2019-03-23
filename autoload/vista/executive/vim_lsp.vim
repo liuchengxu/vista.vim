@@ -21,6 +21,7 @@ function! s:Handler(_server, _req_id, _type, data) abort
   call map(result, 'vista#parser#lsp#FromKindToSymbol(v:val, lines)')
 
   let s:data = {}
+  let t:vista.functions = []
   call map(lines, 'vista#parser#lsp#ExtractSymbol(v:val, s:data)')
 
   let s:fetching = v:false

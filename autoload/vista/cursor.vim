@@ -3,6 +3,14 @@
 " vim: ts=2 sw=2 sts=2 et
 
 let s:cursor_timer = -1
+let s:find_timer = -1
+
+function! s:StopFindTimer() abort
+  if s:find_timer != -1
+    call timer_stop(s:find_timer)
+    let s:find_timer = -1
+  endif
+endfunction
 
 function! s:StopCursorTimer() abort
   if s:cursor_timer != -1
@@ -186,4 +194,28 @@ function! vista#cursor#FoldOrJump() abort
   endif
 
   call s:Jump()
+endfunction
+
+function! s:Compare(s1, s2) abort
+  return a:s1.lnum - a:s2.lnum
+endfunction
+
+function! s:FindNearestMethodOrFunction(_timer) abort
+  call sort(t:vista.functions, function('s:Compare'))
+  let result = vista#util#BinarySearch(t:vista.functions, line('.'))
+  call setbufvar(t:vista.source.bufnr, 'vista_nearest_method_or_function', result)
+endfunction
+
+function! vista#cursor#FindNearestMethodOrFunction() abort
+  if bufnr('') != t:vista.source.bufnr
+    return
+  endif
+
+  call s:StopFindTimer()
+
+  let delay = get(g:, 'vista_find_nearest_method_or_function_delay', 400)
+  let s:find_timer = timer_start(
+        \ delay,
+        \ function('s:FindNearestMethodOrFunction'),
+        \ )
 endfunction
