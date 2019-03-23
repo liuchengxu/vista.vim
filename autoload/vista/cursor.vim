@@ -211,6 +211,10 @@ function! vista#cursor#FindNearestMethodOrFunction() abort
     return
   endif
 
+  if empty(t:vista.functions)
+    return
+  endif
+
   call s:StopFindTimer()
 
   let delay = get(g:, 'vista_find_nearest_method_or_function_delay', 400)

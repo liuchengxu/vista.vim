@@ -27,6 +27,10 @@ function! vista#parser#ctags#ExtractTag(line, container) abort
 
   let picked = {'lnum': lnum, 'text': tagname}
 
+  if scope ==? 'function' || scope ==? 'func'
+    call add(t:vista.functions, picked)
+  endif
+
   if has_key(a:container, scope)
     call add(a:container[scope], picked)
   else
@@ -40,6 +44,10 @@ function! vista#parser#ctags#TagFromJSON(line, container) abort
   let kind = line.kind
 
   let picked = {'lnum': line.line, 'text': line.name }
+
+  if kind ==? 'function' || kind ==? 'func'
+    call add(t:vista.functions, picked)
+  endif
 
   if has_key(a:container, kind)
     call add(a:container[kind], picked)
