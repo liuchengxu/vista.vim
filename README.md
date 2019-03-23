@@ -15,6 +15,7 @@ View and search LSP symbols, tags in Vim/NeoVim.
         * [Vim 8](#vim-8)
         * [NeoVim](#neovim)
 * [Usage](#usage)
+    * [Show the nearest method/function in the statusline](#show-the-nearest-methodfunction-in-the-statusline)
     * [Commands](#commands)
     * [Options](#options)
 * [Contributing](#contributing)
@@ -47,14 +48,15 @@ Vista.vim can also be a symbol navigator similar to [ctrlp-funky](https://github
 - [x] Jump to the tag/symbol from vista sidebar with a blink.
 - [x] Update automatically when switching between buffers.
 - [x] Update asynchonously in the background when `+job` avaliable.
-- [ ] Supports all of the languages that ctags does.
+- [x] Find the nearest method or function to the cursor, which could be integrated into the statusline.
 - [ ] Highlight current tag/symbol.
+- [ ] Supports all of the languages that ctags does.
 - [ ] Show the visibility (public/private) of tags.
 - [ ] Tree viewer for hierarchy data.
 
 Notes:
 
-- The feature of finder in vista.vim `:Vista finder [EXECUTIVE]` is a bit like `:BTags` or `:Tags` in [fzf.vim](https://github.com/junegunn/fzf.vim), `:CocList` in [coc.nvim](https://github.com/neoclide/coc.nvim), `:LeaderfBufTag` in [leaderf.vim](https://github.com/Yggdroot/LeaderF), etc. You can choose whichever you like.
+- The feature of finder in vista.vim `:Vista finder [EXECUTIVE]` is a bit like `:BTags` or `:Tags` in [fzf.vim](https://github.com/junegunn/fzf.vim), `:CocList` in [coc.nvim](https://github.com/neoclide/coc.nvim), `:LeaderfBufTag` in [leaderf.vim](https://github.com/Yggdroot/LeaderF), etc. You can choose whatever you like.
 
 - I personally don't use all the features I have listed. Hence some of them may be on the TODOs forever :(.
 
@@ -97,6 +99,22 @@ $ git clone https://github.com/liuchengxu/vista.vim.git --depth=1 ~/.local/share
 ## Usage
 
 :warning: The following instructions are not complete, **please see the help via `:help vista` for more detailed usage**.
+
+### Show the nearest method/function in the statusline
+
+You can do the following to show the nearest method/function in your statusline:
+
+```vim
+function! NearestMethodOrFunction() abort
+  return get(b:, 'vista_nearest_method_or_function', '')
+endfunction
+
+set statusline+=%{NearestMethodOrFunction()}
+```
+
+Also refer to [liuchengxu/eleline#18](https://github.com/liuchengxu/eleline.vim/pull/18).
+
+![eleline](https://user-images.githubusercontent.com/8850248/54868435-6b90e780-4dc7-11e9-9da9-b9f8fa0b577b.png)
 
 ### Commands
 
