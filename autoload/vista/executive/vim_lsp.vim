@@ -53,7 +53,7 @@ function! s:HasAvaliableServers() abort
 endfunction
 
 function! s:Run() abort
-  call s:RunAsync(s:servers)
+  call s:RunAsync()
   while s:fetching
     sleep 100m
   endwhile
@@ -61,9 +61,6 @@ function! s:Run() abort
 endfunction
 
 function! s:RunAsync() abort
-  if !exists('s:ever_done')
-    call vista#util#Retriving(s:provider)
-  endif
   for server in s:servers
     call lsp#send_request(server, {
         \ 'method': 'textDocument/documentSymbol',
@@ -100,6 +97,9 @@ function! vista#executive#vim_lsp#Execute(bang, should_display) abort
   if a:bang
     call s:Run()
   else
+    if !exists('s:ever_done')
+      call vista#util#Retriving(s:provider)
+    endif
     call s:RunAsync()
   endif
 endfunction
