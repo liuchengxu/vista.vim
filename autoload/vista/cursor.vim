@@ -212,12 +212,13 @@ function! vista#cursor#FindNearestMethodOrFunction() abort
   endif
 
   if empty(t:vista.functions)
+    call setbufvar(t:vista.source.bufnr, 'vista_nearest_method_or_function', '')
     return
   endif
 
   call s:StopFindTimer()
 
-  let delay = get(g:, 'vista_find_nearest_method_or_function_delay', 400)
+  let delay = get(g:, 'vista_find_nearest_method_or_function_delay', 300)
   let s:find_timer = timer_start(
         \ delay,
         \ function('s:FindNearestMethodOrFunction'),

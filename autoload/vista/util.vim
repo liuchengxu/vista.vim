@@ -149,6 +149,10 @@ function! vista#util#BinarySearch(array, target) abort
     endif
   endwhile
 
+  if low == 0
+    return ''
+  endif
+
   " If no exact match, prefer the previous nearest one.
   if get(g:, 'vista_find_absolute_nearest_method_or_function', 0)
     if abs(array[low].lnum - target) < abs(array[low - 1].lnum - target)
