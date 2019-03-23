@@ -38,7 +38,7 @@ Vista.vim can also be a symbol navigator similar to [ctrlp-funky](https://github
 
 - [x] View tags and LSP symbols in a sidebar.
     - [x] [ctags](https://github.com/universal-ctags/ctags)
-    - [ ] [vim-lsp](https://github.com/prabirshrestha/vim-lsp)
+    - [x] [vim-lsp](https://github.com/prabirshrestha/vim-lsp)
     - [x] [coc.nvim](https://github.com/neoclide/coc.nvim)
     - [x] [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
 - [x] Finder for tags and LSP symbols.
@@ -141,7 +141,7 @@ let g:vista_blink = [2, 100]
 let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
 
 " Executive used when opening vista sidebar without specifying it.
-" Avaliable: 'coc', 'ctags'. 'ctags' by default.
+" See all the avaliable executives via `:echo g:vista#executives`.
 let g:vista_default_executive = 'ctags'
 
 " Declare the command including the executable and options used to generate ctags output

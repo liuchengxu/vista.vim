@@ -2,6 +2,8 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
+let s:provider = fnamemodify(expand('<sfile>'), ':t:r')
+
 let s:reload_only = v:false
 let s:should_display = v:false
 
@@ -74,8 +76,6 @@ function! s:Execute(bang, should_display) abort
     let s:should_display = a:should_display
     call CocActionAsync('documentSymbols', function('s:Cb'))
   endif
-
-  call vista#autocmd#Init('VistaCoc', function('s:AutoUpdate'))
 endfunction
 
 function! s:Dispatch(F, ...) abort
@@ -105,7 +105,7 @@ function! vista#executive#coc#RunAsync() abort
 endfunction
 
 function! vista#executive#coc#Execute(bang, should_display) abort
-  let t:vista.provider = 'coc'
-  call vista#SetStatusline()
+  call vista#SetProvider(s:provider)
+  call vista#autocmd#Init('VistaCoc', function('s:AutoUpdate'))
   return s:Dispatch('s:Execute', a:bang, a:should_display)
 endfunction

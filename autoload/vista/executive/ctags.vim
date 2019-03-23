@@ -2,6 +2,8 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
+let s:provider = fnamemodify(expand('<sfile>'), ':t:r')
+
 let s:reload_only = v:false
 let s:should_display = v:false
 
@@ -267,8 +269,6 @@ function! s:Execute(bang, should_display) abort
   let s:should_display = a:should_display
   let s:fpath = expand('%:p')
   call s:ApplyExecute(a:bang, s:fpath)
-
-  call vista#autocmd#Init('VistaCtags', function('s:AutoUpdate'))
 endfunction
 
 function! s:Dispatch(F, ...) abort
@@ -300,8 +300,8 @@ function! vista#executive#ctags#RunAsync(fpath) abort
 endfunction
 
 function! vista#executive#ctags#Execute(bang, should_display) abort
-  let t:vista.provider = 'ctags'
-  call vista#SetStatusline()
+  call vista#SetProvider(s:provider)
+  call vista#autocmd#Init('VistaCtags', function('s:AutoUpdate'))
   return s:Dispatch('s:Execute', a:bang, a:should_display)
 endfunction
 
