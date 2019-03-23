@@ -93,6 +93,20 @@ function! vista#util#Warning(msg) abort
   echohl NONE
 endfunction
 
+function! vista#util#Retriving(executive) abort
+  echohl WarningMsg
+  echom '[Vista.vim] '
+  echohl NONE
+
+  echohl Function
+  echon a:executive
+  echohl NONE
+
+  echohl Type
+  echon  ' is retriving symbols ..., please try again later'
+  echohl NONE
+endfunction
+
 function! vista#util#Complete(A, L, P) abort
   let cmd = ['coc', 'ctags', 'finder']
   let args = split(a:L)
