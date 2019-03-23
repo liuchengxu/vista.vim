@@ -50,7 +50,7 @@ FEATURES                                                          *vista-feature
 
 *   [x] View tags and LSP symbols in a sidebar.
     *   [x] ctags (https://github.com/universal-ctags/ctags)
-    *   [ ] vim-lsp (https://github.com/prabirshrestha/vim-lsp)
+    *   [x] vim-lsp (https://github.com/prabirshrestha/vim-lsp)
     *   [x] coc.nvim (https://github.com/neoclide/coc.nvim)
     *   [x] LanguageClient-neovim (https://github.com/autozimu/LanguageClient-neovim)
 *   [x] Finder for tags and LSP symbols.
@@ -158,7 +158,7 @@ g:vista_echo_cursor_strategy                         *g:vista_echo_cursor_strate
 
   `echo`         - echo in the cmdline.
   `floating_win` - display in neovim's floating window. See if you have the
-  floating window support via `:echo exists(*nvim_open_win)` .
+                 floating window support via `:echo exists(*nvim_open_win)` .
   `both`         - both `echo` and `floating_win` will be used.
 
 g:vista_close_on_jump                                      *g:vista_close_on_jump*
@@ -194,7 +194,7 @@ g:vista_default_executive                              *g:vista_default_executiv
   Default: `ctags`
 
   Executive used when opening vista sidebar without specifying it.
-  Avaliable: 'coc', 'ctags'.
+  See all the avaliable executives via `:echo g:vista#executives` .
 >
 g:vista_ctags_cmd                                              *g:vista_ctags_cmd*
   Type: |Dictionary|
@@ -231,6 +231,7 @@ g:vista_finder_alternative_executives       *g:vista_finder_alternative_executiv
   Default: `['coc']`
 
   Fall back to other executives if the specified one gives empty data.
+  This is useful if you want to switch to `ctags` when LSP is not usable.
   By default it's all the provided executives excluding the tried one.
 
 

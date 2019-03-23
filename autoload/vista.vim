@@ -66,7 +66,7 @@ function! vista#(bang, ...) abort
     elseif a:1 == 'finder!'
       call vista#finder#fzf#ProjectRun()
     else
-      return vista#error#Expect("Vista [EXECUTIVE | finder]")
+      return vista#error#Expect("Vista [finder] [EXECUTIVE]")
     endif
   elseif a:0 == 2
     if a:1 !=# 'finder'
