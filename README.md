@@ -4,6 +4,7 @@ View and search LSP symbols, tags in Vim/NeoVim.
 
 :warning: **Currently vista.vim is mostly usable, yet not stable. All the public APIs and global options can be changed or even be removed in the future.**
 
+## Table Of Contents
 <!-- TOC GFM -->
 
 * [Introduction](#introduction)
@@ -114,7 +115,9 @@ set statusline+=%{NearestMethodOrFunction()}
 
 Also refer to [liuchengxu/eleline#18](https://github.com/liuchengxu/eleline.vim/pull/18).
 
-![eleline](https://user-images.githubusercontent.com/8850248/54868435-6b90e780-4dc7-11e9-9da9-b9f8fa0b577b.png)
+<p align="center">
+    <img width="800px" src="https://user-images.githubusercontent.com/8850248/54868435-6b90e780-4dc7-11e9-9da9-b9f8fa0b577b.png">
+</p>
 
 ### Commands
 
