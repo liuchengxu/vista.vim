@@ -115,6 +115,7 @@ endfunction
 
 function! s:close_cb(channel)
   let s:data = {}
+  let t:vista.functions = []
 
   while ch_status(a:channel, {'part': 'out'}) ==# 'buffered'
     let line = ch_read(a:channel)
@@ -145,6 +146,7 @@ endfunction
 
 function! s:ExtractLinewise(raw_data) abort
   let s:data = {}
+  let t:vista.functions = []
   call map(a:raw_data, 'call(s:TagParser, [v:val, s:data])')
 endfunction
 

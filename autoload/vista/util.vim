@@ -128,3 +128,41 @@ function! vista#util#LowerIndentLineNr() abort
   endwhile
   return 0
 endfunction
+
+" array: List of Method or Function symbols
+" target: current line number in the source buffer
+function! vista#util#BinarySearch(array, target) abort
+  let [array, target] = [a:array, a:target]
+
+  let low = 0
+  let high = len(array) - 1
+
+  while low <= high
+    let mid = (low + high) / 2
+    if array[mid].lnum == target
+      let found = array[mid]
+      return found.text
+    elseif array[mid].lnum > target
+      let high = mid - 1
+    else
+      let low = mid + 1
+    endif
+  endwhile
+
+  if low == 0
+    return ''
+  endif
+
+  " If no exact match, prefer the previous nearest one.
+  if get(g:, 'vista_find_absolute_nearest_method_or_function', 0)
+    if abs(array[low].lnum - target) < abs(array[low - 1].lnum - target)
+      let found = array[low]
+    else
+      let found = array[low - 1]
+    endif
+  else
+    let found = array[low - 1]
+  endif
+
+  return found.text
+endfunction

@@ -59,6 +59,8 @@ FEATURES                                                          *vista-feature
 *   [x] Jump to the tag/symbol from vista sidebar with a blink.
 *   [x] Update automatically when switching between buffers.
 *   [x] Update asynchonously in the background when `+job` avaliable.
+*   [x] Find the nearest method or function to the cursor, which could be
+    integrated into the statusline.
 *   [ ] Supports all of the languages that ctags does.
 *   [ ] Highlight current tag/symbol.
 *   [ ] Show the visibility (public/private) of tags.

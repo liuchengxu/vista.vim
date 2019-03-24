@@ -2,6 +2,14 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
+function! s:Insert(container, kind, picked) abort
+  if has_key(a:container, a:kind)
+    call add(a:container[a:kind], a:picked)
+  else
+    let a:container[a:kind] = [a:picked]
+  endif
+endfunction
+
 " Parse the output from ctags linewise and feed them into the container
 " The parsed result should be compatible with the LSP output.
 "
@@ -27,11 +35,11 @@ function! vista#parser#ctags#ExtractTag(line, container) abort
 
   let picked = {'lnum': lnum, 'text': tagname}
 
-  if has_key(a:container, scope)
-    call add(a:container[scope], picked)
-  else
-    let a:container[scope] = [picked]
+  if scope =~# '^f'
+    call add(t:vista.functions, picked)
   endif
+
+  call s:Insert(a:container, scope, picked)
 endfunction
 
 function! vista#parser#ctags#TagFromJSON(line, container) abort
@@ -41,11 +49,11 @@ function! vista#parser#ctags#TagFromJSON(line, container) abort
 
   let picked = {'lnum': line.line, 'text': line.name }
 
-  if has_key(a:container, kind)
-    call add(a:container[kind], picked)
-  else
-    let a:container[kind] = [picked]
+  if kind ==? 'function' || kind ==? 'func'
+    call add(t:vista.functions, picked)
   endif
+
+  call s:Insert(a:container, kind, picked)
 endfunction
 
 function! vista#parser#ctags#ProjectTagFromXformat(line, container) abort
@@ -77,11 +85,7 @@ function! vista#parser#ctags#ProjectTagFromXformat(line, container) abort
 
   let picked = {'lnum': lnum, 'text': tagname, 'tagfile': relpath, 'taginfo': pattern[2:-3]}
 
-  if has_key(a:container, kind)
-    call add(a:container[kind], picked)
-  else
-    let a:container[kind] = [picked]
-  endif
+  call s:Insert(a:container, kind, picked)
 endfunction
 
 function! vista#parser#ctags#ProjectTagFromJSON(line, container) abort
@@ -99,9 +103,5 @@ function! vista#parser#ctags#ProjectTagFromJSON(line, container) abort
 
   let picked = {'lnum': line.line, 'text': line.name, 'tagfile': line.path, 'taginfo': line.pattern[2:-3]}
 
-  if has_key(a:container, kind)
-    call add(a:container[kind], picked)
-  else
-    let a:container[kind] = [picked]
-  endif
+  call s:Insert(a:container, kind, picked)
 endfunction
