@@ -50,7 +50,7 @@ Vista.vim can also be a symbol navigator similar to [ctrlp-funky](https://github
 - [x] Update automatically when switching between buffers.
 - [x] Update asynchonously in the background when `+job` avaliable.
 - [x] Find the nearest method or function to the cursor, which could be integrated into the statusline.
-- [ ] Highlight current tag/symbol.
+- [ ] Highlight the nearest tag/symbol in the vista sidebar.
 - [ ] Supports all of the languages that ctags does.
 - [ ] Show the visibility (public/private) of tags.
 - [ ] Tree viewer for hierarchy data.
