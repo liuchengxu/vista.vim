@@ -2,6 +2,8 @@
 
 View and search LSP symbols, tags in Vim/NeoVim.
 
+![vista](https://user-images.githubusercontent.com/8850248/54874346-88a7d380-4e24-11e9-8574-fb4c56085e9d.gif)
+
 :warning: **Currently vista.vim is mostly usable, yet not stable. All the public APIs and global options can be changed or even be removed in the future.**
 
 ## Table Of Contents
