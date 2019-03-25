@@ -207,6 +207,10 @@ function! s:FindNearestMethodOrFunction(_timer) abort
 endfunction
 
 function! vista#cursor#FindNearestMethodOrFunction() abort
+  if !exists('t:vista')
+    return
+  endif
+
   if bufnr('') != t:vista.source.bufnr
     return
   endif
