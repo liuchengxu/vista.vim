@@ -129,7 +129,7 @@ function! vista#sidebar#Open() abort
     " if there is no LSP for a given filetype.
     let executive = 'ctags'
   endif
-  call vista#executive#{executive}#Execute(v:false, v:true)
+  call vista#executive#{executive}#Execute(v:false, v:true, v:false)
 endfunction
 
 function! s:IsVisible() abort

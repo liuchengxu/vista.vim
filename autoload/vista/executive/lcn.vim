@@ -68,7 +68,7 @@ function! vista#executive#lcn#RunAsync() abort
   call s:RunAsync()
 endfunction
 
-function! vista#executive#lcn#Execute(bang, should_display) abort
+function! vista#executive#lcn#Execute(bang, should_display, ...) abort
   call vista#SetProvider(s:provider)
   call vista#autocmd#Init('VistaLCN', function('s:AutoUpdate'))
 

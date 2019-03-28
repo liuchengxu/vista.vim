@@ -105,7 +105,7 @@ function! vista#executive#coc#RunAsync() abort
   call s:Dispatch('s:RunAsync')
 endfunction
 
-function! vista#executive#coc#Execute(bang, should_display) abort
+function! vista#executive#coc#Execute(bang, should_display, ...) abort
   call vista#SetProvider(s:provider)
   call vista#autocmd#Init('VistaCoc', function('s:AutoUpdate'))
   return s:Dispatch('s:Execute', a:bang, a:should_display)
