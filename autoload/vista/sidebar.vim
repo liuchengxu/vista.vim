@@ -124,6 +124,9 @@ function! vista#sidebar#Open() abort
   let executive = get(g:, 'vista_default_executive', 'ctags')
   let ft = &filetype
   if exists('g:vista_ctags_cmd') && has_key(g:vista_ctags_cmd, ft)
+    " If an entry for this filetype exists in vista_ctags_cmd, override 
+    " the default to ctags. This allows configuring ctags as a fallback 
+    " if there is no LSP for a given filetype.
     let executive = 'ctags'
   endif
   call vista#executive#{executive}#Execute(v:false, v:true)
