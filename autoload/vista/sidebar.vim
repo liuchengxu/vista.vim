@@ -122,6 +122,10 @@ function! vista#sidebar#Open() abort
   let [bufnr, winnr, fname, fpath] = [bufnr('%'), winnr(), expand('%'), expand('%:p')]
   call vista#source#Update(bufnr, winnr, fname, fpath)
   let executive = get(g:, 'vista_default_executive', 'ctags')
+  let ft = &filetype
+  if exists('g:vista_ctags_cmd') && has_key(g:vista_ctags_cmd, ft)
+    let executive = 'ctags'
+  endif
   call vista#executive#{executive}#Execute(v:false, v:true)
 endfunction
 
