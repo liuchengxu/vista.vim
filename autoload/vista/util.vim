@@ -31,9 +31,8 @@ function! s:PrependFpath(lines) abort
     " Shorten the file path if it's too long
     if len(fpath) > width
       let fpath = '..'.fpath[len(fpath)-width:]
-      let lines = [fpath, ''] + a:lines
-      return lines
     endif
+    return [fpath, ''] + a:lines
   endif
 
   return a:lines
