@@ -86,9 +86,12 @@ function! vista#executive#vim_lsp#RunAsync() abort
   endif
 endfunction
 
-function! vista#executive#vim_lsp#Execute(bang, should_display) abort
+function! vista#executive#vim_lsp#Execute(bang, should_display, ...) abort
   if !s:HasAvaliableServers()
-    return vista#error#("Retrieving symbols is not avaliable")
+    if get(a:000, 0, v:true)
+      return vista#error#("Retrieving symbols is not avaliable")
+    endif
+    return
   endif
 
   let s:should_display = a:should_display

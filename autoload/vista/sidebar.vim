@@ -118,18 +118,33 @@ function! vista#sidebar#CloseIfVisible() abort
   endif
 endfunction
 
+function! s:GetExplicitExecutive() abort
+  let ft = &filetype
+
+  if exists('g:vista_'.ft.'_executive')
+    execute 'return' 'g:vista_'.ft.'_executive'
+  endif
+
+  if exists('g:vista_executive_for') && has_key(g:vista_executive_for, ft)
+    return g:vista_executive_for[ft]
+  endif
+
+  return v:null
+endfunction
+
 function! vista#sidebar#Open() abort
   let [bufnr, winnr, fname, fpath] = [bufnr('%'), winnr(), expand('%'), expand('%:p')]
   call vista#source#Update(bufnr, winnr, fname, fpath)
-  let executive = get(g:, 'vista_default_executive', 'ctags')
-  let ft = &filetype
-  if exists('g:vista_ctags_cmd') && has_key(g:vista_ctags_cmd, ft)
-    " If an entry for this filetype exists in vista_ctags_cmd, override 
-    " the default to ctags. This allows configuring ctags as a fallback 
-    " if there is no LSP for a given filetype.
-    let executive = 'ctags'
+
+  let explicit_executive = s:GetExplicitExecutive()
+
+  if explicit_executive isnot# v:null
+    let executive = explicit_executive
+  else
+    let executive = get(g:, 'vista_default_executive', 'ctags')
   endif
-  call vista#executive#{executive}#Execute(v:false, v:true)
+
+  call vista#executive#{executive}#Execute(v:false, v:true, v:false)
 endfunction
 
 function! s:IsVisible() abort
