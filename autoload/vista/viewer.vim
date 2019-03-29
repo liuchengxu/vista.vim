@@ -50,7 +50,8 @@ function! s:viewer.render() abort
           let row = s:Join(
                 \ repeat(' ', self.gap),
                 \ self.prefixes[1],
-                \ i.text.':'.i.lnum
+                \ i.text,
+                \ ':'.i.lnum
                 \ )
           call add(self.rows, row)
         endif

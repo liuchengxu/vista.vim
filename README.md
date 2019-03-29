@@ -23,6 +23,8 @@ View and search LSP symbols, tags in Vim/NeoVim.
     * [Show the nearest method/function in the statusline](#show-the-nearest-methodfunction-in-the-statusline)
     * [Commands](#commands)
     * [Options](#options)
+    * [Other tips](#other-tips)
+        * [Compile ctags with JSON format support](#compile-ctags-with-json-format-support)
 * [Contributing](#contributing)
 * [License](#license)
 
@@ -43,7 +45,7 @@ Vista.vim can also be a symbol navigator similar to [ctrlp-funky](https://github
 ## Features
 
 - [x] View tags and LSP symbols in a sidebar.
-    - [x] [ctags](https://github.com/universal-ctags/ctags)
+    - [x] [universal-ctags](https://github.com/universal-ctags/ctags)
     - [x] [vim-lsp](https://github.com/prabirshrestha/vim-lsp)
     - [x] [coc.nvim](https://github.com/neoclide/coc.nvim)
     - [x] [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
@@ -103,8 +105,6 @@ $ git clone https://github.com/liuchengxu/vista.vim.git --depth=1 ~/.local/share
 
 ## Usage
 
-:warning: The following instructions are not complete, **please see the help via `:help vista` for more detailed usage**.
-
 ### Show the nearest method/function in the statusline
 
 You can do the following to show the nearest method/function in your statusline:
@@ -137,29 +137,9 @@ Command   | Description
 
 ### Options
 
+:warning: The following options are not complete, **please see the help via `:help vista-options` for more details**.
+
 ```vim
-" Position to open the vista sidebar. On the right by default.
-" Change to 'vertical topleft' to open on the left.
-let g:vista_sidebar_position = 'vertical botright'
-
-" Width of vista sidebar.
-let g:vista_sidebar_width = 30
-
-" Set this flag to 0 to disable echoing when the cursor moves.
-let g:vista_echo_cursor = 1
-
-" Time delay for showing detailed symbol info at current cursor.
-let g:vista_cursor_delay = 400
-
-" Close the vista window automatically close when you jump to a symbol.
-let g:vista_close_on_jump = 0
-
-" Move to the vista window when it is opened.
-let g:vista_stay_on_open = 1
-
-" Blinking cursor 2 times with 100ms interval after jumping to the tag.
-let g:vista_blink = [2, 100]
-
 " How each level is indented and what to prepend.
 " This could make the display more compact or more spacious.
 " e.g., more compact: ["▸ ", ""]
@@ -169,22 +149,50 @@ let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
 " See all the avaliable executives via `:echo g:vista#executives`.
 let g:vista_default_executive = 'ctags'
 
+" Set the executive for some filetypes explicitly. Use the explicit executive
+" instead of the default one for these filetypes when using `:Vista` without 
+" specifying the executive.
+let g:vista_executive_for = {
+  \ 'cpp': 'vim_lsp',
+  \ 'php': 'vim_lsp',
+  \ }
+
 " Declare the command including the executable and options used to generate ctags output
 " for some certain filetypes.The file path will be appened to your custom command.
 " For example:
 let g:vista_ctags_cmd = {
-      \ 'haskell': 'hasktags -o - -c',
+      \ 'haskell': 'hasktags -x -o - -c',
       \ }
 
 " To enable fzf's preview window set g:vista_fzf_preview.
 " The elements of g:vista_fzf_preview will be passed as arguments to fzf#vim#with_preview()
 " For example:
 let g:vista_fzf_preview = ['right:50%']
-
-" Fall back to other executives if the specified one gives empty data.
-" By default it's all the provided executives excluding the tried one.
-" let g:vista_finder_alternative_executives = ['coc']
 ```
+
+### Other tips
+
+#### Compile ctags with JSON format support
+
+First of all, check if your ctags supports JSON format via `ctags --list-features`. If not, I recommend you to install ctags with JSON format support that would make vista's parser easier and more reliable. [universal-ctags](https://github.com/universal-ctags/ctags) has JSON output mode, it's avaliable if u-ctags is linked to libjansson.
+
+- macOS
+
+    ```bash
+    brew install --with-jansson universal-ctags/universal-ctags/universal-ctags
+    ```
+
+- Ubuntu
+
+    ```bash
+    # install libjansson first
+    sudo apt-get install libjansson-dev
+
+    # then compile and install ctags
+    ```
+
+    Refer to [Compiling and Installing Jansson](https://jansson.readthedocs.io/en/latest/gettingstarted.html#compiling-and-installing-jansson) as well.
+
 
 ## Contributing
 

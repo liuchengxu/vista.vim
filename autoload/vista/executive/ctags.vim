@@ -11,59 +11,6 @@ let s:ctags = get(g:, 'vista_ctags_executable', 'ctags')
 let s:support_json_format =
       \ len(filter(split(system(s:ctags.' --list-features'), '\n'), 'v:val =~ "^json"')) > 0
 
-let s:language_opt = {
-      \ 'ant'        : ['ant'        , 'pt']            ,
-      \ 'asm'        : ['asm'        , 'dlmt']          ,
-      \ 'aspperl'    : ['asp'        , 'fsv']           ,
-      \ 'aspvbs'     : ['asp'        , 'fsv']           ,
-      \ 'awk'        : ['awk'        , 'f']             ,
-      \ 'beta'       : ['beta'       , 'fsv']           ,
-      \ 'c'          : ['c'          , 'dgsutvf']       ,
-      \ 'cpp'        : ['c++'        , 'nvdtcgsuf']     ,
-      \ 'cs'         : ['c#'         , 'dtncEgsipm']    ,
-      \ 'cobol'      : ['cobol'      , 'dfgpPs']        ,
-      \ 'delphi'     : ['pascal'     , 'fp']            ,
-      \ 'dosbatch'   : ['dosbatch'   , 'lv']            ,
-      \ 'eiffel'     : ['eiffel'     , 'cf']            ,
-      \ 'erlang'     : ['erlang'     , 'drmf']          ,
-      \ 'expect'     : ['tcl'        , 'cfp']           ,
-      \ 'fortran'    : ['fortran'    , 'pbceiklmntvfs'] ,
-      \ 'go'         : ['go'         , 'fctv']          ,
-      \ 'html'       : ['html'       , 'af']            ,
-      \ 'java'       : ['java'       , 'pcifm']         ,
-      \ 'javascript' : ['javascript' , 'f']             ,
-      \ 'lisp'       : ['lisp'       , 'f']             ,
-      \ 'lua'        : ['lua'        , 'f']             ,
-      \ 'make'       : ['make'       , 'm']             ,
-      \ 'matlab'     : ['matlab'     , 'f']             ,
-      \ 'ocaml'      : ['ocaml'      , 'cmMvtfCre']     ,
-      \ 'pascal'     : ['pascal'     , 'fp']            ,
-      \ 'perl'       : ['perl'       , 'clps']          ,
-      \ 'php'        : ['php'        , 'cdvf']          ,
-      \ 'python'     : ['python'     , 'cmf']           ,
-      \ 'rexx'       : ['rexx'       , 's']             ,
-      \ 'ruby'       : ['ruby'       , 'cfFm']          ,
-      \ 'rust'       : ['rust'       , 'fgsmcti']     ,
-      \ 'scheme'     : ['scheme'     , 'sf']            ,
-      \ 'sh'         : ['sh'         , 'f']             ,
-      \ 'csh'        : ['sh'         , 'f']             ,
-      \ 'zsh'        : ['sh'         , 'f']             ,
-      \ 'scala'      : ['scala'      , 'ctTmlp']        ,
-      \ 'slang'      : ['slang'      , 'nf']            ,
-      \ 'sml'        : ['sml'        , 'ecsrtvf']       ,
-      \ 'sql'        : ['sql'        , 'cFPrstTvfp']    ,
-      \ 'tex'        : ['tex'        , 'ipcsubPGl']     ,
-      \ 'tcl'        : ['tcl'        , 'cfmp']          ,
-      \ 'vera'       : ['vera'       , 'cdefgmpPtTvx']  ,
-      \ 'verilog'    : ['verilog'    , 'mcPertwpvf']    ,
-      \ 'vhdl'       : ['vhdl'       , 'PctTrefp']      ,
-      \ 'vim'        : ['vim'        , 'avf']           ,
-      \ 'yacc'       : ['yacc'       , 'l']             ,
-      \ }
-
-let s:language_opt = map(s:language_opt,
-      \ 'printf("--language-force=%s --%s-types=%s", v:val[0], v:val[0], v:val[1])')
-
 function! s:GetCustomCmd(ft) abort
   if exists('g:vista_ctags_cmd') && has_key(g:vista_ctags_cmd, a:ft)
     return g:vista_ctags_cmd[a:ft]
@@ -71,34 +18,51 @@ function! s:GetCustomCmd(ft) abort
   return v:null
 endfunction
 
+function! s:GetLanguageSpecificOptition(filetype) abort
+  let opt = ''
+
+  try
+
+    let types = g:vista#types#uctags#{a:filetype}#
+    let lang = types.lang
+    let kinds = join(keys(types.kinds), '')
+    let opt = printf('--language-force=%s --%s-kinds=%s', lang, lang, kinds)
+
+  " Ignore Vim(let):E121: Undefined variable
+  catch /^Vim\%((\a\+)\)\=:E121/
+  endtry
+
+  return opt
+endfunction
+
 " FIXME support all languages that ctags does
-function! s:Cmd(file) abort
+function! s:BuildCmd(file) abort
   let ft = &filetype
+
+  " Refer to tagbar
+  let common_opt = '--format=2 --excmd=pattern --fields=nksSaf --extras= --file-scope=yes --sort=no --append=no'
+  let language_specific_opt = s:GetLanguageSpecificOptition(ft)
+
+  " TODO vista_ctags_{filetype}_executable
+  if s:support_json_format
+    let fmt = '%s %s %s --output-format=json -f- %s'
+    let s:TagParser = function('vista#parser#ctags#FromJSON')
+  else
+    let fmt = '%s %s %s -f- %s'
+    let s:TagParser = function('vista#parser#ctags#FromExtendedRaw')
+  endif
+
+  let cmd = printf(fmt, s:ctags, common_opt, language_specific_opt, a:file)
 
   let custom_cmd = s:GetCustomCmd(ft)
 
   if custom_cmd isnot v:null
+    if stridx(custom_cmd, '--output-format=json') > -1
+      let s:TagParser = function('vista#parser#ctags#FromJSON')
+    else
+      let s:TagParser = function('vista#parser#ctags#FromExtendedRaw')
+    endif
     let cmd = printf('%s %s', custom_cmd, a:file)
-    return cmd
-  endif
-
-  if ft ==# 'cpp'
-    let opt = '--c++-kinds=+p'
-  else
-    let opt = printf('--language-force=%s', ft)
-  endif
-
-  if has_key(s:language_opt, ft)
-    let opt = s:language_opt[ft]
-  endif
-
-  " TODO vista_ctags_{filetype}_executable
-  if s:support_json_format
-    let cmd = printf('%s --excmd=number --sort=no --fields=Ks  --fields=+n --output-format=json %s -f- %s', s:ctags, opt, a:file)
-    let s:TagParser = function('vista#parser#ctags#TagFromJSON')
-  else
-    let cmd = printf('%s --excmd=number --sort=no --fields=Ks %s -f- %s', s:ctags, opt, a:file)
-    let s:TagParser = function('vista#parser#ctags#ExtractTag')
   endif
 
   return cmd
@@ -217,7 +181,7 @@ function! s:ApplyExecute(bang, fpath) abort
     return
   endif
 
-  let cmd = s:Cmd(file)
+  let cmd = s:BuildCmd(file)
 
   if a:bang
     call s:ApplyRun(cmd)
@@ -242,7 +206,7 @@ function! s:Run(fpath) abort
 
   let s:fpath = a:fpath
 
-  let cmd = s:Cmd(file)
+  let cmd = s:BuildCmd(file)
   call s:ApplyRun(cmd)
 
   return s:data
@@ -254,7 +218,7 @@ function! s:RunAsync(fpath) abort
     return
   endif
 
-  let cmd = s:Cmd(file)
+  let cmd = s:BuildCmd(file)
 
   if exists('s:id')
     call vista#util#JobStop(s:id)

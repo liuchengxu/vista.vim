@@ -42,6 +42,92 @@ function! vista#parser#ctags#ExtractTag(line, container) abort
   call s:Insert(a:container, scope, picked)
 endfunction
 
+function! s:ShortToLong(short) abort
+  let ft = getbufvar(t:vista.source.bufnr, '&filetype')
+
+  try
+
+    let types = g:vista#types#uctags#{ft}#
+    if has_key(types.kinds, a:short)
+      return types.kinds[a:short]['long']
+    endif
+  catch /^Vim\%((\a\+)\)\=:E121/
+  endtry
+
+  return a:short
+endfunction
+
+function! s:ParseTagfield(tagfields) abort
+  let fields = {}
+
+  if stridx(a:tagfields[0], ':') > -1
+    let colon = stridx(a:tagfields[0], ':')
+    let value = tagfield[colon+1:]
+    let fields.kind = value
+  else
+    let fields.kind = s:ShortToLong(a:tagfields[0])
+  endif
+
+  if len(a:tagfields) > 1
+    for tagfield in a:tagfields[1:]
+      let colon = stridx(tagfield, ':')
+      let name = tagfield[0:colon-1]
+      let value = tagfield[colon+1:]
+      let fields[name] = value
+    endfor
+  endif
+
+  return fields
+endfunction
+
+function! vista#parser#ctags#FromExtendedRaw(line, container) abort
+  if a:line =~ '^!_TAG'
+    return
+  endif
+  let items = split(a:line, '\t')
+
+  let line = {}
+
+  let line.name = items[0]
+  let line.tagfile = items[1]
+  let line.tagaddress = items[2]
+
+  let tagfields = s:ParseTagfield(items[3:])
+
+  call extend(line, tagfields)
+
+  let kind = line.kind
+
+  let picked = {'lnum': line.line, 'text': line.name}
+
+  if kind =~# '^f' || kind =~# '^m'
+    if has_key(line, 'signature')
+      let picked.signature = line.signature
+    endif
+    call add(t:vista.functions, picked)
+  endif
+
+  call s:Insert(a:container, kind, picked)
+
+endfunction
+
+function! vista#parser#ctags#FromJSON(line, container) abort
+  let line = json_decode(a:line)
+
+  let kind = line.kind
+
+  let picked = {'lnum': line.line, 'text': line.name }
+
+  if kind =~# '^f' || kind =~# '^m'
+    if has_key(line, 'signature')
+      let picked.signature = line.signature
+    endif
+    call add(t:vista.functions, picked)
+  endif
+
+  call s:Insert(a:container, kind, picked)
+endfunction
+
 function! vista#parser#ctags#TagFromJSON(line, container) abort
   let line = json_decode(a:line)
 
@@ -49,7 +135,7 @@ function! vista#parser#ctags#TagFromJSON(line, container) abort
 
   let picked = {'lnum': line.line, 'text': line.name }
 
-  if kind ==? 'function' || kind ==? 'func'
+  if kind =~# '^f'
     call add(t:vista.functions, picked)
   endif
 
