@@ -214,7 +214,7 @@ g:vista_executive_for                                      *g:vista_executive_fo
       \ 'cpp': 'vim_lsp',
       \ 'php': 'vim_lsp',
       \ }
-<
+
 g:vista_{&filetype}_executive                       *g:vista_{&filetype}_executive*
   Type: |String|
   Default: `''`
