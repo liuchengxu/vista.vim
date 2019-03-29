@@ -39,13 +39,6 @@ endfunction
 function! s:BuildCmd(file) abort
   let ft = &filetype
 
-  let custom_cmd = s:GetCustomCmd(ft)
-
-  if custom_cmd isnot v:null
-    let cmd = printf('%s %s', custom_cmd, a:file)
-    return cmd
-  endif
-
   " Refer to tagbar
   let common_opt = '--format=2 --excmd=pattern --fields=nksSaf --extras= --file-scope=yes --sort=no --append=no'
   let language_specific_opt = s:GetLanguageSpecificOptition(ft)
@@ -60,6 +53,12 @@ function! s:BuildCmd(file) abort
   endif
 
   let cmd = printf(fmt, s:ctags, common_opt, language_specific_opt, a:file)
+
+  let custom_cmd = s:GetCustomCmd(ft)
+
+  if custom_cmd isnot v:null
+    let cmd = printf('%s %s', custom_cmd, a:file)
+  endif
 
   return cmd
 endfunction
