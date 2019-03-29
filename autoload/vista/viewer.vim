@@ -51,7 +51,6 @@ function! s:viewer.render() abort
                 \ repeat(' ', self.gap),
                 \ self.prefixes[1],
                 \ i.text,
-                \ get(i, 'signature', ''),
                 \ ':'.i.lnum
                 \ )
           call add(self.rows, row)
