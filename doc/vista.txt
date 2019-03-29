@@ -197,7 +197,35 @@ g:vista_default_executive                              *g:vista_default_executiv
 
   Executive used when opening vista sidebar without specifying it.
   See all the avaliable executives via `:echo g:vista#executives` .
->
+
+g:vista_executive_for                                      *g:vista_executive_for*
+  Type: |Dict|
+  Default: `{}`
+
+  Set the executive for some filetypes explicitly, which is useful for setting
+  `ctags` as the default executive, whereas you prefer to use LSP for some
+  filetypes you ensured the LSP functionality is good. The rationality is the
+  LSP server needs to be installed explicitly and people normally only install
+  a few frequently used ones, but ctags supports much more languages by default.
+  >
+  let g:vista_default_executive = 'ctags'
+
+  let g:vista_executive_for = {
+      \ 'cpp': 'vim_lsp',
+      \ 'php': 'vim_lsp',
+      \ }
+<
+g:vista_{&filetype}_executive                       *g:vista_{&filetype}_executive*
+  Type: |String|
+  Default: `''`
+
+  The goal of this option is similar to |g:vista_executive_for|, but with
+  higher priority if you set the same filetype in `g:vista_executive_for`.
+  vista.vim will check `g:vista_{&filetype}_executive` first and then
+  `g:vista_executive_for`. >
+
+  let g:vista_cpp_executive = 'vim_lsp'
+
 g:vista_ctags_cmd                                              *g:vista_ctags_cmd*
   Type: |Dictionary|
   Default: `{}`
