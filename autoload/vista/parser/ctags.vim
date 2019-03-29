@@ -80,7 +80,7 @@ function! s:ParseTagfield(tagfields) abort
   return fields
 endfunction
 
-function! vista#parser#ctags#FromRaw(line, container) abort
+function! vista#parser#ctags#FromExtendedRaw(line, container) abort
   if a:line =~ '^!_TAG'
     return
   endif

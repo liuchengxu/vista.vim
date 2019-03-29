@@ -49,7 +49,7 @@ function! s:BuildCmd(file) abort
     let s:TagParser = function('vista#parser#ctags#FromJSON')
   else
     let fmt = '%s %s %s -f- %s'
-    let s:TagParser = function('vista#parser#ctags#FromRaw')
+    let s:TagParser = function('vista#parser#ctags#FromExtendedRaw')
   endif
 
   let cmd = printf(fmt, s:ctags, common_opt, language_specific_opt, a:file)
@@ -60,7 +60,7 @@ function! s:BuildCmd(file) abort
     if stridx(custom_cmd, '--output-format=json') > -1
       let s:TagParser = function('vista#parser#ctags#FromJSON')
     else
-      let s:TagParser = function('vista#parser#ctags#FromRaw')
+      let s:TagParser = function('vista#parser#ctags#FromExtendedRaw')
     endif
     let cmd = printf('%s %s', custom_cmd, a:file)
   endif
