@@ -60,12 +60,12 @@ endfunction
 function! s:ParseTagfield(tagfields) abort
   let fields = {}
 
-  if len(a:tagfields[0]) == 1
-    let fields.kind = s:ShortToLong(a:tagfields[0])
-  else
+  if stridx(a:tagfields[0], ':') > -1
     let colon = stridx(a:tagfields[0], ':')
     let value = tagfield[colon+1:]
     let fields.kind = value
+  else
+    let fields.kind = s:ShortToLong(a:tagfields[0])
   endif
 
   if len(a:tagfields) > 1
@@ -81,6 +81,9 @@ function! s:ParseTagfield(tagfields) abort
 endfunction
 
 function! vista#parser#ctags#FromRaw(line, container) abort
+  if a:line =~ '^!_TAG'
+    return
+  endif
   let items = split(a:line, '\t')
 
   let line = {}

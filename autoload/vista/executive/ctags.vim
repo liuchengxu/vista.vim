@@ -57,6 +57,11 @@ function! s:BuildCmd(file) abort
   let custom_cmd = s:GetCustomCmd(ft)
 
   if custom_cmd isnot v:null
+    if stridx(custom_cmd, '--output-format=json') > -1
+      let s:TagParser = function('vista#parser#ctags#FromJSON')
+    else
+      let s:TagParser = function('vista#parser#ctags#FromRaw')
+    endif
     let cmd = printf('%s %s', custom_cmd, a:file)
   endif
 
