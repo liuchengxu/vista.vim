@@ -161,7 +161,7 @@ let g:vista_executive_for = {
 " for some certain filetypes.The file path will be appened to your custom command.
 " For example:
 let g:vista_ctags_cmd = {
-      \ 'haskell': 'hasktags -o - -c',
+      \ 'haskell': 'hasktags -x -o - -c',
       \ }
 
 " To enable fzf's preview window set g:vista_fzf_preview.
