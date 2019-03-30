@@ -115,6 +115,11 @@ function! NearestMethodOrFunction() abort
 endfunction
 
 set statusline+=%{NearestMethodOrFunction()}
+
+" By default vista.vim never run if you don't call it explicitly.
+"
+" You can add the following line to your vimrc if you want to show the nearest function in your statusline automatically.
+autocmd VimEnter * call vista#RunForNearestMethodOrFunction()
 ```
 
 Also refer to [liuchengxu/eleline#18](https://github.com/liuchengxu/eleline.vim/pull/18).
@@ -135,9 +140,9 @@ Command   | Description
 
 `:Vista finder [EXECUTIVE]`: search tags/symbols generated from EXECUTIVE.
 
-### Options
+See `:help vista-commands` for more information.
 
-:warning: The following options are not complete, **please see the help via `:help vista-options` for more details**.
+### Options
 
 ```vim
 " How each level is indented and what to prepend.
@@ -150,7 +155,7 @@ let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
 let g:vista_default_executive = 'ctags'
 
 " Set the executive for some filetypes explicitly. Use the explicit executive
-" instead of the default one for these filetypes when using `:Vista` without 
+" instead of the default one for these filetypes when using `:Vista` without
 " specifying the executive.
 let g:vista_executive_for = {
   \ 'cpp': 'vim_lsp',
@@ -169,6 +174,8 @@ let g:vista_ctags_cmd = {
 " For example:
 let g:vista_fzf_preview = ['right:50%']
 ```
+
+See `:help vista-options` for more information.
 
 ### Other tips
 

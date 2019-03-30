@@ -58,3 +58,11 @@ function! vista#autocmd#Init(group_name, AUF) abort
           \ call s:GenericAutoUpdate(fnamemodify(expand('<afile>'), ':p'))
   augroup END
 endfunction
+
+
+function! vista#autocmd#InitMOF() abort
+  augroup VistaMOF
+    autocmd!
+    autocmd CursorMoved * call vista#cursor#FindNearestMethodOrFunction()
+  augroup END
+endfunction

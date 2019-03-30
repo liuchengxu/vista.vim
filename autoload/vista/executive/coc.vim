@@ -105,8 +105,9 @@ function! vista#executive#coc#RunAsync() abort
   call s:Dispatch('s:RunAsync')
 endfunction
 
+" The public Execute function is used for interacting with this plugin from
+" outside, where sets the provider and auto update events.
 function! vista#executive#coc#Execute(bang, should_display, ...) abort
-  call vista#SetProvider(s:provider)
-  call vista#autocmd#Init('VistaCoc', function('s:AutoUpdate'))
+  call vista#OnExecute(s:provider, 'VistaCoc', function('s:AutoUpdate'))
   return s:Dispatch('s:Execute', a:bang, a:should_display)
 endfunction

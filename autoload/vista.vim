@@ -33,6 +33,22 @@ function! vista#SetProvider(provider) abort
   endif
 endfunction
 
+function! vista#OnExecute(provider, group_name, AUF) abort
+  call vista#SetProvider(a:provider)
+  call vista#autocmd#Init(a:group_name, a:AUF)
+endfunction
+
+function! vista#RunForNearestMethodOrFunction() abort
+  let [bufnr, winnr, fname, fpath] = [bufnr('%'), winnr(), expand('%'), expand('%:p')]
+  call vista#source#Update(bufnr, winnr, fname, fpath)
+  let executive = get(g:, 'vista_default_executive', 'ctags')
+  call vista#executive#{executive}#Execute(v:false, v:false)
+
+  if !exists('#VistaMOF')
+    call vista#autocmd#InitMOF()
+  endif
+endfunction
+
 function! vista#(bang, ...) abort
   if a:bang
     if a:0 == 0

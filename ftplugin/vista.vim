@@ -42,5 +42,8 @@ augroup VistaCursor
   if get(g:, 'vista_echo_cursor', 1)
     autocmd CursorMoved <buffer> call vista#cursor#ShowDetailWithDelay()
   endif
-  autocmd CursorMoved * call vista#cursor#FindNearestMethodOrFunction()
 augroup END
+
+if !exists('#VistaMOF')
+  call vista#autocmd#InitMOF()
+endif

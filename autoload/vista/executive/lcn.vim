@@ -69,8 +69,7 @@ function! vista#executive#lcn#RunAsync() abort
 endfunction
 
 function! vista#executive#lcn#Execute(bang, should_display, ...) abort
-  call vista#SetProvider(s:provider)
-  call vista#autocmd#Init('VistaLCN', function('s:AutoUpdate'))
+  call vista#OnExecute(s:provider, 'VistaLCN', function('s:AutoUpdate'))
 
   let s:should_display = a:should_display
   if a:bang

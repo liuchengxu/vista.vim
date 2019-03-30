@@ -207,7 +207,7 @@ function! s:FindNearestMethodOrFunction(_timer) abort
 endfunction
 
 function! vista#cursor#FindNearestMethodOrFunction() abort
-  if !exists('t:vista')
+  if !exists('t:vista') || !has_key(t:vista, 'functions')
     return
   endif
 
