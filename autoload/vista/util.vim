@@ -57,6 +57,10 @@ function! vista#util#JobStop(jobid) abort
   endif
 endfunction
 
+function! vista#util#Join(...) abort
+  return join(a:000, '')
+endfunction
+
 " Blink current line under cursor, from junegunn/vim-slash
 function! vista#util#Blink(times, delay) abort
   let s:blink = { 'ticks': 2 * a:times, 'delay': a:delay }
@@ -128,9 +132,9 @@ function! vista#util#LowerIndentLineNr() abort
   return 0
 endfunction
 
-" array: List of Method or Function symbols
+" array: List of Dict, composed of Method or Function symbols
 " target: current line number in the source buffer
-function! vista#util#BinarySearch(array, target) abort
+function! vista#util#BinarySearch(array, target, cmp_key, ret_key) abort
   let [array, target] = [a:array, a:target]
 
   let low = 0
@@ -138,10 +142,10 @@ function! vista#util#BinarySearch(array, target) abort
 
   while low <= high
     let mid = (low + high) / 2
-    if array[mid].lnum == target
+    if array[mid][a:cmp_key] == target
       let found = array[mid]
-      return found.text
-    elseif array[mid].lnum > target
+      return found[a:ret_key]
+    elseif array[mid][a:cmp_key] > target
       let high = mid - 1
     else
       let low = mid + 1
@@ -154,7 +158,7 @@ function! vista#util#BinarySearch(array, target) abort
 
   " If no exact match, prefer the previous nearest one.
   if get(g:, 'vista_find_absolute_nearest_method_or_function', 0)
-    if abs(array[low].lnum - target) < abs(array[low - 1].lnum - target)
+    if abs(array[low][a:cmp_key] - target) < abs(array[low - 1][a:cmp_key] - target)
       let found = array[low]
     else
       let found = array[low - 1]
@@ -163,5 +167,5 @@ function! vista#util#BinarySearch(array, target) abort
     let found = array[low - 1]
   endif
 
-  return found.text
+  return found[a:ret_key]
 endfunction

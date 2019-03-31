@@ -66,6 +66,9 @@ function! s:ParseTagfield(tagfields) abort
     let fields.kind = value
   else
     let fields.kind = s:ShortToLong(a:tagfields[0])
+    if index(t:vista.kinds, kind) == -1
+      call add(t:vista.kinds, kind)
+    endif
   endif
 
   if len(a:tagfields) > 1
@@ -114,6 +117,8 @@ endfunction
 function! vista#parser#ctags#FromJSON(line, container) abort
   let line = json_decode(a:line)
 
+  call add(t:vista.raw, line)
+
   let kind = line.kind
 
   let picked = {'lnum': line.line, 'text': line.name }
@@ -123,6 +128,10 @@ function! vista#parser#ctags#FromJSON(line, container) abort
       let picked.signature = line.signature
     endif
     call add(t:vista.functions, picked)
+  endif
+
+  if index(t:vista.kinds, kind) == -1
+    call add(t:vista.kinds, kind)
   endif
 
   call s:Insert(a:container, kind, picked)

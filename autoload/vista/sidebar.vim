@@ -152,12 +152,12 @@ function! vista#sidebar#Open() abort
   call vista#executive#{executive}#Execute(v:false, v:true, v:false)
 endfunction
 
-function! s:IsVisible() abort
+function! vista#sidebar#IsVisible() abort
   return bufwinnr('__vista__') != -1
 endfunction
 
 function! vista#sidebar#Toggle() abort
-  if s:IsVisible()
+  if vista#sidebar#IsVisible()
     call vista#sidebar#Close()
   else
     call vista#sidebar#Open()

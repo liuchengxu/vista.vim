@@ -30,10 +30,6 @@ function! s:ContainWhitespaceOnly(str) abort
   return a:str !~ '\S'
 endfunction
 
-function! s:Join(...) abort
-  return join(a:000, '')
-endfunction
-
 function! s:viewer.render() abort
   let try_adjust = self.prefixes[0] != self.prefixes[1]
 
@@ -49,7 +45,7 @@ function! s:viewer.render() abort
       " Children
       for i in v
         if len(i) > 0
-          let row = s:Join(
+          let row = vista#util#Join(
                 \ repeat(' ', self.gap),
                 \ self.prefixes[1],
                 \ i.text,
@@ -77,14 +73,10 @@ function! s:viewer.render() abort
   return self.rows
 endfunction
 
-function! s:Render(data) abort
+function! vista#renderer#kind#Render(data) abort
   if empty(a:data)
     return []
   endif
   call s:viewer.init(a:data)
   return s:viewer.render()
-endfunction
-
-function! vista#renderer#kind#Render(data) abort
-  return s:Render(a:data)
 endfunction
