@@ -126,7 +126,9 @@ function! s:ApplyRun(opts, Hi) abort
 
   " https://unix.stackexchange.com/questions/149209/refresh-changed-content-of-file-opened-in-vim
   " Vim Highlight does not work at times
-  if !has('nvim')
+  "
+  "  &modifiable is to avoid error in MacVim - E948: Job still running (add ! to end the job)
+  if !has('nvim') && &modifiable
     edit
   endif
 endfunction

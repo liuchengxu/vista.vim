@@ -63,7 +63,7 @@ function! s:EchoInCmdline(msg, tag) abort
   " Echo the scope of current tag if found
   if linenr != 0
     let pieces = split(getline(linenr), ' ')
-    if !empty(pieces)
+    if len(pieces) > 1
       let scope = pieces[1]
       echohl Function  | echo '['.scope.'] '  | echohl NONE
       " if start is 0, msg[0:-1] will display the redundant whole msg.
