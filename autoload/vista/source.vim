@@ -16,8 +16,22 @@ function! vista#source#Extension() abort
 endfunction
 
 function! vista#source#GotoWin() abort
-  let winnr = t:vista.source.winnr
-  noautocmd execute winnr."wincmd w"
+  if exists('*bufwinid')
+    let winid = bufwinid(t:vista.source.bufnr)
+    if winid != -1
+      call win_gotoid(winid)
+    else
+      return vista#error#('Cannot find the source window id')
+    endif
+  else
+    " t:vista.source.winnr is not always correct.
+    let winnr = bufwinnr(t:vista.source.bufnr)
+    if winnr != -1
+      noautocmd execute winnr."wincmd w"
+    else
+      return vista#error#('Cannot find the target window')
+    endif
+  endif
   " Floating window relys on BufEnter event to be closed automatically.
   if exists('#VistaFloatingWin')
     doautocmd BufEnter VistaFloatingWin
