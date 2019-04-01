@@ -28,4 +28,4 @@ hi default link VistaPrefix      String
 hi default link VistaLineNr      LineNr
 hi default link VistaColon       SpecialKey
 
-let b:current_syntax = 'vista'
+let b:current_syntax = 'vista_kind'

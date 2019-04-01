@@ -165,7 +165,13 @@ function! s:IntoTemp(...) abort
   if empty(a:1)
     let lines = vista#source#Lines()
   else
-    let lines = readfile(a:1)
+    try
+      let lines = readfile(a:1)
+    " Vim cannot read a temporary file, this may happen when you open vim with
+    " a file which does not exist yet, e.g., 'vim does_exist_yet.txt'
+    catch /E484/
+      return
+    endtry
   endif
 
   if writefile(lines, tmp) == 0
