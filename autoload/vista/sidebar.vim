@@ -7,7 +7,12 @@ function! s:NewWindow() abort
   let width = get(g:, 'vista_sidebar_width', 30)
   let open = position.' '.width.'new'
   silent execute open '__vista__'
-  setlocal filetype=vista
+
+  if get(g:, 'vista_ctags_renderer', '') == 'default'
+    setlocal filetype=vista
+  else
+    setlocal filetype=vista_kind
+  endif
 
   " FIXME when to delete?
   if has_key(t:vista.source, 'fpath')

@@ -9,7 +9,7 @@ let g:vista#executives = map(
 
 " Skip special buffers, filetypes.
 function! vista#ShouldSkip() abort
-  let blacklist = ['vista', 'nerdtree', 'startify', 'tagbar', 'fzf']
+  let blacklist = ['vista', 'vista_kind', 'nerdtree', 'startify', 'tagbar', 'fzf']
 
   return !empty(&buftype)
         \ || empty(&filetype)
