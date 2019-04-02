@@ -31,7 +31,9 @@ setlocal foldmethod=expr
 setlocal foldexpr=vista#fold#Expr()
 setlocal foldtext=vista#fold#Text()
 
-let &l:statusline = vista#statusline()
+if !vista#statusline#ShouldDisable()
+  let &l:statusline = vista#statusline#()
+endif
 
 nnoremap <buffer> <silent> q    :close<CR>
 nnoremap <buffer> <silent> <CR> :<c-u>call vista#cursor#FoldOrJump()<CR>

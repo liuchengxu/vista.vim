@@ -127,6 +127,7 @@ Vista!!                                                                  *Vista!
 OPTIONS                                                            *vista-options*
 
 g:vista_sidebar_position                                *g:vista_sidebar_position*
+
   Type: |String|
   Default: `vertical botright`
 
@@ -134,24 +135,28 @@ g:vista_sidebar_position                                *g:vista_sidebar_positio
   Change to `vertical topleft` to open on the left.
 
 g:vista_sidebar_width                                      *g:vista_sidebar_width*
+
   Type: |Number|
   Default: `30`
 
   Width of vista sidebar.
 
 g:vista_echo_cursor                                          *g:vista_echo_cursor*
+
   Type: |Number|
   Default: `1`
 
   Set this option to `0` to disable echoing when the cursor moves.
 >
 g:vista_cursor_delay                                        *g:vista_cursor_delay*
+
   Type: |Number|
   Default: `400`
 
   Time delay for showing detailed symbol info at current cursor.
 
 g:vista_echo_cursor_strategy                         *g:vista_echo_cursor_strategy*
+
   Type: |String|
   Default: `echo`
 
@@ -164,6 +169,7 @@ g:vista_echo_cursor_strategy                         *g:vista_echo_cursor_strate
   `both`         - both `echo` and `floating_win` will be used.
 
 g:vista_close_on_jump                                      *g:vista_close_on_jump*
+
   Type: |Number|
   Default: `0`
 
@@ -171,6 +177,7 @@ g:vista_close_on_jump                                      *g:vista_close_on_jum
   close when you jump to a symbol.
 >
 g:vista_stay_on_open                                        *g:vista_stay_on_open*
+
   Type: |Number|
   Default: `1`
 
@@ -178,6 +185,7 @@ g:vista_stay_on_open                                        *g:vista_stay_on_ope
   in current windown when opening the vista sidebar.
 >
 g:vista_blink                                                      *g:vista_blink*
+
   Type: |List|
   Default: `[2, 100]`
 
@@ -185,6 +193,7 @@ g:vista_blink                                                      *g:vista_blin
   jumping to the source line of tag.
 >
 g:vista_icon_indent                                          *g:vista_icon_indent*
+
   Type: |List|
   Default: `["╰─▸ ", "├─▸ "]`
 
@@ -192,6 +201,7 @@ g:vista_icon_indent                                          *g:vista_icon_inden
   the display more compact or more spacious.
 >
 g:vista_default_executive                              *g:vista_default_executive*
+
   Type: |String|
   Default: `ctags`
 
@@ -199,6 +209,7 @@ g:vista_default_executive                              *g:vista_default_executiv
   See all the avaliable executives via `:echo g:vista#executives` .
 
 g:vista_executive_for                                      *g:vista_executive_for*
+
   Type: |Dict|
   Default: `{}`
 
@@ -216,6 +227,7 @@ g:vista_executive_for                                      *g:vista_executive_fo
       \ }
 
 g:vista_{&filetype}_executive                       *g:vista_{&filetype}_executive*
+
   Type: |String|
   Default: `''`
 
@@ -227,6 +239,7 @@ g:vista_{&filetype}_executive                       *g:vista_{&filetype}_executi
   let g:vista_cpp_executive = 'vim_lsp'
 
 g:vista_ctags_cmd                                              *g:vista_ctags_cmd*
+
   Type: |Dictionary|
   Default: `{}`
 
@@ -240,6 +253,7 @@ g:vista_ctags_cmd                                              *g:vista_ctags_cm
       \ }
 
 g:vista_fzf_preview                                          *g:vista_fzf_preview*
+
   Type: |List|
   Default: `[]`
 
@@ -251,12 +265,14 @@ g:vista_fzf_preview                                          *g:vista_fzf_previe
   let g:vista_fzf_preview = ['right:50%']
 
 g:vista_fzf_opt                                                  *g:vista_fzf_opt*
+
   Type: |List|
   Default: `[]`
 
   Append options to `fzf#run()`.
 
 g:vista_finder_alternative_executives       *g:vista_finder_alternative_executives*
+
   Type: |List|
   Default: `['coc']`
 
@@ -264,6 +280,14 @@ g:vista_finder_alternative_executives       *g:vista_finder_alternative_executiv
   This is useful if you want to switch to `ctags` when LSP is not usable.
   By default it's all the provided executives excluding the tried one.
 
+g:vista_disable_statusline                              *g:vista_disable_statusline*
+
+  Type: |Number|
+  Default: `exists('g:loaded_airline') || exists('g:loaded_lightline')`
+
+  Vista.vim has a builtin statusline renderer, which may cause some problems
+  if you use other statusline plugins at the same time. Hence it's disabled
+  by default if you have installed airline or lightline.
 
 --------------------------------------------------------------------------------
 CONTRIBUTING                                                  *vista-contributing*

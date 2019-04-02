@@ -50,7 +50,7 @@ function! vista#autocmd#Init(group_name, AUF) abort
   execute 'augroup' a:group_name
     autocmd!
 
-    autocmd WinEnter,WinLeave __vista__ let &l:statusline = vista#statusline()
+    autocmd WinEnter,WinLeave __vista__ call vista#statusline#RenderOnWinEvent()
 
     " BufReadPost is needed for reloading the current buffer if the file
     " was changed by an external command;

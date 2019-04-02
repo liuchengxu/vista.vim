@@ -16,21 +16,9 @@ function! vista#ShouldSkip() abort
         \ || index(blacklist, &filetype) > -1
 endfunction
 
-function! vista#statusline() abort
-  let fname = get(t:vista.source, 'fname', '')
-  let provider = get(t:vista, 'provider', '')
-  if !empty(provider)
-    return '[Vista] '.provider.' %<'.fname
-  else
-    return '[Vista] %<'.fname
-  endif
-endfunction
-
 function! vista#SetProvider(provider) abort
   let t:vista.provider = a:provider
-  if has_key(t:vista, 'bufnr')
-    call setbufvar(t:vista.bufnr, '&statusline', vista#statusline())
-  endif
+  call vista#statusline#Render()
 endfunction
 
 function! vista#OnExecute(provider, group_name, AUF) abort
