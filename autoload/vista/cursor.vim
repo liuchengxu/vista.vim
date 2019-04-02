@@ -160,7 +160,10 @@ function! s:FindNearestMethodOrFunction(_timer) abort
   call setbufvar(t:vista.source.bufnr, 'vista_nearest_method_or_function', result)
 
   call s:StopHighlightTimer()
-  let s:highlight_timer = timer_start(200, function('s:HighlightNearestTag'))
+
+  if vista#sidebar#IsVisible()
+    let s:highlight_timer = timer_start(200, function('s:HighlightNearestTag'))
+  endif
 endfunction
 
 function! s:ExistsVlnum() abort
@@ -194,12 +197,12 @@ function! s:HighlightNearestTag(_timer) abort
     let l:switch_back = 1
   endif
 
-  if exists('w:highlight_id')
-    call matchdelete(w:highlight_id)
-    unlet w:highlight_id
+  if exists('w:vista_highlight_id')
+    call matchdelete(w:vista_highlight_id)
+    unlet w:vista_highlight_id
   endif
 
-  let w:highlight_id = matchaddpos('Search', [s:vlnum])
+  let w:vista_highlight_id = matchaddpos('Search', [s:vlnum])
 
   execute 'normal!' s:vlnum.'z.'
 
