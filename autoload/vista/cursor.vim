@@ -288,6 +288,10 @@ endfunction
 
 " This happens on calling `:Vista show` but the vista window is still invisible.
 function! vista#cursor#ShowTagFor(lnum) abort
+  if !s:ExistsVlnum()
+    return
+  endif
+
   let s:vlnum = vista#util#BinarySearch(t:vista.raw, a:lnum, 'line', 'vlnum')
   if empty(s:vlnum)
     return
