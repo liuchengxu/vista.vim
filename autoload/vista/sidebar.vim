@@ -96,13 +96,6 @@ function! s:ClearAugroups(...) abort
   endfor
 endfunction
 
-function! vista#sidebar#CloseIfVisible() abort
-  let winnr = bufwinnr('__vista__')
-  if winnr != -1
-    execute winnr.'close!'
-  endif
-endfunction
-
 function! s:GetExplicitExecutive() abort
   let ft = &filetype
 
