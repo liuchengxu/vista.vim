@@ -293,6 +293,8 @@ function! vista#cursor#ShowTag() abort
     return
   endif
 
+  let winnr = t:vista.winnr()
+
   if winnr() != winnr
     execute winnr.'wincmd w'
   endif

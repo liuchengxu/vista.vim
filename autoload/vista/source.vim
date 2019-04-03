@@ -7,6 +7,9 @@ let s:use_winid = exists('*bufwinid')
 function! s:EnsureExists() abort
   if !exists('t:vista')
     let t:vista = {}
+    function! t:vista.winnr() abort
+      return bufwinnr('__vista__')
+    endfunction
   endif
 
   if !has_key(t:vista, 'source')
