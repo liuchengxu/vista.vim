@@ -76,37 +76,13 @@ endfunction
 
 function! vista#sidebar#Close() abort
   if exists('t:vista.bufnr')
+    let winnr = t:vista.winnr()
+    if winnr != -1
+      noautocmd execute winnr.'wincmd c'
+    endif
+
     silent execute  t:vista.bufnr.'bwipe!'
     unlet t:vista.bufnr
-  endif
-
-  " let winnr = t:vista.winnr()
-
-  " " Abort if can't find vista window
-  " if winnr == -1
-    " return
-  " endif
-
-  " let switch_in = winnr() != winnr
-
-  " if switch_in
-    " noautocmd execute winnr."wincmd w"
-  " endif
-
-  " if switch_in
-    " wincmd p
-  " endif
-  "
-  if exists('t:vista.winnr')
-    let winnr = t:vista.winnr()
-    noautocmd execute winnr.'wincmd w'
-    if winnr() == winnr
-      close!
-      let pos = t:vista.pos
-      execute pos[-1]
-      noautocmd execute pos[1].'wincmd w'
-      call winrestview(pos[0])
-    endif
   endif
 
   call s:ClearAugroups('VistaCoc', 'VistaCtags')
