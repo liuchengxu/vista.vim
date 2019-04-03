@@ -98,7 +98,7 @@ function! vista#sidebar#Close() abort
   endif
 
   if exists('t:vista.winnr')
-    let winnr = t:vista.winnr
+    let winnr = t:vista.winnr()
     noautocmd execute winnr.'wincmd w'
     if winnr() == winnr
       close!
