@@ -33,7 +33,7 @@ function! vista#sidebar#Reload(data) abort
     return
   endif
 
-  let winnr = bufwinnr(t:vista.bufnr)
+  let winnr = t:vista.winnr()
 
   " Abort if can't find vista window
   if winnr == -1
@@ -64,7 +64,7 @@ function! vista#sidebar#OpenOrUpdate(rows) abort
     let t:vista.winid = win_getid()
     let t:vista.pos = [winsaveview(), winnr(), winrestcmd()]
   else
-    let winnr = bufwinnr(t:vista.bufnr)
+    let winnr = t:vista.winnr()
     if winnr ==  -1
       silent execute 'botright vsplit +buffer'.t:vista.bufnr
       vertical resize 30
@@ -107,7 +107,6 @@ function! vista#sidebar#Close() abort
       noautocmd execute pos[1].'wincmd w'
       call winrestview(pos[0])
     endif
-    unlet t:vista.winnr
   endif
 
   call s:ClearAugroups('VistaCoc', 'VistaCtags')
