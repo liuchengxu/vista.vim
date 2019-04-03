@@ -4,8 +4,6 @@
 
 let s:scope_icon = ['⊕', '⊖']
 
-let s:last_kind = 'DOES_NOT_EXIST'
-
 let s:visibility_icon = {
       \ 'public': '+',
       \ 'protected': '#',
@@ -28,7 +26,7 @@ function! s:RenderLinewise() abort
       let access = ''
     endif
 
-    if has_key(line, 'kind') && s:last_kind != line.kind
+    if !exists('s:last_kind') || has_key(line, 'kind') && s:last_kind != line.kind
       call add(rows, line.kind)
       let s:last_kind = get(line, 'kind')
       continue
@@ -51,6 +49,8 @@ function! s:RenderLinewise() abort
 
     let idx += 1
   endwhile
+
+  unlet s:last_kind
 
   return rows
 endfunction
