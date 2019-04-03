@@ -2,22 +2,49 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
-function! vista#source#Lines() abort
-  return getbufline(t:vista.source.bufnr, 1, '$')
-endfunction
+let s:use_winid = exists('*bufwinid')
 
-function! vista#source#Line(lnum) abort
-  let bufline = getbufline(t:vista.source.bufnr, a:lnum)
-  return empty(bufline) ? '' : vista#util#Trim(bufline[0])
-endfunction
+function! s:EnsureExists() abort
+  if !exists('t:vista')
+    let t:vista = {}
+    function! t:vista.winnr() abort
+      return bufwinnr('__vista__')
+    endfunction
+  endif
 
-function! vista#source#Extension() abort
-  return fnamemodify(t:vista.source.fpath, ':e')
+  if !has_key(t:vista, 'source')
+    let t:vista.source = {}
+
+    function! t:vista.source.winnr() abort
+      return bufwinnr(self.bufnr)
+    endfunction
+
+    function! t:vista.source.winid() abort
+      return bufwinid(self.bufnr)
+    endfunction
+
+    function! t:vista.source.filetype() abort
+      return getbufvar(self.bufnr, '&filetype')
+    endfunction
+
+    function! t:vista.source.lines() abort
+      return getbufline(self.bufnr, 1, '$')
+    endfunction
+
+    function! t:vista.source.line(lnum) abort
+      let bufline = getbufline(self.bufnr, a:lnum)
+      return empty(bufline) ? '' : vista#util#Trim(bufline[0])
+    endfunction
+
+    function! t:vista.source.extension() abort
+      return fnamemodify(self.fpath, ':e')
+    endfunction
+  endif
 endfunction
 
 function! vista#source#GotoWin() abort
-  if exists('*bufwinid')
-    let winid = bufwinid(t:vista.source.bufnr)
+  if s:use_winid
+    let winid = t:vista.source.winid()
     if winid != -1
       call win_gotoid(winid)
     else
@@ -25,7 +52,7 @@ function! vista#source#GotoWin() abort
     endif
   else
     " t:vista.source.winnr is not always correct.
-    let winnr = bufwinnr(t:vista.source.bufnr)
+    let winnr = t:vista.source.winnr()
     if winnr != -1
       noautocmd execute winnr."wincmd w"
     else
@@ -41,12 +68,12 @@ endfunction
 " Update the infomation of source file to be processed,
 " including whose bufnr, winnr, fname, fpath
 function! vista#source#Update(bufnr, winnr, ...) abort
-  if !exists('t:vista')
-    let t:vista = {}
+  if !exists('t:_vista_initialized')
+    call s:EnsureExists()
+    let t:_vista_initialized = 1
   endif
-  let t:vista.source = get(t:vista, 'source', {})
+
   let t:vista.source.bufnr = a:bufnr
-  let t:vista.source.winnr = a:winnr
 
   if a:0 == 1
     let t:vista.source.fname = a:1

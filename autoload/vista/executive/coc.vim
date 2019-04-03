@@ -7,14 +7,19 @@ let s:provider = fnamemodify(expand('<sfile>'), ':t:r')
 let s:reload_only = v:false
 let s:should_display = v:false
 
+function! s:PrepareContainer() abort
+  let s:data = {}
+  let t:vista.functions = []
+  let t:vista.raw = []
+endfunction
+
 " Extract fruitful infomation from raw symbols
 function! s:Extract(symbols) abort
   if empty(a:symbols)
     return
   endif
 
-  let s:data = {}
-  let t:vista.functions = []
+  call s:PrepareContainer()
   call map(a:symbols, 'vista#parser#lsp#ExtractSymbol(v:val, s:data)')
 
   if empty(s:data)

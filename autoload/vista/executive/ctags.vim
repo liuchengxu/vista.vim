@@ -80,6 +80,8 @@ endfunction
 function! s:close_cb(channel)
   let s:data = {}
   let t:vista.functions = []
+  let t:vista.raw = []
+  let t:vista.kinds = []
 
   while ch_status(a:channel, {'part': 'out'}) ==# 'buffered'
     let line = ch_read(a:channel)
@@ -111,6 +113,8 @@ endfunction
 function! s:ExtractLinewise(raw_data) abort
   let s:data = {}
   let t:vista.functions = []
+  let t:vista.raw = []
+  let t:vista.kinds = []
   call map(a:raw_data, 'call(s:TagParser, [v:val, s:data])')
 endfunction
 
@@ -157,13 +161,13 @@ endfunction
 " This idea comes from tagbar.
 function! s:IntoTemp(...) abort
   let tmp = tempname()
-  let ext = vista#source#Extension()
+  let ext = t:vista.source.extension()
   if ext != ''
     let tmp = join([tmp, ext], '.')
   endif
 
   if empty(a:1)
-    let lines = vista#source#Lines()
+    let lines = t:vista.source.lines()
   else
     try
       let lines = readfile(a:1)

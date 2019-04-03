@@ -83,7 +83,7 @@ function! s:AlignSource() abort
 
   for [kind, v] in items(s:data)
     for item in v
-      let line = vista#source#Line(item.lnum)
+      let line = t:vista.source.line(item.lnum)
       let lnum_and_text = printf("%s:%s", item.lnum, item.text)
       let row = printf("%s%s\t[%s]%s\t%s",
             \ lnum_and_text, repeat(' ', max_len_lnum_and_text- strwidth(lnum_and_text)),

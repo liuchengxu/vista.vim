@@ -10,7 +10,17 @@ the issue may be closed as unreproducible. Thanks. -->
 **Describe the bug**
 A clear and concise description of what the bug is.
 
-**Steps to reproduce**
+**Environment:**
+- OS: <!-- e.g. Mac OS, Ubuntu 18.04, Windows 10 -->
+- Vim/Neovim version: <!-- first two lines of `:version` command output -->
+- This plugin version: <!-- output of `git rev-parse origin/master` command -->
+
+**Minimal vimrc to reproduce**
+
+```vim
+```
+
+**Steps to reproduce given the above minimal vimrc**
 <!-- short descriptions of actions, which lead towards the issue -->
 1.
 2.
@@ -25,8 +35,3 @@ A clear and concise description of what actually happens.
 
 **Screenshot or gif** (if possible)
 If applicable, add screenshots to help explain your problem.
-
-**Environment:**
-- OS: <!-- e.g. Mac OS, Ubuntu 18.04, Windows 10 -->
-- Vim/Neovim version: <!-- first two lines of `:version` command output -->
-- This plugin version: <!-- output of `git rev-parse origin/master` command -->

@@ -2,21 +2,26 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
-let s:cursor_timer = -1
 let s:find_timer = -1
+let s:cursor_timer = -1
+let s:highlight_timer = -1
+
+let s:last_vlnum = -1
+
+function! s:GenericStopTimer(timer) abort
+  execute 'if '.a:timer.' != -1 | call timer_stop('.a:timer.') | let 'a:timer.' = -1 | endif'
+endfunction
 
 function! s:StopFindTimer() abort
-  if s:find_timer != -1
-    call timer_stop(s:find_timer)
-    let s:find_timer = -1
-  endif
+  call s:GenericStopTimer('s:find_timer')
 endfunction
 
 function! s:StopCursorTimer() abort
-  if s:cursor_timer != -1
-    call timer_stop(s:cursor_timer)
-    let s:cursor_timer = -1
-  endif
+  call s:GenericStopTimer('s:cursor_timer')
+endfunction
+
+function! s:StopHighlightTimer() abort
+  call s:GenericStopTimer('s:highlight_timer')
 endfunction
 
 " Get tag and corresponding source line at current cursor position.
@@ -30,7 +35,7 @@ function! s:GetInfoUnderCursor() abort
 
   let lnum = cur_line[-1]
 
-  let source_line = vista#source#Line(lnum)
+  let source_line = t:vista.source.line(lnum)
   if empty(source_line)
     return [v:null, v:null]
   endif
@@ -114,36 +119,6 @@ function! s:ShowDetail() abort
   endif
 endfunction
 
-function! vista#cursor#ShowDetail(_timer) abort
-  let cur_line = getline('.')
-  if empty(cur_line)
-    return
-  endif
-
-  " scope line
-  if cur_line[-1:] ==# ']'
-    let splitted = split(cur_line)
-    " Join the scope parts in case of they contains spaces, e.g., structure names
-    let scope = join(splitted[1:-2], ' ')
-    let cnt = matchstr(splitted[-1], '\d\+')
-    echohl Keyword  | echo '['.scope.']: ' | echohl NONE
-    echohl Function | echon cnt          | echohl NONE
-    return
-  endif
-
-  call s:ShowDetail()
-endfunction
-
-function! vista#cursor#ShowDetailWithDelay() abort
-  call s:StopCursorTimer()
-
-  let delay = get(g:, 'vista_cursor_delay', 400)
-  let s:cursor_timer = timer_start(
-        \ delay,
-        \ function('vista#cursor#ShowDetail'),
-        \ )
-endfunction
-
 function! s:Jump() abort
   let cur_line = split(getline('.'), ':')
 
@@ -175,6 +150,71 @@ function! s:Jump() abort
   endif
 endfunction
 
+function! s:Compare(s1, s2) abort
+  return a:s1.lnum - a:s2.lnum
+endfunction
+
+function! s:FindNearestMethodOrFunction(_timer) abort
+  call sort(t:vista.functions, function('s:Compare'))
+  let result = vista#util#BinarySearch(t:vista.functions, line('.'), 'lnum', 'text')
+  call setbufvar(t:vista.source.bufnr, 'vista_nearest_method_or_function', result)
+
+  call s:StopHighlightTimer()
+
+  if vista#sidebar#IsVisible()
+    let s:highlight_timer = timer_start(200, function('s:HighlightNearestTag'))
+  endif
+endfunction
+
+function! s:ExistsVlnum() abort
+  return exists('t:vista')
+        \ && has_key(t:vista, 'raw')
+        \ && !empty(t:vista.raw)
+        \ && has_key(t:vista.raw[0], 'vlnum')
+endfunction
+
+function! s:ApplyHighlight(lnum) abort
+  if exists('w:vista_highlight_id')
+    call matchdelete(w:vista_highlight_id)
+    unlet w:vista_highlight_id
+  endif
+
+  let w:vista_highlight_id = matchaddpos('Search', [a:lnum])
+
+  execute 'normal!' s:vlnum.'z.'
+endfunction
+
+function! s:HighlightNearestTag(_timer) abort
+  if vista#ShouldSkip() || !s:ExistsVlnum()
+    return
+  endif
+
+  let s:vlnum = vista#util#BinarySearch(t:vista.raw, line('.'), 'line', 'vlnum')
+
+  if empty(s:vlnum)
+    return
+  endif
+
+  " If the vlnum is same with previous one
+  if s:last_vlnum == s:vlnum
+    return
+  endif
+
+  let s:last_vlnum = s:vlnum
+
+  let winnr = bufwinnr('__vista__')
+  if winnr() != winnr
+    execute winnr.'wincmd w'
+    let l:switch_back = 1
+  endif
+
+  call s:ApplyHighlight(s:vlnum)
+
+  if exists('l:switch_back')
+    wincmd p
+  endif
+endfunction
+
 " Fold scope based on the indent.
 " Jump to the target source line or source file.
 function! vista#cursor#FoldOrJump() abort
@@ -184,6 +224,7 @@ function! vista#cursor#FoldOrJump() abort
   endif
 
   " Fold or unfold when meets scope line
+  " FIXME this only work for the kind renderer.
   if getline('.') =~ ']$'
     if foldclosed('.') != -1
       normal! zo
@@ -196,35 +237,86 @@ function! vista#cursor#FoldOrJump() abort
   call s:Jump()
 endfunction
 
-function! s:Compare(s1, s2) abort
-  return a:s1.lnum - a:s2.lnum
-endfunction
-
-function! s:FindNearestMethodOrFunction(_timer) abort
-  call sort(t:vista.functions, function('s:Compare'))
-  let result = vista#util#BinarySearch(t:vista.functions, line('.'))
-  call setbufvar(t:vista.source.bufnr, 'vista_nearest_method_or_function', result)
-endfunction
-
 function! vista#cursor#FindNearestMethodOrFunction() abort
-  if !exists('t:vista') || !has_key(t:vista, 'functions')
+  if !exists('t:vista') || !has_key(t:vista, 'functions') || bufnr('') != t:vista.source.bufnr
     return
   endif
 
-  if bufnr('') != t:vista.source.bufnr
-    return
-  endif
+  call s:StopFindTimer()
 
   if empty(t:vista.functions)
     call setbufvar(t:vista.source.bufnr, 'vista_nearest_method_or_function', '')
     return
   endif
 
-  call s:StopFindTimer()
-
   let delay = get(g:, 'vista_find_nearest_method_or_function_delay', 300)
   let s:find_timer = timer_start(
         \ delay,
         \ function('s:FindNearestMethodOrFunction'),
         \ )
+endfunction
+
+function! vista#cursor#ShowDetail(_timer) abort
+  let cur_line = getline('.')
+  if empty(cur_line)
+    return
+  endif
+
+  " scope line
+  if cur_line[-1:] ==# ']'
+    let splitted = split(cur_line)
+    " Join the scope parts in case of they contains spaces, e.g., structure names
+    let scope = join(splitted[1:-2], ' ')
+    let cnt = matchstr(splitted[-1], '\d\+')
+    echohl Keyword  | echo '['.scope.']: ' | echohl NONE
+    echohl Function | echon cnt          | echohl NONE
+    return
+  endif
+
+  call s:ShowDetail()
+endfunction
+
+function! vista#cursor#ShowDetailWithDelay() abort
+  call s:StopCursorTimer()
+
+  let delay = get(g:, 'vista_cursor_delay', 400)
+  let s:cursor_timer = timer_start(
+        \ delay,
+        \ function('vista#cursor#ShowDetail'),
+        \ )
+endfunction
+
+" This happens on calling `:Vista show` but the vista window is still invisible.
+function! vista#cursor#ShowTagFor(lnum) abort
+  if !s:ExistsVlnum()
+    return
+  endif
+
+  let s:vlnum = vista#util#BinarySearch(t:vista.raw, a:lnum, 'line', 'vlnum')
+  if empty(s:vlnum)
+    return
+  endif
+
+  call s:ApplyHighlight(s:vlnum)
+endfunction
+
+function! vista#cursor#ShowTag() abort
+  if !s:ExistsVlnum()
+    return
+  endif
+
+  let s:vlnum = vista#util#BinarySearch(t:vista.raw, line('.'), 'line', 'vlnum')
+
+  if empty(s:vlnum)
+    return
+  endif
+
+  let winnr = t:vista.winnr()
+
+  if winnr() != winnr
+    execute winnr.'wincmd w'
+  endif
+
+  call cursor(s:vlnum, 1)
+  normal! zz
 endfunction

@@ -125,7 +125,7 @@ autocmd VimEnter * call vista#RunForNearestMethodOrFunction()
 Also refer to [liuchengxu/eleline#18](https://github.com/liuchengxu/eleline.vim/pull/18).
 
 <p align="center">
-    <img width="800px" src="https://user-images.githubusercontent.com/8850248/54868435-6b90e780-4dc7-11e9-9da9-b9f8fa0b577b.png">
+    <img width="800px" src="https://user-images.githubusercontent.com/8850248/55477900-da363680-564c-11e9-8e71-845260f3d44b.png">
 </p>
 
 ### Commands

@@ -69,6 +69,13 @@ function! vista#(bang, ...) abort
       call vista#finder#fzf#Run('coc')
     elseif a:1 == 'finder!'
       call vista#finder#fzf#ProjectRun()
+    elseif a:1 == 'show'
+      if vista#sidebar#IsVisible()
+        call vista#cursor#ShowTag()
+      else
+        call vista#sidebar#Open()
+        let t:vista.lnum = line('.')
+      endif
     else
       return vista#error#Expect("Vista [finder] [EXECUTIVE]")
     endif
