@@ -204,7 +204,7 @@ function! s:HighlightNearestTag(_timer) abort
     return
   endif
 
-  " If the vlnum is same with previous one
+  " Skip if the vlnum is same with previous one
   if s:vlnum is v:null || s:last_vlnum == s:vlnum
     return
   endif
