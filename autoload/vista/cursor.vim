@@ -173,6 +173,17 @@ function! s:ExistsVlnum() abort
         \ && has_key(t:vista.raw[0], 'vlnum')
 endfunction
 
+function! s:ApplyHighlight(lnum) abort
+  if exists('w:vista_highlight_id')
+    call matchdelete(w:vista_highlight_id)
+    unlet w:vista_highlight_id
+  endif
+
+  let w:vista_highlight_id = matchaddpos('Search', [a:lnum])
+
+  execute 'normal!' s:vlnum.'z.'
+endfunction
+
 function! s:HighlightNearestTag(_timer) abort
   if vista#ShouldSkip() || !s:ExistsVlnum()
     return
@@ -197,14 +208,7 @@ function! s:HighlightNearestTag(_timer) abort
     let l:switch_back = 1
   endif
 
-  if exists('w:vista_highlight_id')
-    call matchdelete(w:vista_highlight_id)
-    unlet w:vista_highlight_id
-  endif
-
-  let w:vista_highlight_id = matchaddpos('Search', [s:vlnum])
-
-  execute 'normal!' s:vlnum.'z.'
+  call s:ApplyHighlight(s:vlnum)
 
   if exists('l:switch_back')
     wincmd p
@@ -280,6 +284,16 @@ function! vista#cursor#ShowDetailWithDelay() abort
         \ delay,
         \ function('vista#cursor#ShowDetail'),
         \ )
+endfunction
+
+" This happens on calling `:Vista show` but the vista window is still invisible.
+function! vista#cursor#ShowTagFor(lnum) abort
+  let s:vlnum = vista#util#BinarySearch(t:vista.raw, a:lnum, 'line', 'vlnum')
+  if empty(s:vlnum)
+    return
+  endif
+
+  call s:ApplyHighlight(s:vlnum)
 endfunction
 
 function! vista#cursor#ShowTag() abort

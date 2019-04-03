@@ -74,6 +74,7 @@ function! vista#(bang, ...) abort
         call vista#cursor#ShowTag()
       else
         call vista#sidebar#Open()
+        let t:vista.lnum = line('.')
       endif
     else
       return vista#error#Expect("Vista [finder] [EXECUTIVE]")

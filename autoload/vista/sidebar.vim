@@ -81,6 +81,11 @@ function! vista#sidebar#OpenOrUpdate(rows) abort
 
   call vista#util#SetBufline(t:vista.bufnr, a:rows)
 
+  if has_key(t:vista, 'lnum')
+    call vista#cursor#ShowTagFor(t:vista.lnum)
+    unlet t:vista.lnum
+  endif
+
   if !get(g:, 'vista_stay_on_open', 1)
     wincmd p
   endif
