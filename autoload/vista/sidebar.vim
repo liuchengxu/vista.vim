@@ -33,25 +33,8 @@ function! vista#sidebar#Reload(data) abort
     return
   endif
 
-  let winnr = t:vista.winnr()
-
-  " Abort if can't find vista window
-  if winnr == -1
-    return
-  endif
-
-  let switch_in = winnr() != winnr
-
-  if switch_in
-    noautocmd execute winnr."wincmd w"
-  endif
-
   let rendered = vista#viewer#Render(a:data)
   call vista#util#SetBufline(t:vista.bufnr, rendered)
-
-  if switch_in
-    wincmd p
-  endif
 endfunction
 
 " Open or update vista buffer given the rendered rows.
@@ -97,6 +80,23 @@ function! vista#sidebar#Close() abort
     unlet t:vista.bufnr
   endif
 
+  " let winnr = t:vista.winnr()
+
+  " " Abort if can't find vista window
+  " if winnr == -1
+    " return
+  " endif
+
+  " let switch_in = winnr() != winnr
+
+  " if switch_in
+    " noautocmd execute winnr."wincmd w"
+  " endif
+
+  " if switch_in
+    " wincmd p
+  " endif
+  "
   if exists('t:vista.winnr')
     let winnr = t:vista.winnr()
     noautocmd execute winnr.'wincmd w'

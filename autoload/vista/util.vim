@@ -39,14 +39,16 @@ function! s:PrependFpath(lines) abort
 endfunction
 
 function! vista#util#SetBufline(bufnr, lines) abort
-  setlocal noreadonly modifiable
+  call setbufvar(a:bufnr, '&readonly', 0)
+  call setbufvar(a:bufnr, '&modifiable', 1)
   let lines = s:PrependFpath(a:lines)
   if has('nvim')
     call nvim_buf_set_lines(a:bufnr, 0, -1, 0, lines)
   else
     call setbufline(a:bufnr, 1, lines)
   endif
-  setlocal readonly nomodifiable
+  call setbufvar(a:bufnr, '&readonly', 1)
+  call setbufvar(a:bufnr, '&modifiable', 0)
 endfunction
 
 function! vista#util#JobStop(jobid) abort
