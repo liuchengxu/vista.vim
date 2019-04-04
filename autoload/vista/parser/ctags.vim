@@ -65,7 +65,8 @@ function! s:ParseTagfield(tagfields) abort
     let value = tagfield[colon+1:]
     let fields.kind = value
   else
-    let fields.kind = s:ShortToLong(a:tagfields[0])
+    let kind = s:ShortToLong(a:tagfields[0])
+    let fields.kind = kind
     if index(t:vista.kinds, kind) == -1
       call add(t:vista.kinds, kind)
     endif
