@@ -276,7 +276,7 @@ function! vista#executive#ctags#RunAsync(fpath) abort
 endfunction
 
 function! vista#executive#ctags#Execute(bang, should_display, ...) abort
-  call vista#OnExecute(s:provider, 'VistaCtags', function('s:AutoUpdate'))
+  call vista#OnExecute(s:provider, function('s:AutoUpdate'))
   return s:Dispatch('s:Execute', a:bang, a:should_display)
 endfunction
 

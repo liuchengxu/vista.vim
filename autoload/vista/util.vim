@@ -63,6 +63,11 @@ function! vista#util#Join(...) abort
   return join(a:000, '')
 endfunction
 
+" Change coc, ctags, lcn, vim_lsp to Coc, Ctags, Lcn, VimLsp
+function! vista#util#ToCamelCase(s) abort
+  return substitute(a:s, '\(^\l\+\)\|_\(\l\+\)', '\u\1\2', 'g')
+endfunction
+
 " Blink current line under cursor, from junegunn/vim-slash
 function! vista#util#Blink(times, delay) abort
   let s:blink = { 'ticks': 2 * a:times, 'delay': a:delay }

@@ -96,7 +96,7 @@ function! vista#executive#vim_lsp#Execute(bang, should_display, ...) abort
 
   let s:should_display = a:should_display
 
-  call vista#OnExecute(s:provider, 'VistaVimLsp', function('s:AutoUpdate'))
+  call vista#OnExecute(s:provider, function('s:AutoUpdate'))
 
   if a:bang
     call s:Run()

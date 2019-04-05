@@ -113,6 +113,6 @@ endfunction
 " The public Execute function is used for interacting with this plugin from
 " outside, where sets the provider and auto update events.
 function! vista#executive#coc#Execute(bang, should_display, ...) abort
-  call vista#OnExecute(s:provider, 'VistaCoc', function('s:AutoUpdate'))
+  call vista#OnExecute(s:provider, function('s:AutoUpdate'))
   return s:Dispatch('s:Execute', a:bang, a:should_display)
 endfunction

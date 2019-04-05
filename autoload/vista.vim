@@ -21,9 +21,9 @@ function! vista#SetProvider(provider) abort
   call vista#statusline#Render()
 endfunction
 
-function! vista#OnExecute(provider, group_name, AUF) abort
+function! vista#OnExecute(provider, AUF) abort
   call vista#SetProvider(a:provider)
-  call vista#autocmd#Init(a:group_name, a:AUF)
+  call vista#autocmd#Init('Vista'.vista#util#ToCamelCase(a:provider), a:AUF)
 endfunction
 
 function! vista#RunForNearestMethodOrFunction() abort
