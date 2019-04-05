@@ -41,8 +41,10 @@ function! s:Execute() abort
 endfunction
 
 function! s:ApplyAutoUpdate() abort
-  let rendered = vista#renderer#markdown#Render(s:Execute())
-  call vista#util#SetBufline(t:vista.bufnr, rendered)
+  if has_key(t:vista, 'bufnr')
+    let rendered = vista#renderer#markdown#Render(s:Execute())
+    call vista#util#SetBufline(t:vista.bufnr, rendered)
+  endif
 endfunction
 
 function! vista#extension#markdown#AutoUpdate(fpath)
