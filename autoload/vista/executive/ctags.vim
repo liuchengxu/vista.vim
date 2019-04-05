@@ -119,8 +119,16 @@ function! s:ExtractLinewise(raw_data) abort
 endfunction
 
 function! s:AutoUpdate(fpath) abort
-  let s:reload_only = v:true
-  call s:ApplyExecute(v:false, a:fpath)
+  if t:vista.source.filetype() == 'markdown'
+    call vista#extension#markdown#AutoUpdate(a:fpath)
+  else
+    let s:reload_only = v:true
+    call s:ApplyExecute(v:false, a:fpath)
+  endif
+endfunction
+
+function! vista#executive#ctags#AutoUpdate(fpath) abort
+  call s:AutoUpdate(a:fpath)
 endfunction
 
 " Run ctags synchronously given the cmd

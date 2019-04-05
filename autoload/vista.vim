@@ -69,6 +69,8 @@ function! vista#(bang, ...) abort
       call vista#finder#fzf#Run('coc')
     elseif a:1 == 'finder!'
       call vista#finder#fzf#ProjectRun()
+    elseif a:1 == 'toc'
+      call vista#extension#markdown#Execute(v:false, v:true)
     elseif a:1 == 'show'
       if vista#sidebar#IsVisible()
         call vista#cursor#ShowTag()
