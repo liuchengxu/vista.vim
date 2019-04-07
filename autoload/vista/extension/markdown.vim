@@ -61,11 +61,6 @@ endfunction
 
 " Credit: originally from `:Toc` of vim-markdown
 function! vista#extension#markdown#Execute(_bang, should_display) abort
-
-  let [bufnr, winnr, fname, fpath] = [bufnr('%'), winnr(), expand('%'), expand('%:p')]
-
-  call vista#source#Update(bufnr, winnr, fname, fpath)
-
   call vista#OnExecute(s:provider, function('s:AutoUpdate'))
 
   let headers =  s:Execute()

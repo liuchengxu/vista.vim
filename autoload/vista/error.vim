@@ -41,7 +41,10 @@ function! vista#error#RunCtags(cmd) abort
   call s:Echon('Underlined', a:cmd)
 endfunction
 
-function! vista#error#ParseError() abort
+function! vista#error#For(cmd, filetype) abort
+  call s:Echo('ErrorMsg', '[vista.vim]')
+  call s:Echon('Underlined', ' '.a:cmd)
+  call s:Echon('Normal', ' only exists in '.a:filetype.' filetype.')
 endfunction
 
 function! vista#error#InvalidOption(opt, ...) abort
