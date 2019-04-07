@@ -43,7 +43,7 @@ endfunction
 
 " The kind field in the result is a number instead of a readable text, we
 " should transform the number to the symbol text first.
-function! vista#parser#lsp#FromKindToSymbol(line, container) abort
+function! vista#parser#lsp#KindToSymbol(line, container) abort
   let line = a:line
   let location = line.location
   if s:IsFileUri(location.uri)

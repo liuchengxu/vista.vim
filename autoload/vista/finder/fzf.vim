@@ -203,7 +203,6 @@ function! s:TryAlternatives(tried, fpath) abort
   let alternatives = filter(copy(executives), 'v:val != a:tried')
 
   for alternative in alternatives
-    " FIXME when running synchornously, no need to add extra check.
     let s:data = vista#executive#{alternative}#Run(a:fpath)
     if !empty(s:data)
       let s:cur_executive = alternative
@@ -215,6 +214,7 @@ function! s:TryAlternatives(tried, fpath) abort
   return v:false
 endfunction
 
+" TODO workspace symbols
 function! vista#finder#fzf#ProjectRun() abort
   let executive = 'ctags'
   let s:data = vista#executive#{executive}#ProjectRun()

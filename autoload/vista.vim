@@ -69,6 +69,13 @@ function! vista#(bang, ...) abort
       call vista#finder#fzf#Run('coc')
     elseif a:1 == 'finder!'
       call vista#finder#fzf#ProjectRun()
+    elseif a:1 == 'toc'
+      if &filetype == 'markdown'
+        call vista#source#Update(bufnr, winnr, fname, fpath)
+        call vista#extension#markdown#Execute(v:false, v:true)
+      else
+        return vista#error#For('Vista toc', 'markdown')
+      endif
     elseif a:1 == 'show'
       if vista#sidebar#IsVisible()
         call vista#cursor#ShowTag()

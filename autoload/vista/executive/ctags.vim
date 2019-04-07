@@ -68,6 +68,13 @@ function! s:BuildCmd(file) abort
   return cmd
 endfunction
 
+function! s:PrepareContainer() abort
+  let s:data = {}
+  let t:vista.functions = []
+  let t:vista.raw = []
+  let t:vista.kinds = []
+endfunction
+
 function! s:on_exit(_job, _data, _event) abort dict
   if v:dying | return | endif
 
@@ -75,13 +82,14 @@ function! s:on_exit(_job, _data, _event) abort dict
   call s:ExtractLinewise(self.stdout[:-2])
 
   call s:ApplyExtracted()
+
+  if exists('s:id')
+    unlet s:id
+  endif
 endfunction
 
 function! s:close_cb(channel)
-  let s:data = {}
-  let t:vista.functions = []
-  let t:vista.raw = []
-  let t:vista.kinds = []
+  call s:PrepareContainer()
 
   while ch_status(a:channel, {'part': 'out'}) ==# 'buffered'
     let line = ch_read(a:channel)
@@ -89,6 +97,10 @@ function! s:close_cb(channel)
   endwhile
 
   call s:ApplyExtracted()
+
+  if exists('s:id')
+    unlet s:id
+  endif
 endfunction
 
 function! s:ApplyExtracted() abort
@@ -111,16 +123,21 @@ function! s:ApplyExtracted() abort
 endfunction
 
 function! s:ExtractLinewise(raw_data) abort
-  let s:data = {}
-  let t:vista.functions = []
-  let t:vista.raw = []
-  let t:vista.kinds = []
+  call s:PrepareContainer()
   call map(a:raw_data, 'call(s:TagParser, [v:val, s:data])')
 endfunction
 
 function! s:AutoUpdate(fpath) abort
-  let s:reload_only = v:true
-  call s:ApplyExecute(v:false, a:fpath)
+  if t:vista.source.filetype() == 'markdown'
+    call vista#extension#markdown#AutoUpdate(a:fpath)
+  else
+    let s:reload_only = v:true
+    call s:ApplyExecute(v:false, a:fpath)
+  endif
+endfunction
+
+function! vista#executive#ctags#AutoUpdate(fpath) abort
+  call s:AutoUpdate(a:fpath)
 endfunction
 
 " Run ctags synchronously given the cmd
@@ -280,6 +297,7 @@ function! vista#executive#ctags#Execute(bang, should_display, ...) abort
   return s:Dispatch('s:Execute', a:bang, a:should_display)
 endfunction
 
+" Run ctags recursively.
 function! vista#executive#ctags#ProjectRun() abort
   " https://github.com/universal-ctags/ctags/issues/2042
   "
@@ -288,10 +306,10 @@ function! vista#executive#ctags#ProjectRun() abort
   " Otherwise we will use the `--_xformat` option.
   if s:support_json_format
     let cmd = s:ctags." -R -x --output-format=json --fields=+n"
-    let Parser = function('vista#parser#ctags#ProjectTagFromJSON')
+    let Parser = function('vista#parser#ctags#RecursiveFromJSON')
   else
     let cmd = s:ctags." -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
-    let Parser = function('vista#parser#ctags#ProjectTagFromXformat')
+    let Parser = function('vista#parser#ctags#RecursiveFromXformat')
   endif
 
   let output = system(cmd)
