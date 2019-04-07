@@ -2,9 +2,9 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
-function! s:Echom(group, msg) abort
+function! s:Echo(group, msg) abort
   execute 'echohl' a:group
-  echom a:msg
+  echo a:msg
   echohl NONE
 endfunction
 
@@ -15,20 +15,20 @@ function! s:Echon(group, msg) abort
 endfunction
 
 function! vista#error#Expect(expected) abort
-  call s:Echom('ErrorMsg', '[vista.vim]')
+  call s:Echo('ErrorMsg', '[vista.vim]')
   call s:Echon('Normal', ' Invalid args. expected: ')
   call s:Echon('Underlined', a:expected)
 endfunction
 
 function! vista#error#Need(needed) abort
-  call s:Echom('ErrorMsg', '[vista.vim]')
+  call s:Echo('ErrorMsg', '[vista.vim]')
   call s:Echon('Normal', ' You must have ')
   call s:Echon('Underlined', a:needed)
   call s:Echon('Normal', ' installed to continue.')
 endfunction
 
 function! vista#error#InvalidExecutive(exe) abort
-  call s:Echom('ErrorMsg', '[vista.vim]')
+  call s:Echo('ErrorMsg', '[vista.vim]')
   call s:Echon('Normal', ' The executive')
   call s:Echon('Underlined', ' '.a:exe.' ')
   call s:Echon('Normal', 'does not exist. Avaliable: ')
@@ -36,7 +36,7 @@ function! vista#error#InvalidExecutive(exe) abort
 endfunction
 
 function! vista#error#RunCtags(cmd) abort
-  call s:Echom('ErrorMsg', '[vista.vim]')
+  call s:Echo('ErrorMsg', '[vista.vim]')
   call s:Echon('Normal', 'Fail to run ctags given the command: ')
   call s:Echon('Underlined', a:cmd)
 endfunction
@@ -45,12 +45,12 @@ function! vista#error#ParseError() abort
 endfunction
 
 function! vista#error#InvalidOption(opt, ...) abort
-  call s:Echom('ErrorMsg', '[vista.vim]')
+  call s:Echo('ErrorMsg', '[vista.vim]')
   call s:Echon('Normal', ' Invalid option '.a:opt.'. Avaliable: ')
   call s:Echon('Underlined', a:0 > 0 ? string(a:1) : '')
 endfunction
 
 function! vista#error#(msg) abort
-  call s:Echom('ErrorMsg', '[vista.vim]')
+  call s:Echo('ErrorMsg', '[vista.vim]')
   call s:Echon('Normal', a:msg)
 endfunction
