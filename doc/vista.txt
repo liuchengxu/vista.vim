@@ -30,12 +30,12 @@ it seemingly doesn't have a plan to support the promising {Language Server Proto
 and async processing.
 
 In terms of viewer for ctags-generated tags, vista.vim is sort of the poor version
-of tagbar, for some details has not been worked out. Nonetheless, it's more than a
-tags viewer.
+of tagbar, for some details has not been worked out. Nonetheless, it's more than
+a tags viewer.
 
-Vista.vim can also be a symbol navigator similar to {ctrlp-funky}{4}. Last but not
-least, one important goal of vista.vim is to support LSP symbols, which understands
-the semantics instead of the regex only.
+Vista.vim can also be a symbol navigator similar to {ctrlp-funky}{4}. Last but
+not least, one important goal of vista.vim is to support LSP symbols, which
+understands the semantics instead of the regex only.
 
 {1} https://github.com/liuchengxu/vista.vim
 
@@ -48,31 +48,32 @@ the semantics instead of the regex only.
 --------------------------------------------------------------------------------
 FEATURES                                                          *vista-features*
 
-*   [x] View tags and LSP symbols in a sidebar.
-    *   [x] ctags (https://github.com/universal-ctags/ctags)
-    *   [x] vim-lsp (https://github.com/prabirshrestha/vim-lsp)
-    *   [x] coc.nvim (https://github.com/neoclide/coc.nvim)
-    *   [x] LanguageClient-neovim (https://github.com/autozimu/LanguageClient-neovim)
-*   [x] Finder for tags and LSP symbols.
-    *   [x] fzf (https://github.com/junegunn/fzf)
-*   [x] Display decent detailed symbol info in cmdline.
-*   [x] Jump to the tag/symbol from vista sidebar with a blink.
-*   [x] Update automatically when switching between buffers.
-*   [x] Update asynchonously in the background when `+job` avaliable.
-*   [x] Find the nearest method or function to the cursor, which could be
+[x] View tags and LSP symbols in a sidebar.
+    [x] ctags (https://github.com/universal-ctags/ctags)
+    [x] vim-lsp (https://github.com/prabirshrestha/vim-lsp)
+    [x] coc.nvim (https://github.com/neoclide/coc.nvim)
+    [x] LanguageClient-neovim (https://github.com/autozimu/LanguageClient-neovim)
+[x] Finder for tags and LSP symbols.
+    [x] fzf (https://github.com/junegunn/fzf)
+[x] Display decent detailed symbol info in cmdline.
+[x] Jump to the tag/symbol from vista sidebar with a blink.
+[x] Update automatically when switching between buffers.
+[x] Update asynchonously in the background when `+job` avaliable.
+[x] Find the nearest method or function to the cursor, which could be
     integrated into the statusline.
-*   [ ] Supports all of the languages that ctags does.
-*   [ ] Highlight current tag/symbol.
-*   [ ] Show the visibility (public/private) of tags.
-*   [ ] Tree viewer for hierarchy data.
+[ ] Supports all of the languages that ctags does.
+[ ] Highlight current tag/symbol.
+[ ] Show the visibility (public/private) of tags.
+[ ] Tree viewer for hierarchy data.
 
 Notes:
 
 *   The feature of finder in vista.vim is a bit like `:BTags` or `:Tags` in {fzf.vim}{5},
-`:CocList` in coc.nvim, `:LeaderfBufTag` in {leaderf.vim}{6}, etc. You can choose
-whichever you like.
+    `:CocList` in coc.nvim, `:LeaderfBufTag` in {leaderf.vim}{6}, etc. You can choose
+    whichever you like.
+
 *   I personally don't use all the features I have listed. Hence some of them
-may be on the TODOs forever :(.
+    may be on the TODOs forever :(.
 
 {5} https://github.com/junegunn/fzf.vim
 {6} https://github.com/Yggdroot/LeaderF
@@ -103,21 +104,34 @@ Vista                                                                      *Vist
 
   `:Vista`: same with `:Vista ctags` .
 
-  `:Vista show`: jump to the tag nearby the current cursor in vista window.
-  This feature needs `let g:vista_ctags_renderer = 'default'` at the moment.
+  `:Vista show`:  jump to the tag nearby the current cursor in vista window. This
+                feature needs `let g:vista_ctags_renderer = 'default'` at the moment.
 
-  `:Vista ctags`: open vista window based on ctags.
+  `:Vista toc`:   show table of contents of the markdown file.
 
-  `:Vista coc`: open vista window based on coc.nvim.
+                                                                 *vista-executive*
 
-  `:Vista finder`: same with `:Vista finder ctags` .
+  `:Vista coc`:     open vista window based on coc.nvim.
+
+  `:Vista lcn`:     open vista window based on LanguageClient-neovim.
+
+  `:Vista ctags`:   open vista window based on ctags.
+
+  `:Vista vim_lsp`: open vista window based on vim-lsp.
+
+                                                                    *vista-finder*
+
+  `:Vista finder`:  same with `:Vista finder ctags` .
 
   `:Vista finder!`: search tags recursively. Note: it's still experimental.
-  What's more, it may be very slow to generate all tags in a whole project.
+                  What's more, it may be very slow to generate all tags
+                  in a whole project.
 
-  `:Vista finder ctags`: search tags provided by ctags.
+  You can also specify an executive for the finder, for example:
 
   `:Vista finder coc`: search symbols provided by coc.nvim.
+
+  `:Vista finder ctags`: search tags provided by ctags.
 
 Vista!                                                                    *Vista!*
 
@@ -158,7 +172,7 @@ g:vista_cursor_delay                                        *g:vista_cursor_dela
 
   Time delay for showing detailed symbol info at current cursor.
 
-g:vista_echo_cursor_strategy                         *g:vista_echo_cursor_strategy*
+g:vista_echo_cursor_strategy                        *g:vista_echo_cursor_strategy*
 
   Type: |String|
   Default: `echo`
@@ -229,7 +243,7 @@ g:vista_executive_for                                      *g:vista_executive_fo
       \ 'php': 'vim_lsp',
       \ }
 
-g:vista_{&filetype}_executive                       *g:vista_{&filetype}_executive*
+g:vista_{&filetype}_executive                      *g:vista_{&filetype}_executive*
 
   Type: |String|
   Default: `''`
@@ -274,7 +288,7 @@ g:vista_fzf_opt                                                  *g:vista_fzf_op
 
   Append options to `fzf#run()`.
 
-g:vista_finder_alternative_executives       *g:vista_finder_alternative_executives*
+g:vista_finder_alternative_executives      *g:vista_finder_alternative_executives*
 
   Type: |List|
   Default: `['coc']`
@@ -283,7 +297,7 @@ g:vista_finder_alternative_executives       *g:vista_finder_alternative_executiv
   This is useful if you want to switch to `ctags` when LSP is not usable.
   By default it's all the provided executives excluding the tried one.
 
-g:vista_disable_statusline                              *g:vista_disable_statusline*
+g:vista_disable_statusline                            *g:vista_disable_statusline*
 
   Type: |Number|
   Default: `exists('g:loaded_airline') || exists('g:loaded_lightline')`
