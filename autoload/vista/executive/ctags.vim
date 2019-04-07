@@ -68,6 +68,13 @@ function! s:BuildCmd(file) abort
   return cmd
 endfunction
 
+function! s:PrepareContainer() abort
+  let s:data = {}
+  let t:vista.functions = []
+  let t:vista.raw = []
+  let t:vista.kinds = []
+endfunction
+
 function! s:on_exit(_job, _data, _event) abort dict
   if v:dying | return | endif
 
@@ -75,13 +82,12 @@ function! s:on_exit(_job, _data, _event) abort dict
   call s:ExtractLinewise(self.stdout[:-2])
 
   call s:ApplyExtracted()
+
+  unlet s:id
 endfunction
 
 function! s:close_cb(channel)
-  let s:data = {}
-  let t:vista.functions = []
-  let t:vista.raw = []
-  let t:vista.kinds = []
+  call s:PrepareContainer()
 
   while ch_status(a:channel, {'part': 'out'}) ==# 'buffered'
     let line = ch_read(a:channel)
@@ -89,6 +95,8 @@ function! s:close_cb(channel)
   endwhile
 
   call s:ApplyExtracted()
+
+  unlet s:id
 endfunction
 
 function! s:ApplyExtracted() abort
@@ -111,10 +119,7 @@ function! s:ApplyExtracted() abort
 endfunction
 
 function! s:ExtractLinewise(raw_data) abort
-  let s:data = {}
-  let t:vista.functions = []
-  let t:vista.raw = []
-  let t:vista.kinds = []
+  call s:PrepareContainer()
   call map(a:raw_data, 'call(s:TagParser, [v:val, s:data])')
 endfunction
 
@@ -288,6 +293,7 @@ function! vista#executive#ctags#Execute(bang, should_display, ...) abort
   return s:Dispatch('s:Execute', a:bang, a:should_display)
 endfunction
 
+" Run ctags recursively.
 function! vista#executive#ctags#ProjectRun() abort
   " https://github.com/universal-ctags/ctags/issues/2042
   "
