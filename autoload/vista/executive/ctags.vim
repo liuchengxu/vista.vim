@@ -83,7 +83,9 @@ function! s:on_exit(_job, _data, _event) abort dict
 
   call s:ApplyExtracted()
 
-  unlet s:id
+  if exists('s:id')
+    unlet s:id
+  endif
 endfunction
 
 function! s:close_cb(channel)
@@ -96,7 +98,9 @@ function! s:close_cb(channel)
 
   call s:ApplyExtracted()
 
-  unlet s:id
+  if exists('s:id')
+    unlet s:id
+  endif
 endfunction
 
 function! s:ApplyExtracted() abort
