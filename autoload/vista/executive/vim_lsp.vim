@@ -18,7 +18,7 @@ function! s:Handler(_server, _req_id, _type, data) abort
   let result = a:data.response.result
 
   let lines = []
-  call map(result, 'vista#parser#lsp#FromKindToSymbol(v:val, lines)')
+  call map(result, 'vista#parser#lsp#KindToSymbol(v:val, lines)')
 
   let s:data = {}
   let t:vista.functions = []

@@ -306,10 +306,10 @@ function! vista#executive#ctags#ProjectRun() abort
   " Otherwise we will use the `--_xformat` option.
   if s:support_json_format
     let cmd = s:ctags." -R -x --output-format=json --fields=+n"
-    let Parser = function('vista#parser#ctags#ProjectTagFromJSON')
+    let Parser = function('vista#parser#ctags#RecursiveFromJSON')
   else
     let cmd = s:ctags." -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
-    let Parser = function('vista#parser#ctags#ProjectTagFromXformat')
+    let Parser = function('vista#parser#ctags#RecursiveFromXformat')
   endif
 
   let output = system(cmd)

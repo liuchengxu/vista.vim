@@ -21,26 +21,6 @@ endfunction
 "   'kind': 'Function',
 "   'text': 'testnet_genesis',
 " }
-"
-function! vista#parser#ctags#ExtractTag(line, container) abort
-  " {tagname}<Tab>{tagfile}<Tab>{tagaddress}[;"<Tab>{tagfield}..]
-  " {tagname}<Tab>{tagfile}<Tab>{tagaddress};"<Tab>{kind}<Tab>{scope}
-  " ['vista#executive#ctags#Execute', '/Users/xlc/.vim/plugged/vista.vim/autoload/vista/executive/ctags.vim', '84;"', 'function']
-  let items = split(a:line, '\t')
-
-  let tagname = items[0]
-  let tagfile = items[1]
-  let lnum = split(items[2], ';')[0]
-  let scope = items[-1]
-
-  let picked = {'lnum': lnum, 'text': tagname}
-
-  if scope =~# '^f'
-    call add(t:vista.functions, picked)
-  endif
-
-  call s:Insert(a:container, scope, picked)
-endfunction
 
 function! s:ShortToLong(short) abort
   let ft = getbufvar(t:vista.source.bufnr, '&filetype')
@@ -84,6 +64,9 @@ function! s:ParseTagfield(tagfields) abort
   return fields
 endfunction
 
+" {tagname}<Tab>{tagfile}<Tab>{tagaddress}[;"<Tab>{tagfield}..]
+" {tagname}<Tab>{tagfile}<Tab>{tagaddress};"<Tab>{kind}<Tab>{scope}
+" ['vista#executive#ctags#Execute', '/Users/xlc/.vim/plugged/vista.vim/autoload/vista/executive/ctags.vim', '84;"', 'function']
 function! vista#parser#ctags#FromExtendedRaw(line, container) abort
   if a:line =~ '^!_TAG'
     return
@@ -138,22 +121,9 @@ function! vista#parser#ctags#FromJSON(line, container) abort
   call s:Insert(a:container, kind, picked)
 endfunction
 
-function! vista#parser#ctags#TagFromJSON(line, container) abort
-  let line = json_decode(a:line)
-
-  let kind = line.kind
-
-  let picked = {'lnum': line.line, 'text': line.name }
-
-  if kind =~# '^f'
-    call add(t:vista.functions, picked)
-  endif
-
-  call s:Insert(a:container, kind, picked)
-endfunction
-
-function! vista#parser#ctags#ProjectTagFromXformat(line, container) abort
-  " let cmd = "ctags -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
+" ctags -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
+"
+function! vista#parser#ctags#RecursiveFromXformat(line, container) abort
 
   if a:line =~ '^ctags: Warning: ignoring null tag'
     return
@@ -184,7 +154,7 @@ function! vista#parser#ctags#ProjectTagFromXformat(line, container) abort
   call s:Insert(a:container, kind, picked)
 endfunction
 
-function! vista#parser#ctags#ProjectTagFromJSON(line, container) abort
+function! vista#parser#ctags#RecursiveFromJSON(line, container) abort
   " {
   "  "_type":"tag",
   "  "name":"vista#source#Update",
@@ -193,6 +163,10 @@ function! vista#parser#ctags#ProjectTagFromJSON(line, container) abort
   "  "line":29,
   "  "kind":"function"
   " }
+  if a:line =~ '^ctags: Warning: ignoring null tag'
+    return
+  endif
+
   let line = json_decode(a:line)
 
   let kind = line.kind
