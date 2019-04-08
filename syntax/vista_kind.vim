@@ -6,7 +6,7 @@ if exists('b:current_syntax')
   finish
 endif
 
-let icons = join(values(g:vista#icons), '\|')
+let icons = join(values(g:vista#renderer#icons), '\|')
 execute 'syntax match VistaIcon' '/'.icons.'/' 'contained'
 
 syntax match VistaBracket /\(\[\|\]\)/ contained
