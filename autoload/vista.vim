@@ -7,6 +7,36 @@ let g:vista#executives = map(
       \ split(globpath(s:cur_dir.'/vista/executive', '*'), '\n'),
       \ 'fnamemodify(v:val, ":t:r")')
 
+let g:vista#icons = {
+\    "function": "\uf794",
+\    "method": "\uf6a6",
+\    "variable": "\uf71b",
+\    "constant": "\uf8ff",
+\    "struct": "\ufb44",
+\    "class": "\uf0e8",
+\    "interface": "\ufa52",
+\    "text": "\ue612",
+\    "enum": "\uf435",
+\    "enumMember": "\uf02b",
+\    "module": "\uf668",
+\    "color": "\ue22b",
+\    "property": "\ufab6",
+\    "field": "\uf93d",
+\    "unit": "\uf475",
+\    "file": "\uf471",
+\    "value": "\uf8a3",
+\    "event": "\ufacd",
+\    "keyword": "\uf893",
+\    "operator": "\uf915",
+\    "reference": "\uf87a",
+\    "typeParameter": "\uf278",
+\    "default": "\uf29c"
+\}
+
+function! vista#Decorate(kind) abort
+  return get(g:vista#icons, a:kind, g:vista#icons.default).' '.a:kind
+endfunction
+
 " Skip special buffers, filetypes.
 function! vista#ShouldSkip() abort
   let blacklist = ['vista', 'vista_kind', 'nerdtree', 'startify', 'tagbar', 'fzf']

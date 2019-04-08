@@ -36,7 +36,7 @@ function! s:viewer.render() abort
   " prefixes[0] scope [children_num]
   "   prefixes[1] tag:num
   for [kind, v] in items(self.data)
-    let parent = self.prefixes[0] . kind . ' ['.len(v).']'
+    let parent = self.prefixes[0] .vista#Decorate(kind).' ['.len(v).']'
     " Parent
     call add(self.rows, parent)
 

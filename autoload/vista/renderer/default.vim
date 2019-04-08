@@ -27,7 +27,7 @@ function! s:RenderLinewise() abort
     endif
 
     if !exists('s:last_kind') || has_key(line, 'kind') && s:last_kind != line.kind
-      call add(rows, line.kind)
+      call add(rows, vista#Decorate(line.kind))
       let s:last_kind = get(line, 'kind')
       continue
     endif
