@@ -21,6 +21,7 @@ View and search LSP symbols, tags in Vim/NeoVim.
         * [NeoVim](#neovim)
 * [Usage](#usage)
     * [Show the nearest method/function in the statusline](#show-the-nearest-methodfunction-in-the-statusline)
+        * [lightline.vim](#lightlinevim)
     * [Commands](#commands)
     * [Options](#options)
     * [Other tips](#other-tips)
@@ -118,7 +119,8 @@ set statusline+=%{NearestMethodOrFunction()}
 
 " By default vista.vim never run if you don't call it explicitly.
 "
-" You can add the following line to your vimrc if you want to show the nearest function in your statusline automatically.
+" If you want to show the nearest function in your statusline automatically,
+" you can add the following line to your vimrc 
 autocmd VimEnter * call vista#RunForNearestMethodOrFunction()
 ```
 
@@ -127,6 +129,21 @@ Also refer to [liuchengxu/eleline#18](https://github.com/liuchengxu/eleline.vim/
 <p align="center">
     <img width="800px" src="https://user-images.githubusercontent.com/8850248/55477900-da363680-564c-11e9-8e71-845260f3d44b.png">
 </p>
+
+#### [lightline.vim](https://github.com/itchyny/lightline.vim)
+
+```vim
+let g:lightline = {
+      \ 'colorscheme': 'wombat',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'readonly', 'filename', 'modified', 'method' ] ]
+      \ },
+      \ 'component_function': {
+      \   'method': 'NearestMethodOrFunction'
+      \ },
+      \ }
+```
 
 ### Commands
 
@@ -174,6 +191,21 @@ let g:vista_ctags_cmd = {
 " For example:
 let g:vista_fzf_preview = ['right:50%']
 ```
+
+```vim
+" Ensure you have installed some decent font to show these pretty symbols, then you can enable icon for the kind.
+let g:vista#renderer#enable_icon = 1
+
+" The default icons can't be suitable for all the filetypes, you can extend it as you wish.
+let g:vista#renderer#icons = {
+\   "function": "\uf794",
+\   "variable": "\uf71b",
+\  }
+```
+
+<p align="center">
+    <img width="300px" src="https://user-images.githubusercontent.com/8850248/55805524-2b449f80-5b11-11e9-85d4-018c305a5ecb.png">
+</p>
 
 See `:help vista-options` for more information.
 

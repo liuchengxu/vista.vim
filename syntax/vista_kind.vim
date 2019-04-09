@@ -6,6 +6,9 @@ if exists('b:current_syntax')
   finish
 endif
 
+let icons = join(values(g:vista#renderer#icons), '\|')
+execute 'syntax match VistaIcon' '/'.icons.'/' 'contained'
+
 syntax match VistaBracket /\(\[\|\]\)/ contained
 syntax match VistaChildrenNr /\[\d*\]$/ contains=VistaBracket
 
@@ -15,7 +18,7 @@ let s:prefixes = filter(
 let s:pattern = join(s:prefixes, '\|')
 execute 'syntax match VistaPrefix' '/\('.s:pattern.'\)/' 'contained'
 
-syntax match VistaScope /^\S.*$/ contains=VistaPrefix,VistaChildrenNr
+syntax match VistaScope /^\S.*$/ contains=VistaPrefix,VistaChildrenNr,VistaIcon
 syntax match VistaColon /:/ contained
 syntax match VistaLineNr /:\d*$/ contains=VistaColon
 syntax region VistaTag start="^" end="$" contains=VistaLineNr,VistaScope,VistaPrefix
@@ -27,5 +30,6 @@ hi default link VistaTag         Keyword
 hi default link VistaPrefix      String
 hi default link VistaLineNr      LineNr
 hi default link VistaColon       SpecialKey
+hi default link VistaIcon        StorageClass
 
 let b:current_syntax = 'vista_kind'

@@ -65,7 +65,9 @@ function! vista#executive#lcn#Run(_fpath) abort
 endfunction
 
 function! vista#executive#lcn#RunAsync() abort
-  call s:RunAsync()
+  if exists('*LanguageClient#textDocument_documentSymbol')
+    call s:RunAsync()
+  endif
 endfunction
 
 function! vista#executive#lcn#Execute(bang, should_display, ...) abort

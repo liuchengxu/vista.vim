@@ -26,8 +26,8 @@ APIs and global options can be changed or even removed in the future.
 INTRODUCTION                                                  *vista-introduction*
 
 I initially started {vista.vim}{1} with an intention of replacing {tagbar}{2} as
-it seemingly doesn't have a plan to support the promising {Language Server Protocol}{3}
-and async processing.
+it seemingly does not have a plan to support the promising
+{Language Server Protocol}{3} and async processing.
 
 In terms of viewer for ctags-generated tags, vista.vim is sort of the poor version
 of tagbar, for some details has not been worked out. Nonetheless, it's more than
@@ -129,7 +129,7 @@ Vista                                                                      *Vist
 
   You can also specify an executive for the finder, for example:
 
-  `:Vista finder coc`: search symbols provided by coc.nvim.
+  `:Vista finder coc`:   search symbols provided by coc.nvim.
 
   `:Vista finder ctags`: search tags provided by ctags.
 
@@ -305,6 +305,18 @@ g:vista_disable_statusline                            *g:vista_disable_statuslin
   Vista.vim has a builtin statusline renderer, which may cause some problems
   if you use other statusline plugins at the same time. Hence it's disabled
   by default if you have installed airline or lightline.
+
+g:vista#renderer#enable_icon                        *g:vista#renderer#enable_icon*
+
+  Type: |Number|
+  Default: `exists('g:vista#renderer#icons') || exists('g:airline_powerline_fonts')`
+
+  Add pretty symbols for the kind of tags or LSP symbols.
+
+g:vista#renderer#icons                                    *g:vista#renderer#icons*
+
+  Type: |Dict|
+  Default: See `autoload/vista/renderer.vim` .
 
 --------------------------------------------------------------------------------
 CONTRIBUTING                                                  *vista-contributing*

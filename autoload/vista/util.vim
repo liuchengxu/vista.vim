@@ -45,7 +45,11 @@ function! vista#util#SetBufline(bufnr, lines) abort
   if has('nvim')
     call nvim_buf_set_lines(a:bufnr, 0, -1, 0, lines)
   else
+    let cur_lines = getbufline(a:bufnr, 1, '$')
     call setbufline(a:bufnr, 1, lines)
+    if len(cur_lines) > len(lines)
+      call deletebufline(a:bufnr, len(lines)+1, len(cur_lines)+1)
+    endif
   endif
   call setbufvar(a:bufnr, '&readonly', 1)
   call setbufvar(a:bufnr, '&modifiable', 0)
