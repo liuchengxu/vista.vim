@@ -21,6 +21,7 @@ View and search LSP symbols, tags in Vim/NeoVim.
         * [NeoVim](#neovim)
 * [Usage](#usage)
     * [Show the nearest method/function in the statusline](#show-the-nearest-methodfunction-in-the-statusline)
+        * [lightline.vim](#lightlinevim)
     * [Commands](#commands)
     * [Options](#options)
     * [Other tips](#other-tips)
@@ -127,6 +128,21 @@ Also refer to [liuchengxu/eleline#18](https://github.com/liuchengxu/eleline.vim/
 <p align="center">
     <img width="800px" src="https://user-images.githubusercontent.com/8850248/55477900-da363680-564c-11e9-8e71-845260f3d44b.png">
 </p>
+
+#### [lightline.vim](https://github.com/itchyny/lightline.vim)
+
+```vim
+let g:lightline = {
+      \ 'colorscheme': 'wombat',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'readonly', 'filename', 'modified', 'method' ] ]
+      \ },
+      \ 'component_function': {
+      \   'method': 'NearestMethodOrFunction'
+      \ },
+      \ }
+```
 
 ### Commands
 
