@@ -175,6 +175,20 @@ let g:vista_ctags_cmd = {
 let g:vista_fzf_preview = ['right:50%']
 ```
 
+```vim
+" Ensure you have installed some decent font to show these pretty symbols, then you can enable icon for the kind.
+let g:vista#renderer#enable_icon = 1
+
+" The default icons can't be suitable for all the filetypes, you can extend it as you wish.
+let g:vista#renderer#icons = {
+\   "function": "\uf794",
+\  }
+```
+
+<p align="center">
+    <img width="500px" src="https://user-images.githubusercontent.com/8850248/55805524-2b449f80-5b11-11e9-85d4-018c305a5ecb.png">
+</p>
+
 See `:help vista-options` for more information.
 
 ### Other tips

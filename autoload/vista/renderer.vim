@@ -25,6 +25,7 @@ let s:icons = {
 \    "macros": "\uf8a3",
 \    "map": "\ufb44",
 \    "class": "\uf0e8",
+\    "augroup": "\ufb44",
 \    "struct": "\ufb44",
 \    "union": "\ufacd",
 \    "member": "\uf02b",
@@ -45,7 +46,7 @@ let g:vista#renderer#enable_icon = get(g:, 'vista#renderer#enable_icon',
 
 function! vista#renderer#Decorate(kind) abort
   if g:vista#renderer#enable_icon
-    return get(g:vista#renderer#icons, tolower(a:kind), g:vista#renderer#icons.default).' '.a:kind
+    return get(g:vista#renderer#icons, tolower(a:kind), g:vista#renderer#icons.default).'  '.a:kind
   else
     return a:kind
   endif
