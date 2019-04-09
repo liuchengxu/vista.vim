@@ -186,7 +186,7 @@ let g:vista#renderer#icons = {
 ```
 
 <p align="center">
-    <img width="500px" src="https://user-images.githubusercontent.com/8850248/55805524-2b449f80-5b11-11e9-85d4-018c305a5ecb.png">
+    <img width="300px" src="https://user-images.githubusercontent.com/8850248/55805524-2b449f80-5b11-11e9-85d4-018c305a5ecb.png">
 </p>
 
 See `:help vista-options` for more information.
