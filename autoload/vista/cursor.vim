@@ -70,7 +70,11 @@ function! s:EchoInCmdline(msg, tag) abort
     let pieces = split(getline(linenr), ' ')
     if len(pieces) > 1
       let scope = pieces[1]
-      echohl Function  | echo '['.scope.'] '  | echohl NONE
+      if g:vista#renderer#enable_icon
+        echohl Function | echo ' '.scope.' ' | echohl NONE
+      else
+        echohl Function  | echo '['.scope.'] '  | echohl NONE
+      endif
       " if start is 0, msg[0:-1] will display the redundant whole msg.
       if start != 0
         echohl Statement | echon msg[0:start-1] | echohl NONE

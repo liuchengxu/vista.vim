@@ -1,3 +1,7 @@
+" Copyright (c) 2019 Liu-Cheng Xu
+" MIT License
+" vim: ts=2 sw=2 sts=2 et
+
 let s:icons = {
 \    "function": "\uf794",
 \    "method": "\uf6a6",
@@ -24,8 +28,15 @@ let s:icons = {
 \    "default": "\uf29c"
 \}
 
-let g:vista#renderer#icons = extend(s:icons, get(g:, 'vista_icons', {}))
+let g:vista#renderer#icons = extend(s:icons, get(g:, 'vista#renderer#icons', {}))
+
+let g:vista#renderer#enable_icon = get(g:, 'vista#renderer#enable_icon',
+      \ exists('g:vista#renderer#icons') || exists('g:airline_powerline_fonts'))
 
 function! vista#renderer#Decorate(kind) abort
-  return get(g:vista#renderer#icons, a:kind, g:vista#renderer#icons.default).' '.a:kind
+  if g:vista#renderer#enable_icon
+    return get(g:vista#renderer#icons, a:kind, g:vista#renderer#icons.default).' '.a:kind
+  else
+    return a:kind
+  endif
 endfunction
