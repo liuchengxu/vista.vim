@@ -15,11 +15,12 @@ endfunction
 
 " Extract fruitful infomation from raw symbols
 function! s:Extract(symbols) abort
+  call s:PrepareContainer()
+
   if empty(a:symbols)
     return
   endif
 
-  call s:PrepareContainer()
   call map(a:symbols, 'vista#parser#lsp#ExtractSymbol(v:val, s:data)')
 
   if empty(s:data)
