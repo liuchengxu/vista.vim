@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+set -e
+set -u
+
+image=liuchengxu/vista.vim
+current_image_id=738429493f87
+
+# Used in all test scripts for running the selected Docker image.
+DOCKER_RUN_IMAGE="$image"
+export DOCKER_RUN_IMAGE
+
+exit_code=0
+docker_flags=(--rm -v "$PWD:/testplugin" -v "$PWD/test:/home" -w /testplugin "$DOCKER_RUN_IMAGE")
+
+echo '========================================'
+echo 'Running Vint to lint our code'
+echo '========================================'
+echo 'Vint warnings/errors follow:'
+echo
+
+set -o pipefail
+docker run -a stdout "${docker_flags[@]}" vint -s . || exit_code=$?
+set +o pipefail
+echo
+
+exit $exit_code
