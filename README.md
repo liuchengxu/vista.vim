@@ -1,4 +1,5 @@
 # Vista.vim
+[![Build Status](https://travis-ci.org/liuchengxu/vista.vim.svg?branch=master)](https://travis-ci.org/liuchengxu/vista.vim)
 
 View and search LSP symbols, tags in Vim/NeoVim.
 
