@@ -44,7 +44,7 @@ function! s:aligner.project_ctags() abort
       " FIXME handle ctags -R better
       let lnum_and_text = printf('%s:%s', item.lnum, item.text)
       let relpath = item.tagfile
-      let row = printf('%s%s\t[%s]%s\t%s%s\t%s',
+      let row = printf("%s%s\t[%s]%s\t%s%s\t%s",
             \ lnum_and_text, repeat(' ', max_len_lnum_and_text- strwidth(lnum_and_text)),
             \ kind, repeat(' ', max_len_scope - strwidth(kind)),
             \ relpath, repeat(' ', max_len_relpath - strwidth(relpath)),
@@ -87,7 +87,7 @@ function! s:AlignSource() abort
     for item in v
       let line = t:vista.source.line(item.lnum)
       let lnum_and_text = printf('%s:%s', item.lnum, item.text)
-      let row = printf('%s%s\t[%s]%s\t%s',
+      let row = printf("%s%s\t[%s]%s\t%s",
             \ lnum_and_text, repeat(' ', max_len_lnum_and_text- strwidth(lnum_and_text)),
             \ kind, repeat(' ', max_len_scope - strwidth(kind)),
             \ line)
