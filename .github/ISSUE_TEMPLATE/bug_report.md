@@ -11,16 +11,18 @@ the issue may be closed as unreproducible. Thanks. -->
 A clear and concise description of what the bug is.
 
 **Environment:**
-- OS: <!-- e.g. Mac OS, Ubuntu 18.04, Windows 10 -->
+- OS: <!-- e.g. macOS, Ubuntu 18.04, Windows 10 -->
 - Vim/Neovim version: <!-- first two lines of `:version` command output -->
 - This plugin version: <!-- output of `git rev-parse origin/master` command -->
 
-**Minimal vimrc to reproduce**
+**Vista info**
 
-```vim
+<!-- Paste the output of :Vista info here, or try :Vista info+. -->
+
+```
 ```
 
-**Steps to reproduce given the above minimal vimrc**
+**Steps to reproduce given the above info**
 <!-- short descriptions of actions, which lead towards the issue -->
 1.
 2.
