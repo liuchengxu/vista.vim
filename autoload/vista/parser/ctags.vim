@@ -68,7 +68,7 @@ endfunction
 " {tagname}<Tab>{tagfile}<Tab>{tagaddress};"<Tab>{kind}<Tab>{scope}
 " ['vista#executive#ctags#Execute', '/Users/xlc/.vim/plugged/vista.vim/autoload/vista/executive/ctags.vim', '84;"', 'function']
 function! vista#parser#ctags#FromExtendedRaw(line, container) abort
-  if a:line =~ '^!_TAG'
+  if a:line =~# '^!_TAG'
     return
   endif
   let items = split(a:line, '\t')
@@ -125,7 +125,7 @@ endfunction
 "
 function! vista#parser#ctags#RecursiveFromXformat(line, container) abort
 
-  if a:line =~ '^ctags: Warning: ignoring null tag'
+  if a:line =~# '^ctags: Warning: ignoring null tag'
     return
   endif
 
@@ -163,7 +163,7 @@ function! vista#parser#ctags#RecursiveFromJSON(line, container) abort
   "  "line":29,
   "  "kind":"function"
   " }
-  if a:line =~ '^ctags: Warning: ignoring null tag'
+  if a:line =~# '^ctags: Warning: ignoring null tag'
     return
   endif
 

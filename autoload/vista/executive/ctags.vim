@@ -9,7 +9,7 @@ let s:should_display = v:false
 
 let s:ctags = get(g:, 'vista_ctags_executable', 'ctags')
 let s:support_json_format =
-      \ len(filter(split(system(s:ctags.' --list-features'), '\n'), 'v:val =~ "^json"')) > 0
+      \ len(filter(split(system(s:ctags.' --list-features'), '\n'), 'v:val =~# ''^json''')) > 0
 
 function! s:GetCustomCmd(ft) abort
   if exists('g:vista_ctags_cmd') && has_key(g:vista_ctags_cmd, a:ft)
@@ -88,7 +88,7 @@ function! s:on_exit(_job, _data, _event) abort dict
   endif
 endfunction
 
-function! s:close_cb(channel)
+function! s:close_cb(channel) abort
   call s:PrepareContainer()
 
   while ch_status(a:channel, {'part': 'out'}) ==# 'buffered'
@@ -128,7 +128,7 @@ function! s:ExtractLinewise(raw_data) abort
 endfunction
 
 function! s:AutoUpdate(fpath) abort
-  if t:vista.source.filetype() == 'markdown'
+  if t:vista.source.filetype() ==# 'markdown'
     call vista#extension#markdown#AutoUpdate(a:fpath)
   else
     let s:reload_only = v:true
@@ -179,7 +179,7 @@ endfunction
 function! s:IntoTemp(...) abort
   let tmp = tempname()
   let ext = t:vista.source.extension()
-  if ext != ''
+  if !empty(ext)
     let tmp = join([tmp, ext], '.')
   endif
 
@@ -305,7 +305,7 @@ function! vista#executive#ctags#ProjectRun() abort
   " `--output-format=json` option, which is easier to parse and more reliable.
   " Otherwise we will use the `--_xformat` option.
   if s:support_json_format
-    let cmd = s:ctags." -R -x --output-format=json --fields=+n"
+    let cmd = s:ctags.' -R -x --output-format=json --fields=+n'
     let Parser = function('vista#parser#ctags#RecursiveFromJSON')
   else
     let cmd = s:ctags." -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"

@@ -3,8 +3,9 @@
 " vim: ts=2 sw=2 sts=2 et
 "
 " Render the content by the kind of tag.
+scriptencoding utf8
 
-let s:default_icon = ["╰─▸ ", "├─▸ "]
+let s:default_icon = ['╰─▸ ', '├─▸ ']
 let s:viewer = {}
 
 function! s:viewer.init(data) abort
@@ -27,7 +28,7 @@ function! s:viewer.init(data) abort
 endfunction
 
 function! s:ContainWhitespaceOnly(str) abort
-  return a:str !~ '\S'
+  return a:str !~# '\S'
 endfunction
 
 function! s:viewer.render() abort

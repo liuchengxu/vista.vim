@@ -15,7 +15,7 @@ function! vista#util#Truncate(msg) abort
   return len(a:msg) < maxlen ? a:msg : a:msg[:maxlen-3].'...'
 endfunction
 
-function! vista#util#Trim(str)
+function! vista#util#Trim(str) abort
   if exists('*trim')
     return trim(a:str)
   else
@@ -30,7 +30,7 @@ function! s:PrependFpath(lines) abort
     let fpath = t:vista.source.fpath
     " Shorten the file path if it's too long
     if len(fpath) > width
-      let fpath = '..'.fpath[len(fpath)-width:]
+      let fpath = '..'.fpath[len(fpath)-width : ]
     endif
     return [fpath, ''] + a:lines
   endif
@@ -76,7 +76,7 @@ endfunction
 function! vista#util#Blink(times, delay) abort
   let s:blink = { 'ticks': 2 * a:times, 'delay': a:delay }
 
-  function! s:blink.tick(_)
+  function! s:blink.tick(_) abort
     let self.ticks -= 1
     let active = self == s:blink && self.ticks > 0
 
@@ -88,7 +88,7 @@ function! vista#util#Blink(times, delay) abort
     endif
   endfunction
 
-  function! s:blink.clear()
+  function! s:blink.clear() abort
     if exists('w:blink_id')
       call matchdelete(w:blink_id)
       unlet w:blink_id
@@ -124,7 +124,7 @@ endfunction
 function! vista#util#Complete(A, L, P) abort
   let cmd = ['coc', 'ctags', 'finder']
   let args = split(a:L)
-  if !empty(args) && args[-1] == 'finder'
+  if !empty(args) && args[-1] ==# 'finder'
     return join(['coc', 'ctags'], "\n")
   endif
   return join(cmd, "\n")

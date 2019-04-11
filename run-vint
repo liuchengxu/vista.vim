@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -eu
+
+image=liuchengxu/vista.vim
+
+exit_code=0
+
+docker_flags=(--rm -v "$PWD:/testplugin" -v "$PWD/test:/home" -w /testplugin "$image")
+
+echo '----------------------------------------'
+echo 'Running Vint...'
+echo '----------------------------------------'
+echo 'Vint warnings/errors follow:'
+echo
+
+set -o pipefail
+docker run -a stdout "${docker_flags[@]}" vint -w . || exit_code=$?
+set +o pipefail
+
+echo
+
+exit $exit_code

@@ -92,7 +92,7 @@ endfunction
 function! vista#executive#vim_lsp#Execute(bang, should_display, ...) abort
   if !s:HasAvaliableServers()
     if get(a:000, 0, v:true)
-      return vista#error#("Retrieving symbols is not avaliable")
+      return vista#error#('Retrieving symbols is not avaliable')
     endif
     return
   endif

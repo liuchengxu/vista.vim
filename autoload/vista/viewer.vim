@@ -2,10 +2,10 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
-let s:default_icon = ["╰─▸ ", "├─▸ "]
+let s:default_icon = ['╰─▸ ', '├─▸ ']
 
 function! s:Render(data) abort
-  if get(g:, 'vista_ctags_renderer', '') == 'default'
+  if get(g:, 'vista_ctags_renderer', '') ==# 'default'
     return vista#renderer#default#Render()
   else
     return vista#renderer#kind#Render(a:data)

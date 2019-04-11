@@ -3,12 +3,12 @@
 " vim: ts=2 sw=2 sts=2 et
 
 " Treat the number of heading whitespaces as indent level
-function! s:HeadingWhitespaces(line)
+function! s:HeadingWhitespaces(line) abort
   return strlen(matchstr(a:line,'\v^\s+'))
 endfunction
 
 function! vista#fold#Expr() abort
-  if getline(v:lnum) =~ '^$'
+  if getline(v:lnum) =~# '^$'
     return 0
   endif
 
