@@ -2,6 +2,8 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
+scriptencoding utf-8
+
 let s:cols_layout = {}
 let s:aligner = {}
 
@@ -15,7 +17,7 @@ function! s:cols_layout.project_ctags() abort
     endif
 
     for item in v
-      let lnum_and_text = printf("%s:%s", item.lnum, item.text)
+      let lnum_and_text = printf('%s:%s', item.lnum, item.text)
       let len_lnum_and_text = strwidth(lnum_and_text)
       if len_lnum_and_text > max_len_lnum_and_text
         let max_len_lnum_and_text = len_lnum_and_text
@@ -40,9 +42,9 @@ function! s:aligner.project_ctags() abort
   for [kind, v] in items(s:data)
     for item in v
       " FIXME handle ctags -R better
-      let lnum_and_text = printf("%s:%s", item.lnum, item.text)
+      let lnum_and_text = printf('%s:%s', item.lnum, item.text)
       let relpath = item.tagfile
-      let row = printf("%s%s\t[%s]%s\t%s%s\t%s",
+      let row = printf('%s%s\t[%s]%s\t%s%s\t%s',
             \ lnum_and_text, repeat(' ', max_len_lnum_and_text- strwidth(lnum_and_text)),
             \ kind, repeat(' ', max_len_scope - strwidth(kind)),
             \ relpath, repeat(' ', max_len_relpath - strwidth(relpath)),
@@ -65,7 +67,7 @@ function! s:FindMaxLen() abort
     endif
 
     for item in v
-      let lnum_and_text = printf("%s:%s", item.lnum, item.text)
+      let lnum_and_text = printf('%s:%s', item.lnum, item.text)
       let len_lnum_and_text = strwidth(lnum_and_text)
       if len_lnum_and_text > max_len_lnum_and_text
         let max_len_lnum_and_text = len_lnum_and_text
@@ -84,8 +86,8 @@ function! s:AlignSource() abort
   for [kind, v] in items(s:data)
     for item in v
       let line = t:vista.source.line(item.lnum)
-      let lnum_and_text = printf("%s:%s", item.lnum, item.text)
-      let row = printf("%s%s\t[%s]%s\t%s",
+      let lnum_and_text = printf('%s:%s', item.lnum, item.text)
+      let row = printf('%s%s\t[%s]%s\t%s',
             \ lnum_and_text, repeat(' ', max_len_lnum_and_text- strwidth(lnum_and_text)),
             \ kind, repeat(' ', max_len_scope - strwidth(kind)),
             \ line)
@@ -221,7 +223,7 @@ function! vista#finder#fzf#ProjectRun() abort
   let s:cur_executive = executive
 
   if empty(s:data)
-    return vista#util#Warning("Empty data for finder")
+    return vista#util#Warning('Empty data for finder')
   endif
 
   call s:ProjectRun()
@@ -266,7 +268,7 @@ function! vista#finder#fzf#Run(...) abort
   let s:using_alternative = v:false
 
   if empty(s:data) && !s:TryAlternatives(executive, fpath)
-    return vista#util#Warning("Empty data for finder")
+    return vista#util#Warning('Empty data for finder')
   endif
 
   call s:Run()

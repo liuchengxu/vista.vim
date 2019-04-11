@@ -5,19 +5,19 @@ let s:types = {}
 let s:types.lang = 'c++'
 
 let s:types.kinds = {
-    \ {'short' : 'h', 'long' : 'header files', 'fold' : 1, 'stl' : 0},
-    \ {'short' : 'd', 'long' : 'macros',       'fold' : 1, 'stl' : 0},
-    \ {'short' : 'p', 'long' : 'prototypes',   'fold' : 1, 'stl' : 0},
-    \ {'short' : 'g', 'long' : 'enums',        'fold' : 0, 'stl' : 1},
-    \ {'short' : 'e', 'long' : 'enumerators',  'fold' : 0, 'stl' : 0},
-    \ {'short' : 't', 'long' : 'typedefs',     'fold' : 0, 'stl' : 0},
-    \ {'short' : 'n', 'long' : 'namespaces',   'fold' : 0, 'stl' : 1},
-    \ {'short' : 'c', 'long' : 'classes',      'fold' : 0, 'stl' : 1},
-    \ {'short' : 's', 'long' : 'structs',      'fold' : 0, 'stl' : 1},
-    \ {'short' : 'u', 'long' : 'unions',       'fold' : 0, 'stl' : 1},
-    \ {'short' : 'f', 'long' : 'functions',    'fold' : 0, 'stl' : 1},
-    \ {'short' : 'm', 'long' : 'members',      'fold' : 0, 'stl' : 0},
-    \ {'short' : 'v', 'long' : 'variables',    'fold' : 0, 'stl' : 0}
+    \ 'h': {'long' : 'header files', 'fold' : 1, 'stl' : 0},
+    \ 'd': {'long' : 'macros',       'fold' : 1, 'stl' : 0},
+    \ 'p': {'long' : 'prototypes',   'fold' : 1, 'stl' : 0},
+    \ 'g': {'long' : 'enums',        'fold' : 0, 'stl' : 1},
+    \ 'e': {'long' : 'enumerators',  'fold' : 0, 'stl' : 0},
+    \ 't': {'long' : 'typedefs',     'fold' : 0, 'stl' : 0},
+    \ 'n': {'long' : 'namespaces',   'fold' : 0, 'stl' : 1},
+    \ 'c': {'long' : 'classes',      'fold' : 0, 'stl' : 1},
+    \ 's': {'long' : 'structs',      'fold' : 0, 'stl' : 1},
+    \ 'u': {'long' : 'unions',       'fold' : 0, 'stl' : 1},
+    \ 'f': {'long' : 'functions',    'fold' : 0, 'stl' : 1},
+    \ 'm': {'long' : 'members',      'fold' : 0, 'stl' : 0},
+    \ 'v': {'long' : 'variables',    'fold' : 0, 'stl' : 0}
     \ }
 
 let s:types.sro = '::'

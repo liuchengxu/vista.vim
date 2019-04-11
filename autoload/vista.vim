@@ -65,18 +65,18 @@ function! vista#(bang, ...) abort
     if index(g:vista#executives, a:1) > -1
       call vista#source#Update(bufnr, winnr, fname, fpath)
       call vista#executive#{a:1}#Execute(v:false, v:true)
-    elseif a:1 == 'finder'
+    elseif a:1 ==# 'finder'
       call vista#finder#fzf#Run('coc')
-    elseif a:1 == 'finder!'
+    elseif a:1 ==# 'finder!'
       call vista#finder#fzf#ProjectRun()
-    elseif a:1 == 'toc'
-      if &filetype == 'markdown'
+    elseif a:1 ==# 'toc'
+      if &filetype ==# 'markdown'
         call vista#source#Update(bufnr, winnr, fname, fpath)
         call vista#extension#markdown#Execute(v:false, v:true)
       else
         return vista#error#For('Vista toc', 'markdown')
       endif
-    elseif a:1 == 'show'
+    elseif a:1 ==# 'show'
       if vista#sidebar#IsVisible()
         call vista#cursor#ShowTag()
       else
@@ -84,15 +84,15 @@ function! vista#(bang, ...) abort
         let t:vista.lnum = line('.')
       endif
     else
-      return vista#error#Expect("Vista [finder] [EXECUTIVE]")
+      return vista#error#Expect('Vista [finder] [EXECUTIVE]')
     endif
   elseif a:0 == 2
     if a:1 !=# 'finder'
-      return vista#error#Expect("Vista finder [EXECUTIVE]")
+      return vista#error#Expect('Vista finder [EXECUTIVE]')
     endif
     call vista#finder#fzf#Run(a:2)
     return
   else
-    return vista#error#("Too many arguments for Vista")
+    return vista#error#('Too many arguments for Vista')
   endif
 endfunction

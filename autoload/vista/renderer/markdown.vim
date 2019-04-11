@@ -1,4 +1,4 @@
-let s:default_icon = ["╰─▸ ", "├─▸ "]
+let s:default_icon = ['╰─▸ ', '├─▸ ']
 
 function! vista#renderer#markdown#Render(data) abort
   " {'lnum': 1, 'level': '4', 'text': '# Vista.vim'}
@@ -8,7 +8,7 @@ function! vista#renderer#markdown#Render(data) abort
 
   for line in data
     let level = line.level
-    let text = vista#util#Trim(line['text'][level:])
+    let text = vista#util#Trim(line['text'][level : ])
     let lnum = line.lnum
     if level > 1
       let row = repeat(' ', 4 * level).s:default_icon[0].' '.text.' H'.level.':'.lnum

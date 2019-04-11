@@ -8,7 +8,7 @@ function! s:NewWindow() abort
   let open = position.' '.width.'new'
   silent execute open '__vista__'
 
-  if get(g:, 'vista_ctags_renderer', '') == 'default'
+  if get(g:, 'vista_ctags_renderer', '') ==# 'default'
     setlocal filetype=vista
   else
     setlocal filetype=vista_kind
@@ -53,7 +53,7 @@ function! vista#sidebar#OpenOrUpdate(rows) abort
       execute 'vertical resize' get(g:, 'vista_sidebar_width', 30)
     else
       if winnr() != winnr
-        noautocmd execute winnr."wincmd w"
+        noautocmd execute winnr.'wincmd w'
       endif
     endif
   endif

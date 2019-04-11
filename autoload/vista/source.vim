@@ -54,7 +54,7 @@ function! vista#source#GotoWin() abort
     " t:vista.source.winnr is not always correct.
     let winnr = t:vista.source.winnr()
     if winnr != -1
-      noautocmd execute winnr."wincmd w"
+      noautocmd execute winnr.'wincmd w'
     else
       return vista#error#('Cannot find the target window')
     endif

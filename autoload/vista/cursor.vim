@@ -86,8 +86,8 @@ function! s:EchoInCmdline(msg, tag) abort
     endif
   endif
 
-  echohl Search    | echon msg[start:end-1] | echohl NONE
-  echohl Statement | echon msg[end:]        | echohl NONE
+  echohl Search    | echon msg[start : end-1] | echohl NONE
+  echohl Statement | echon msg[end : ]        | echohl NONE
 endfunction
 
 function! s:DisplayInFloatingWin(...) abort
@@ -229,7 +229,7 @@ function! vista#cursor#FoldOrJump() abort
 
   " Fold or unfold when meets scope line
   " FIXME this only work for the kind renderer.
-  if getline('.') =~ ']$'
+  if getline('.') =~# ']$'
     if foldclosed('.') != -1
       normal! zo
     else

@@ -4,7 +4,7 @@
 "
 " Render the content by the kind of tag.
 
-let s:default_icon = ["╰─▸ ", "├─▸ "]
+let s:default_icon = ['╰─▸ ', '├─▸ ']
 let s:viewer = {}
 
 function! s:viewer.init(data) abort
@@ -27,7 +27,7 @@ function! s:viewer.init(data) abort
 endfunction
 
 function! s:ContainWhitespaceOnly(str) abort
-  return a:str !~ '\S'
+  return a:str !~# '\S'
 endfunction
 
 function! s:viewer.render() abort
