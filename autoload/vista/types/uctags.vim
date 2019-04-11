@@ -49,7 +49,7 @@ let s:language_opt = {
       \ }
 
 let s:language_opt = map(s:language_opt,
-      \ 'printf("--language-force=%s --%s-types=%s", v:val[0], v:val[0], v:val[1])')
+      \ 'printf(''--language-force=%s --%s-types=%s'', v:val[0], v:val[0], v:val[1])')
 
 function! vista#types#uctags#KindsFor(filetype) abort
   return get(s:language_opt, a:filetype, '')

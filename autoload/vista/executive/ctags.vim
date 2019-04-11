@@ -9,7 +9,7 @@ let s:should_display = v:false
 
 let s:ctags = get(g:, 'vista_ctags_executable', 'ctags')
 let s:support_json_format =
-      \ len(filter(split(system(s:ctags.' --list-features'), '\n'), 'v:val =~# "^json"')) > 0
+      \ len(filter(split(system(s:ctags.' --list-features'), '\n'), 'v:val =~# ''^json''')) > 0
 
 function! s:GetCustomCmd(ft) abort
   if exists('g:vista_ctags_cmd') && has_key(g:vista_ctags_cmd, a:ft)

@@ -5,7 +5,7 @@
 let s:cur_dir = fnamemodify(resolve(expand('<sfile>:p')), ':h')
 let g:vista#executives = map(
       \ split(globpath(s:cur_dir.'/vista/executive', '*'), '\n'),
-      \ 'fnamemodify(v:val, ":t:r")')
+      \ 'fnamemodify(v:val, '':t:r'')')
 
 " Skip special buffers, filetypes.
 function! vista#ShouldSkip() abort
