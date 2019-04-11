@@ -133,6 +133,14 @@ Vista                                                                      *Vist
 
   `:Vista finder ctags`: search tags provided by ctags.
 
+                                                                      *vista-info*
+
+  `:Vista info`: print information about vista.vim, including the explicit
+  global variables, autocmds.
+
+  `:Vista info+`: copy the output of `:Vista info` to your clipboard, may
+  fail in some cases.
+
 Vista!                                                                    *Vista!*
 
   Close the vista view window if already opened.
