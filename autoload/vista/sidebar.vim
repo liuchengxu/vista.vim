@@ -28,8 +28,10 @@ function! vista#sidebar#Reload(data) abort
     return
   endif
 
-  " FIXME may opening a new tab
-  if !has_key(t:vista, 'bufnr')
+  " May opening a new tab if bufnr does not exist in t:vista.
+  "
+  " Skip reloading if vista window is not visible.
+  if !has_key(t:vista, 'bufnr') || t:vista.winnr() == -1
     return
   endif
 
