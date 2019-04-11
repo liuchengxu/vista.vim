@@ -5,19 +5,19 @@
 function! s:GetAvaliableExecutives() abort
   let avaliable = []
   if exists('*CocAction')
-    call add(avaliable, "coc")
+    call add(avaliable, 'coc')
   endif
 
   if executable('ctags')
-    call add(avaliable, "ctags")
+    call add(avaliable, 'ctags')
   endif
 
   if exists('*LanguageClient#textDocument_documentSymbol')
-    call add(avaliable, "lcn")
+    call add(avaliable, 'lcn')
   endif
 
   if exists('*lsp#get_whitelisted_servers')
-    call add(avaliable, "vim_lsp")
+    call add(avaliable, 'vim_lsp')
   endif
 
   return avaliable
@@ -27,13 +27,13 @@ function! s:GetGlobalVariables() abort
   let variable_list = []
 
   for key in keys(g:)
-    if key =~ '^vista'
+    if key =~# '^vista'
       call add(variable_list, key)
     endif
   endfor
 
   " Ignore the variables of types
-  call filter(variable_list, 'v:val !~ "vista#types#"')
+  call filter(variable_list, 'v:val !~# ''vista#types#''')
 
   call sort(variable_list)
 
@@ -50,7 +50,7 @@ function! vista#debugging#Info() abort
   echohl Normal | echon avaliable_executives    | echohl NONE
   echohl Type   | echo '    Global Variables:'  | echohl NONE
   for variable in global_variables
-    echo "    let g:".variable.' = '. string(g:[variable])
+    echo '    let g:'.variable.' = '. string(g:[variable])
   endfor
 endfunction
 
