@@ -3,6 +3,7 @@
 " vim: ts=2 sw=2 sts=2 et
 "
 " Render the content by the kind of tag.
+scriptencoding utf8
 
 let s:default_icon = ['╰─▸ ', '├─▸ ']
 let s:viewer = {}
