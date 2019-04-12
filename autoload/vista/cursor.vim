@@ -111,13 +111,14 @@ function! s:ShowDetail() abort
 
   let strategy = get(g:, 'vista_echo_cursor_strategy', 'echo')
   let avaliable = ['echo', 'floating_win', 'both']
+  let lnum = str2nr(matchstr(getline('.'), '\d\+$'))
   if strategy == avaliable[0]
     call s:EchoInCmdline(msg, tag)
   elseif strategy == avaliable[1]
-    call s:DisplayInFloatingWin(getline('.'), tag)
+    call s:DisplayInFloatingWin(lnum, tag)
   elseif strategy == avaliable[2]
     call s:EchoInCmdline(msg, tag)
-    call s:DisplayInFloatingWin(getline('.'), tag)
+    call s:DisplayInFloatingWin(lnum, tag)
   else
     call vista#error#InvalidOption('g:vista_echo_cursor_strategy', avaliable)
   endif

@@ -16,15 +16,13 @@ let s:types.sro        = '.'
 let s:types.kind2scope = {
     \ 'c' : 'class',
     \ 'f' : 'function',
-    \ 'm' : 'function'
+    \ 'm' : 'member'
     \ }
 
 let s:types.scope2kind = {
     \ 'class'    : 'c',
-    \ 'function' : 'f'
+    \ 'function' : 'f',
+    \ 'member'   : 'm'
     \ }
-
-let s:types.kind2scope.m = 'member'
-let s:types.scope2kind.member = 'm'
 
 let g:vista#types#uctags#python# = s:types

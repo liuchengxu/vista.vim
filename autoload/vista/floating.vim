@@ -136,22 +136,24 @@ function! s:Display(msg) abort
   augroup END
 endfunction
 
-function! vista#floating#Display(msg, tag) abort
+function! vista#floating#Display(lnum, tag) abort
   silent! call timer_stop(s:floating_timer)
   silent! unlet s:start s:end s:lnum
 
-  let [_, start, end] = matchstrpos(a:msg, '\C'.a:tag)
+  let lnum = a:lnum
+
+  let [_, start, end] = matchstrpos(t:vista.source.line(a:lnum), '\C'.a:tag)
 
   if start != -1
     let [s:start, s:end] = [start, end]
   endif
 
-  let lnum = str2nr(split(a:msg, ':')[-1])
-
   " FIXME correct tag height
   let s:lnum = lnum < 6 ? lnum : 5
 
-  let lines = getbufline(t:vista.source.bufnr, lnum - 5 > 1 ? lnum - 5 : 1, lnum + 5)
+  let begin = max([lnum - 5, 1])
+  let end = begin + 5 * 2
+  let lines = getbufline(t:vista.source.bufnr, begin, end)
 
   " TODO the msg could be more fruitful when using floating window
   let delay = get(g:, 'vista_floating_delay', 100)
