@@ -3,6 +3,7 @@
 " vim: ts=2 sw=2 sts=2 et
 
 let s:floating_timer = -1
+let s:last_lnum = -1
 
 " Vista sidebar window usually sits at the right side.
 " TODO improve me!
@@ -113,7 +114,7 @@ function! s:Display(msg) abort
 
   " FIXME current highlight is problematic.
   if exists('s:start')
-    call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:lnum, s:start-2, s:end)
+    call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:lnum, s:start, s:end)
   endif
 
   setlocal
@@ -142,7 +143,13 @@ function! vista#floating#Display(lnum, tag) abort
 
   let lnum = a:lnum
 
-  let [_, start, end] = matchstrpos(t:vista.source.line(a:lnum), '\C'.a:tag)
+  if lnum == s:last_lnum
+    return
+  endif
+
+  let s:last_lnum = lnum
+
+  let [_, start, end] = matchstrpos(t:vista.source.line(lnum), '\C'.a:tag)
 
   if start != -1
     let [s:start, s:end] = [start, end]
