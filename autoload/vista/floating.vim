@@ -155,8 +155,8 @@ function! vista#floating#Display(lnum, tag) abort
     let [s:start, s:end] = [start, end]
   endif
 
-  " FIXME correct tag height
-  let s:lnum = lnum < 6 ? lnum : 5
+  " Be careful!
+  let s:lnum = lnum < 6 ? lnum - 1 : 5
 
   let begin = max([lnum - 5, 1])
   let end = begin + 5 * 2

@@ -45,6 +45,9 @@ function! s:AutoUpdate(fpath) abort
 endfunction
 
 function! s:Run() abort
+  if !exists('*LanguageClient#textDocument_documentSymbol')
+    return
+  endif
   call s:RunAsync()
   let s:fetching = v:true
   while s:fetching
@@ -54,20 +57,18 @@ function! s:Run() abort
 endfunction
 
 function! s:RunAsync() abort
-  call LanguageClient#textDocument_documentSymbol(
-        \ {'handle': v:false}, function('s:Handler'))
+  if exists('*LanguageClient#textDocument_documentSymbol')
+    call LanguageClient#textDocument_documentSymbol(
+          \ {'handle': v:false}, function('s:Handler'))
+  endif
 endfunction
 
 function! vista#executive#lcn#Run(_fpath) abort
-  if exists('*LanguageClient#textDocument_documentSymbol')
-    return s:Run()
-  endif
+  return s:Run()
 endfunction
 
 function! vista#executive#lcn#RunAsync() abort
-  if exists('*LanguageClient#textDocument_documentSymbol')
-    call s:RunAsync()
-  endif
+  call s:RunAsync()
 endfunction
 
 function! vista#executive#lcn#Execute(bang, should_display, ...) abort
