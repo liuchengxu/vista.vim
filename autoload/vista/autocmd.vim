@@ -54,7 +54,7 @@ function! vista#autocmd#Init(group_name, AUF) abort
 
     " BufReadPost is needed for reloading the current buffer if the file
     " was changed by an external command;
-    autocmd BufWritePost,BufReadPost,CursorHold *
+    autocmd BufWritePost,BufReadPost,CursorHold,CursorHoldI *
           \ call s:GenericAutoUpdate(fnamemodify(expand('<afile>'), ':p'))
   augroup END
 endfunction

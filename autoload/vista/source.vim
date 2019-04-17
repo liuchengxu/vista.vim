@@ -10,6 +10,9 @@ function! s:EnsureExists() abort
     function! t:vista.winnr() abort
       return bufwinnr('__vista__')
     endfunction
+    function! t:vista.winid() abort
+      return bufwinid('__vista__')
+    endfunction
   endif
 
   if !has_key(t:vista, 'source')

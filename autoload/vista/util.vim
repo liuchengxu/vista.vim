@@ -38,21 +38,42 @@ function! s:PrependFpath(lines) abort
   return a:lines
 endfunction
 
+function! s:SetBufline(bufnr, lines) abort
+  if has('nvim')
+    call nvim_buf_set_lines(a:bufnr, 0, -1, 0, a:lines)
+  else
+    let cur_lines = getbufline(a:bufnr, 1, '$')
+    call setbufline(a:bufnr, 1, a:lines)
+    if len(cur_lines) > len(a:lines)
+      call deletebufline(a:bufnr, len(a:lines)+1, len(cur_lines)+1)
+    endif
+  endif
+endfunction
+
 function! vista#util#SetBufline(bufnr, lines) abort
   call setbufvar(a:bufnr, '&readonly', 0)
   call setbufvar(a:bufnr, '&modifiable', 1)
   let lines = s:PrependFpath(a:lines)
-  if has('nvim')
-    call nvim_buf_set_lines(a:bufnr, 0, -1, 0, lines)
-  else
-    let cur_lines = getbufline(a:bufnr, 1, '$')
-    call setbufline(a:bufnr, 1, lines)
-    if len(cur_lines) > len(lines)
-      call deletebufline(a:bufnr, len(lines)+1, len(cur_lines)+1)
-    endif
+
+  " This approach runes into the internal error E315.
+  " I don't know why.
+  " call s:SetBufline(a:bufnr, lines)
+
+  let winnr = t:vista.winnr()
+  if winnr() != winnr
+    noautocmd execute winnr.'wincmd w'
+    let l:switch_back = 1
   endif
+
+  silent 1,$delete _
+  call setline(1, lines)
+
   call setbufvar(a:bufnr, '&readonly', 1)
   call setbufvar(a:bufnr, '&modifiable', 0)
+
+  if exists('l:switch_back')
+    noautocmd wincmd p
+  endif
 endfunction
 
 function! vista#util#JobStop(jobid) abort
@@ -155,7 +176,7 @@ function! vista#util#BinarySearch(array, target, cmp_key, ret_key) abort
     let mid = (low + high) / 2
     if array[mid][a:cmp_key] == target
       let found = array[mid]
-      return found[a:ret_key]
+      return get(found, a:ret_key, v:null)
     elseif array[mid][a:cmp_key] > target
       let high = mid - 1
     else
@@ -164,7 +185,7 @@ function! vista#util#BinarySearch(array, target, cmp_key, ret_key) abort
   endwhile
 
   if low == 0
-    return ''
+    return v:null
   endif
 
   " If no exact match, prefer the previous nearest one.
@@ -178,5 +199,5 @@ function! vista#util#BinarySearch(array, target, cmp_key, ret_key) abort
     let found = array[low - 1]
   endif
 
-  return found[a:ret_key]
+  return get(found, a:ret_key, v:null)
 endfunction

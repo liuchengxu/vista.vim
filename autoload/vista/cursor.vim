@@ -6,7 +6,7 @@ let s:find_timer = -1
 let s:cursor_timer = -1
 let s:highlight_timer = -1
 
-let s:last_vlnum = -1
+let s:last_vlnum = v:null
 
 function! s:GenericStopTimer(timer) abort
   execute 'if '.a:timer.' != -1 | call timer_stop('.a:timer.') | let 'a:timer.' = -1 | endif'
@@ -162,6 +162,9 @@ endfunction
 function! s:FindNearestMethodOrFunction(_timer) abort
   call sort(t:vista.functions, function('s:Compare'))
   let result = vista#util#BinarySearch(t:vista.functions, line('.'), 'lnum', 'text')
+  if empty(result)
+    let result = ''
+  endif
   call setbufvar(t:vista.source.bufnr, 'vista_nearest_method_or_function', result)
 
   call s:StopHighlightTimer()
@@ -190,7 +193,8 @@ function! s:ApplyHighlight(lnum) abort
 endfunction
 
 function! s:HighlightNearestTag(_timer) abort
-  if vista#ShouldSkip() || !s:ExistsVlnum()
+  let winnr = t:vista.winnr()
+  if winnr == -1 || vista#ShouldSkip() || !s:ExistsVlnum()
     return
   endif
 
@@ -201,22 +205,24 @@ function! s:HighlightNearestTag(_timer) abort
   endif
 
   " If the vlnum is same with previous one
-  if s:last_vlnum == s:vlnum
+  if s:vlnum is v:null || s:last_vlnum == s:vlnum
     return
   endif
 
   let s:last_vlnum = s:vlnum
 
   let winnr = bufwinnr('__vista__')
+  " noautocmd is necessary, otherwise it may interfere the echoed message by
+  " other plugins, e.g., the warning/error message from ALE.
   if winnr() != winnr
-    execute winnr.'wincmd w'
+    noautocmd execute winnr.'wincmd w'
     let l:switch_back = 1
   endif
 
   call s:ApplyHighlight(s:vlnum)
 
   if exists('l:switch_back')
-    wincmd p
+    noautocmd wincmd p
   endif
 endfunction
 
