@@ -16,7 +16,7 @@ syntax match VistaAccessPrivate /-\</ contained
 syntax match VistaArgs  /(.*)/
 syntax match VistaColon /:/ contained
 syntax match VistaLineNr /:\d*$/ contains=VistaColon
-syntax match VistaScopeKind /(.*).*:\d*$/ contains=VistaArgs,VistaLineNr
+syntax match VistaScopeKind /(.*).*:\d*$/ contains=VistaArgs,VistaLineNr,VistaColon
 syntax match VistaKind / \a*:\d*$/ contains=VistaFuncKind
 syntax match VistaScope /^\S.*$/ contains=VistaAccessPrivate,VistaAccessProtected,VistaAccessPublic,VistaKind,VistaIcon
 syntax region VistaTag start="^" end="$" contains=VistaLineNr,VistaScope,VistaAccessPrivate,VistaAccessProtected,VistaAccessPublic,VistaArgs,VistaScopeKind

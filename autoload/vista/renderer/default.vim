@@ -11,11 +11,7 @@ let s:visibility_icon = {
       \ }
 
 function! s:FilterChildren(line, parent) abort
-  if has_key(a:line, 'scope') && a:line.scope =~# '^'.a:parent
-    return 1
-  else
-    return 0
-  endif
+  return has_key(a:line, 'scope') && a:line.scope =~# a:parent
 endfunction
 
 " Append row to the rows to be displayed given the depth
@@ -23,29 +19,24 @@ function! s:Append(line, rows, depth) abort
   let line = a:line
   let rows = a:rows
 
-  if has_key(line, 'access')
-    let access = get(s:visibility_icon, line.access, '?')
-  else
-    let access = ''
-  endif
+  let visibility = has_key(line, 'access') ? get(s:visibility_icon, line.access, '?') : ''
 
   let row = vista#util#Join(
-        \ repeat(' ', a:depth*4),
-        \ access,
+        \ repeat(' ', a:depth * 4),
+        \ visibility,
         \ get(line, 'name'),
         \ get(line, 'signature', ''),
         \ ': '.get(line, 'kind', ''),
+        \ ' '.get(line, 'scope', ''),
         \ ':'.line.line
         \ )
 
   call add(rows, row)
 
-  " Inject vlnum.
-  " Since we prepend the fpath and a blank line, the vlnum should plus 2.
   let line.vlnum = len(rows) + 2
 endfunction
 
-function! s:RenderScope(root, children, line, rows) abort
+function! s:RenderHierarchyEntity(root, children, line, rows) abort
   let parent = a:root
   let line = a:line
   let rows = a:rows
@@ -66,6 +57,33 @@ function! s:RenderScope(root, children, line, rows) abort
   endfor
 endfunction
 
+" Filter all the children from the whole tag list containing the scope field given the parent
+function s:ChildrenOf(parent) abort
+  let children = []
+  let len = len(t:vista.with_scope)
+
+  let idx = 0
+  while idx < len
+    let item = get(t:vista.with_scope, idx, {})
+    if has_key(item, 'scope') && item.scope =~# a:parent
+      call add(children, item)
+      " To avoid duplicate children
+      unlet t:vista.with_scope[idx]
+    endif
+    let idx += 1
+  endwhile
+
+  return children
+endfunction
+
+function! s:Insert(container, key, line) abort
+  if has_key(a:container, a:key)
+    call add(a:container[a:key], a:line)
+  else
+    let a:container[a:key] = [a:line]
+  endif
+endfunction
+
 function! s:RenderGroupwise() abort
   let rows = []
 
@@ -74,34 +92,34 @@ function! s:RenderGroupwise() abort
   " The root of hierarchy structure doesn't have scope field.
   for line in t:vista.without_scope
     let parent = line.name
-    let children = filter(copy(t:vista.with_scope), 's:FilterChildren(v:val, parent)')
+
+    " If we get children in the way of the following, there are possibly be
+    " duplicate children for the parent, e.g., implement same struct in
+    " serveral sections in Rust.
+    "
+    " let children = filter(copy(t:vista.with_scope), 's:FilterChildren(v:val, parent)')
+
+    let children = s:ChildrenOf(parent)
 
     if !empty(children)
-      call s:RenderScope(parent, children, line, rows)
+      call s:RenderHierarchyEntity(parent, children, line, rows)
       call add(rows, '')
     else
       if has_key(line, 'kind')
-        if has_key(scope_less, line.kind)
-          call add(scope_less[line.kind], line)
-        else
-          let scope_less[line.kind] = [line]
-        endif
+        call s:Insert(scope_less, line.kind, line)
       endif
     endif
   endfor
 
   for kind in keys(scope_less)
     call add(rows, kind)
+
     let lines = scope_less[kind]
     for line in lines
-      if has_key(line, 'access')
-        let access = get(s:visibility_icon, line.access, '?')
-      else
-        let access = ''
-      endif
+      let visibility = has_key(line, 'access') ? get(s:visibility_icon, line.access, '?') : ''
 
       let row = vista#util#Join(
-            \ '  '.access,
+            \ '  '.visibility,
             \ get(line, 'name'),
             \ get(line, 'signature', ''),
             \ ':'.line.line
@@ -109,10 +127,9 @@ function! s:RenderGroupwise() abort
 
       call add(rows, row)
 
-      " Inject vlnum.
-      " Since we prepend the fpath and a blank line, the vlnum should plus 2.
       let line.vlnum = len(rows) + 2
     endfor
+
     call add(rows, '')
   endfor
 
