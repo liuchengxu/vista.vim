@@ -14,16 +14,30 @@ function! s:FilterChildren(line, parent) abort
   return has_key(a:line, 'scope') && a:line.scope =~# a:parent
 endfunction
 
+function! s:GetAppended(line, rows, depth) abort
+  let line = a:line
+  let rows = a:rows
+
+  let row = vista#util#Join(
+        \ repeat(' ', a:depth * 4),
+        \ s:GetVisibility(line),
+        \ get(line, 'name'),
+        \ get(line, 'signature', ''),
+        \ ': '.get(line, 'kind', ''),
+        \ ' '.get(line, 'scope', ''),
+        \ ':'.line.line
+        \ )
+  return row
+endfunction
+
 " Append row to the rows to be displayed given the depth
 function! s:Append(line, rows, depth) abort
   let line = a:line
   let rows = a:rows
 
-  let visibility = has_key(line, 'access') ? get(s:visibility_icon, line.access, '?') : ''
-
   let row = vista#util#Join(
         \ repeat(' ', a:depth * 4),
-        \ visibility,
+        \ s:GetVisibility(line),
         \ get(line, 'name'),
         \ get(line, 'signature', ''),
         \ ': '.get(line, 'kind', ''),
@@ -135,7 +149,19 @@ function! s:RenderDescendants(parent_name, parent_line, descendants, rows, depth
   let depth = a:depth
   let rows = a:rows
 
-  " Append the root
+  " Clear the previous duplicate parent line that is about to be added.
+  "
+  " This is a little bit stupid actually :(.
+  let appended = s:GetAppended(a:parent_line, rows, depth)
+  let idx = 0
+  while idx < len(rows)
+    if rows[idx] ==# appended
+      unlet rows[idx]
+    endif
+    let idx += 1
+  endwhile
+
+  " Append the root actually
   call s:Append(a:parent_line, rows, depth)
   let depth += 1
 
@@ -168,18 +194,21 @@ function! s:RenderDescendants(parent_name, parent_line, descendants, rows, depth
   endwhile
 endfunction
 
+function! s:GetVisibility(line) abort
+  return has_key(a:line, 'access') ? get(s:visibility_icon, a:line.access, '?') : ''
+endfunction
+
 function! s:RenderScopeless(scope_less, rows) abort
   let rows = a:rows
   let scope_less = a:scope_less
+
   for kind in keys(scope_less)
     call add(rows, kind)
 
     let lines = scope_less[kind]
     for line in lines
-      let visibility = has_key(line, 'access') ? get(s:visibility_icon, line.access, '?') : ''
-
       let row = vista#util#Join(
-            \ '  '.visibility,
+            \ '  '.s:GetVisibility(line),
             \ get(line, 'name'),
             \ get(line, 'signature', ''),
             \ ':'.line.line
