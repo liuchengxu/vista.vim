@@ -194,7 +194,7 @@ endfunction
 
 function! s:HighlightNearestTag(_timer) abort
   let winnr = t:vista.winnr()
-  if winnr == -1 || vista#ShouldSkip() || !s:ExistsVlnum()
+  if winnr == -1 || vista#ShouldSkip() || !s:ExistsVlnum() || mode() !=# 'n'
     return
   endif
 

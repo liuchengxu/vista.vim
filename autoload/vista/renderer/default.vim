@@ -168,7 +168,33 @@ function! s:RenderDescendants(parent_name, parent_line, descendants, rows, depth
   endwhile
 endfunction
 
-function! s:RenderGroupwise() abort
+function! s:RenderScopeless(scope_less, rows) abort
+  let rows = a:rows
+  let scope_less = a:scope_less
+  for kind in keys(scope_less)
+    call add(rows, kind)
+
+    let lines = scope_less[kind]
+    for line in lines
+      let visibility = has_key(line, 'access') ? get(s:visibility_icon, line.access, '?') : ''
+
+      let row = vista#util#Join(
+            \ '  '.visibility,
+            \ get(line, 'name'),
+            \ get(line, 'signature', ''),
+            \ ':'.line.line
+            \ )
+
+      call add(rows, row)
+
+      let line.vlnum = len(rows) + 2
+    endfor
+
+    call add(rows, '')
+  endfor
+endfunction
+
+function! s:Render() abort
   let rows = []
 
   let scope_less = {}
@@ -195,27 +221,7 @@ function! s:RenderGroupwise() abort
     endif
   endfor
 
-  for kind in keys(scope_less)
-    call add(rows, kind)
-
-    let lines = scope_less[kind]
-    for line in lines
-      let visibility = has_key(line, 'access') ? get(s:visibility_icon, line.access, '?') : ''
-
-      let row = vista#util#Join(
-            \ '  '.visibility,
-            \ get(line, 'name'),
-            \ get(line, 'signature', ''),
-            \ ':'.line.line
-            \ )
-
-      call add(rows, row)
-
-      let line.vlnum = len(rows) + 2
-    endfor
-
-    call add(rows, '')
-  endfor
+  call s:RenderScopeless(scope_less, rows)
 
   return rows
 endfunction
@@ -225,5 +231,5 @@ function! vista#renderer#default#Render() abort
     return []
   endif
 
-  return s:RenderGroupwise()
+  return s:Render()
 endfunction
