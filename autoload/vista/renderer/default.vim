@@ -14,7 +14,7 @@ function! s:FilterChildren(line, parent) abort
   return has_key(a:line, 'scope') && a:line.scope =~# a:parent
 endfunction
 
-" Return the row to be displayed in the vista sidebar given the depth
+" Return the rendered row to be displayed given the depth
 function! s:Assemble(line, depth) abort
   let line = a:line
 
@@ -23,7 +23,7 @@ function! s:Assemble(line, depth) abort
         \ s:GetVisibility(line),
         \ get(line, 'name'),
         \ get(line, 'signature', ''),
-        \ ': '.get(line, 'kind', ''),
+        \ ' : '.get(line, 'kind', ''),
         \ ' '.get(line, 'scope', ''),
         \ ':'.line.line
         \ )
@@ -31,7 +31,7 @@ function! s:Assemble(line, depth) abort
   return row
 endfunction
 
-" Append row to the rows to be displayed given the depth
+" Actually append to the rows
 function! s:Append(line, rows, depth) abort
   let line = a:line
   let rows = a:rows
@@ -51,12 +51,14 @@ function! s:Insert(container, key, line) abort
   endif
 endfunction
 
+" Return the next root name and line after appending to the rows.
 function! s:AppendChild(line, rows, depth) abort
   if has_key(a:line, 'scope')
-    let parent = a:line.scope
     call s:Append(a:line, a:rows, a:depth)
-    let me = parent.'.'.a:line.name
-    return [me, a:line]
+    let parent_name = a:line.scope
+    " FIXME 
+    let next_root_name = parent_name.s:scope_seperator.a:line.name
+    return [next_root_name, a:line]
   endif
   return [v:null, v:null]
 endfunction
@@ -70,6 +72,7 @@ function! s:RenderDescendants(parent_name, parent_line, descendants, rows, depth
   let depth = a:depth
   let rows = a:rows
 
+  let s:scope_seperator = t:vista.source.scope_seperator()
   " Clear the previous duplicate parent line that is about to be added.
   "
   " This is a little bit stupid actually :(.
