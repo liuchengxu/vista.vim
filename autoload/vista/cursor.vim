@@ -40,6 +40,22 @@ function! s:GetInfoUnderCursor() abort
     return [v:null, v:null]
   endif
 
+  " For scoped tag
+  if has_key(t:vista, 'vlnum_cache')
+    let tagline = get(t:vista.vlnum_cache, line('.') - 3, '')
+    if !empty(tagline)
+      return [tagline.name, source_line]
+    endif
+  endif
+
+  " peer_ilog(PEER,FORMAT,...):90
+  let line = vista#util#Trim(getline('.'))
+  let left_parenthsis_idx = stridx(line, '(')
+  if left_parenthsis_idx > -1
+    return [line[0:left_parenthsis_idx-1], source_line]
+  endif
+
+  " logger_name:80
   let with_tag = split(cur_line[-2])
   if empty(with_tag)
     return [v:null, v:null]

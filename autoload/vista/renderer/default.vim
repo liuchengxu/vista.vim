@@ -204,6 +204,8 @@ function! s:Render() abort
     let idx += 1
   endwhile
 
+  let t:vista.vlnum_cache = s:vlnum_cache
+
   return rows
 endfunction
 
