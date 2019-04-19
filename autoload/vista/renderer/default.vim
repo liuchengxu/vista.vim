@@ -136,7 +136,7 @@ function! s:RenderScopeless(scope_less, rows) abort
   let scope_less = a:scope_less
 
   for kind in keys(scope_less)
-    call add(rows, kind)
+    call add(rows, vista#renderer#Decorate(kind))
 
     let lines = scope_less[kind]
     for line in lines
