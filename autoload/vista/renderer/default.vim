@@ -43,6 +43,15 @@ function! s:Append(line, rows, depth) abort
   let line.vlnum = len(rows) + 2
 endfunction
 
+function! s:ApplyAppend(line, row, rows) abort
+  let line = a:line
+  let rows = a:rows
+
+  call add(rows, a:row)
+
+  let line.vlnum = len(rows) + 2
+endfunction
+
 function! s:Insert(container, key, line) abort
   if has_key(a:container, a:key)
     call add(a:container[a:key], a:line)
@@ -72,21 +81,21 @@ function! s:RenderDescendants(parent_name, parent_line, descendants, rows, depth
   let depth = a:depth
   let rows = a:rows
 
-  let s:scope_seperator = t:vista.source.scope_seperator()
   " Clear the previous duplicate parent line that is about to be added.
   "
   " This is a little bit stupid actually :(.
-  let appended = s:Assemble(a:parent_line, depth)
+  let about_to_append = s:Assemble(a:parent_line, depth)
   let idx = 0
   while idx < len(rows)
-    if rows[idx] ==# appended
+    if rows[idx] ==# about_to_append
       unlet rows[idx]
     endif
     let idx += 1
   endwhile
 
   " Append the root actually
-  call s:Append(a:parent_line, rows, depth)
+  call s:ApplyAppend(a:parent_line, about_to_append, rows)
+
   let depth += 1
 
   " find all the children
@@ -148,6 +157,8 @@ function! s:RenderScopeless(scope_less, rows) abort
 endfunction
 
 function! s:Render() abort
+  let s:scope_seperator = t:vista.source.scope_seperator()
+
   let rows = []
 
   let scope_less = {}
