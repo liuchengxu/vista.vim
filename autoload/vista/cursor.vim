@@ -48,6 +48,7 @@ function! s:GetInfoUnderCursor() abort
     endif
   endif
 
+  " For scopeless tag
   " peer_ilog(PEER,FORMAT,...):90
   let line = vista#util#Trim(getline('.'))
   let left_parenthsis_idx = stridx(line, '(')
@@ -66,6 +67,14 @@ function! s:GetInfoUnderCursor() abort
   return [tag, source_line]
 endfunction
 
+function! s:EchoScope(scope) abort
+  if g:vista#renderer#enable_icon
+    echohl Function | echo ' '.a:scope.' ' | echohl NONE
+  else
+    echohl Function  | echo '['.a:scope.'] '  | echohl NONE
+  endif
+endfunction
+
 " Echo the tag with detailed info in the cmdline
 function! s:EchoInCmdline(msg, tag) abort
   let [msg, tag] = [a:msg, a:tag]
@@ -78,28 +87,43 @@ function! s:EchoInCmdline(msg, tag) abort
     return
   endif
 
-  " Try highlighting the scope of current tag
-  let linenr = vista#util#LowerIndentLineNr()
+  let echoed_scope = v:false
 
-  " Echo the scope of current tag if found
-  if linenr != 0
-    let pieces = split(getline(linenr), ' ')
-    if len(pieces) > 1
-      let scope = pieces[1]
-      if g:vista#renderer#enable_icon
-        echohl Function | echo ' '.scope.' ' | echohl NONE
+  if has_key(t:vista, 'vlnum_cache')
+    let tagline = get(t:vista.vlnum_cache, line('.'), '')
+    if !empty(tagline)
+      if has_key(tagline, 'scope')
+        call s:EchoScope(tagline.scope)
       else
-        echohl Function  | echo '['.scope.'] '  | echohl NONE
+        call s:EchoScope(tagline.kind)
       endif
-      " if start is 0, msg[0:-1] will display the redundant whole msg.
-      if start != 0
-        echohl Statement | echon msg[0:start-1] | echohl NONE
+      let echoed_scope = v:true
+    endif
+  endif
+
+  " Try highlighting the scope of current tag
+  if !echoed_scope
+    let linenr = vista#util#LowerIndentLineNr()
+
+    " Echo the scope of current tag if found
+    if linenr != 0
+      let scope = matchstr(getline(linenr), '\a\+$')
+      if !empty(scope)
+        call s:EchoScope(scope)
+      else
+        " For kind renderer
+        let pieces = split(getline(linenr), ' ')
+        if len(pieces) > 1
+          let scope = pieces[1]
+          call s:EchoScope(scope)
+        endif
       endif
     endif
-  else
-    if start != 0
-      echohl Statement | echo msg[0:start-1] | echohl NONE
-    endif
+  endif
+
+  " if start is 0, msg[0:-1] will display the redundant whole msg.
+  if start != 0
+    echohl Statement | echon msg[0 : start-1] | echohl NONE
   endif
 
   echohl Search    | echon msg[start : end-1] | echohl NONE

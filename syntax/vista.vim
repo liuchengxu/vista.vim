@@ -15,11 +15,11 @@ syntax match VistaAccessPrivate /^\s*-\</ contained
 
 syntax match VistaArgs  /(.*)/
 syntax match VistaColon /:/ contained
-syntax match VistaLineNr /:\d*$/ contains=VistaColon
+syntax match VistaLineNr /\d\+$/
 syntax match VistaScopeKind /: .*$/ contains=VistaArgs,VistaColon,VistaLineNr
 syntax match VistaKind / \a*:\d*$/
 syntax match VistaScope /^\S.*$/ contains=VistaAccessPrivate,VistaAccessProtected,VistaAccessPublic,VistaKind,VistaIcon
-syntax region VistaTag start="^" end="$" contains=VistaLineNr,VistaScope,VistaAccessPrivate,VistaAccessProtected,VistaAccessPublic,VistaArgs,VistaScopeKind,VistaScoped
+syntax region VistaTag start="^" end="$" contains=VistaLineNr,VistaScope,VistaAccessPrivate,VistaAccessProtected,VistaAccessPublic,VistaArgs,VistaScopeKind
 
 hi default link VistaScope       Function
 hi default link VistaTag         Keyword
@@ -30,8 +30,8 @@ hi default link VistaColon       SpecialKey
 hi default link VistaIcon        StorageClass
 hi default link VistaArgs        Comment
 
-hi default VistaAccessPublic     guifg=Green  ctermfg=Green cterm=bold gui=bold
-hi default VistaAccessProtected  guifg=Yellow ctermfg=Yellow cterm=bold gui=bold
-hi default VistaAccessPrivate    guifg=Red    ctermfg=Red cterm=bold gui=bold
+hi default VistaAccessPublic     guifg=Green  ctermfg=Green
+hi default VistaAccessProtected  guifg=Yellow ctermfg=Yellow
+hi default VistaAccessPrivate    guifg=Red    ctermfg=Red
 
 let b:current_syntax = 'vista'
