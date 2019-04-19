@@ -14,12 +14,18 @@ let s:visibility_icon = {
 function! s:Assemble(line, depth) abort
   let line = a:line
 
+  let kind = get(line, 'kind', '')
+
+  if !empty(kind)
+    let kind = vista#renderer#Decorate(kind)
+  endif
+
   let row = vista#util#Join(
         \ repeat(' ', a:depth * 4),
         \ s:GetVisibility(line),
         \ get(line, 'name'),
         \ get(line, 'signature', ''),
-        \ ' : '.get(line, 'kind', ''),
+        \ ' : '.kind,
         \ ':'.line.line
         \ )
 
