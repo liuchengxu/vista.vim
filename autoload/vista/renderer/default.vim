@@ -10,10 +10,6 @@ let s:visibility_icon = {
       \ 'private': '-',
       \ }
 
-function! s:FilterChildren(line, parent) abort
-  return has_key(a:line, 'scope') && a:line.scope =~# a:parent
-endfunction
-
 " Return the rendered row to be displayed given the depth
 function! s:Assemble(line, depth) abort
   let line = a:line
@@ -24,7 +20,6 @@ function! s:Assemble(line, depth) abort
         \ get(line, 'name'),
         \ get(line, 'signature', ''),
         \ ' : '.get(line, 'kind', ''),
-        \ ' '.get(line, 'scope', ''),
         \ ':'.line.line
         \ )
 
@@ -39,8 +34,7 @@ function! s:Append(line, rows, depth) abort
   let row = s:Assemble(line, a:depth)
 
   call add(rows, row)
-
-  let line.vlnum = len(rows) + 2
+  call add(s:vlnum_cache, line)
 endfunction
 
 function! s:ApplyAppend(line, row, rows) abort
@@ -48,8 +42,7 @@ function! s:ApplyAppend(line, row, rows) abort
   let rows = a:rows
 
   call add(rows, a:row)
-
-  let line.vlnum = len(rows) + 2
+  call add(s:vlnum_cache, line)
 endfunction
 
 function! s:Insert(container, key, line) abort
@@ -65,10 +58,10 @@ function! s:AppendChild(line, rows, depth) abort
   if has_key(a:line, 'scope')
     call s:Append(a:line, a:rows, a:depth)
     let parent_name = a:line.scope
-    " FIXME 
-    let next_root_name = parent_name.s:scope_seperator.a:line.name
+    let next_root_name = parent_name . s:scope_seperator . a:line.name
     return [next_root_name, a:line]
   endif
+
   return [v:null, v:null]
 endfunction
 
@@ -89,6 +82,7 @@ function! s:RenderDescendants(parent_name, parent_line, descendants, rows, depth
   while idx < len(rows)
     if rows[idx] ==# about_to_append
       unlet rows[idx]
+      unlet s:vlnum_cache[idx]
     endif
     let idx += 1
   endwhile
@@ -161,25 +155,48 @@ function! s:Render() abort
 
   let rows = []
 
+  " s:vlnum_cache is a cache for recording which original tagline is related to the line in the vista sidebar,
+  " for we have to remove the duplicate parents which leads to reassign the
+  " lnum to the original tagline.
+  let s:vlnum_cache = []
+
   let scope_less = {}
 
   " The root of hierarchy structure doesn't have scope field.
   for potential_root_line in t:vista.without_scope
+
     let root_name = potential_root_line.name
 
     let descendants = s:DescendantsOf(t:vista.with_scope, root_name)
 
     if !empty(descendants)
+
       call s:RenderDescendants(root_name, potential_root_line, descendants, rows, 0)
+
       call add(rows, '')
+      call add(s:vlnum_cache, '')
+
     else
+
       if has_key(potential_root_line, 'kind')
         call s:Insert(scope_less, potential_root_line.kind, potential_root_line)
       endif
+
     endif
+
   endfor
 
   call s:RenderScopeless(scope_less, rows)
+
+  let idx = 0
+  while idx < len(s:vlnum_cache)
+    if !empty(s:vlnum_cache[idx])
+      " idx is 0-based, while the line number is 1-based, and we prepend the
+      " two lines first.
+      let s:vlnum_cache[idx].vlnum = idx + 1 + 2
+    endif
+    let idx += 1
+  endwhile
 
   return rows
 endfunction

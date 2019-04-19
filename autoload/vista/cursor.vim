@@ -187,7 +187,7 @@ function! s:ApplyHighlight(lnum) abort
     unlet w:vista_highlight_id
   endif
 
-  let w:vista_highlight_id = matchaddpos('Search', [a:lnum])
+  let w:vista_highlight_id = matchaddpos('IncSearch', [a:lnum])
 
   execute 'normal!' s:vlnum.'z.'
 endfunction
