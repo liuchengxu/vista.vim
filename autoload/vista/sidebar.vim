@@ -8,7 +8,7 @@ function! s:NewWindow() abort
   let open = position.' '.width.'new'
   silent execute open '__vista__'
 
-  if get(g:, 'vista_ctags_renderer', '') ==# 'default'
+  if t:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default'
     setlocal filetype=vista
   else
     setlocal filetype=vista_kind

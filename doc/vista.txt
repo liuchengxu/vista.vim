@@ -105,7 +105,7 @@ Vista                                                                      *Vist
   `:Vista`: same with `:Vista ctags` .
 
   `:Vista show`:  jump to the tag nearby the current cursor in vista window. This
-                feature needs `let g:vista_ctags_renderer = 'default'` at the moment.
+                feature needs `let g:vista#renderer#ctags = 'default'` at the moment.
 
   `:Vista toc`:   show table of contents of the markdown file.
 

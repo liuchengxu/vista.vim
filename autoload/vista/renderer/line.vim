@@ -55,7 +55,7 @@ function! s:RenderLinewise() abort
   return rows
 endfunction
 
-function! vista#renderer#default#Render() abort
+function! vista#renderer#line#Render() abort
   if empty(t:vista.raw)
     return []
   endif
