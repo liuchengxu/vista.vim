@@ -69,7 +69,7 @@ endfunction
 
 function! s:EchoScope(scope) abort
   if g:vista#renderer#enable_icon
-    echohl Function | echo ' '.a:scope.' ' | echohl NONE
+    echohl Function | echo ' '.a:scope.': ' | echohl NONE
   else
     echohl Function  | echo '['.a:scope.'] '  | echohl NONE
   endif
