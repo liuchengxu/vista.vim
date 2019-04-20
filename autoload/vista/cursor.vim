@@ -90,7 +90,10 @@ function! s:EchoInCmdline(msg, tag) abort
   let echoed_scope = v:false
 
   if has_key(t:vista, 'vlnum_cache')
-    let tagline = get(t:vista.vlnum_cache, line('.'), '')
+    " should exclude the first two lines and keep in mind that the 1-based and
+    " 0-based.
+    " This is really error prone.
+    let tagline = get(t:vista.vlnum_cache, line('.') - 3, '')
     if !empty(tagline)
       if has_key(tagline, 'scope')
         call s:EchoScope(tagline.scope)
@@ -111,7 +114,7 @@ function! s:EchoInCmdline(msg, tag) abort
       if !empty(scope)
         call s:EchoScope(scope)
       else
-        " For kind renderer
+        " For the kind renderer
         let pieces = split(getline(linenr), ' ')
         if len(pieces) > 1
           let scope = pieces[1]
