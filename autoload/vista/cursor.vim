@@ -165,6 +165,8 @@ function! s:ShowDetail() abort
   else
     call vista#error#InvalidOption('g:vista_echo_cursor_strategy', avaliable)
   endif
+
+  call s:ApplyHighlight(line('.'), v:false)
 endfunction
 
 function! s:Jump() abort
@@ -224,7 +226,8 @@ function! s:ExistsVlnum() abort
         \ && has_key(t:vista.raw[0], 'vlnum')
 endfunction
 
-function! s:ApplyHighlight(lnum) abort
+" Highlight the line given the line number and ensure it's visible if required.
+function! s:ApplyHighlight(lnum, ensure_visible) abort
   if exists('w:vista_highlight_id')
     call matchdelete(w:vista_highlight_id)
     unlet w:vista_highlight_id
@@ -232,7 +235,9 @@ function! s:ApplyHighlight(lnum) abort
 
   let w:vista_highlight_id = matchaddpos('IncSearch', [a:lnum])
 
-  execute 'normal!' s:vlnum.'z.'
+  if a:ensure_visible
+    execute 'normal!' a:lnum.'z.'
+  endif
 endfunction
 
 function! s:HighlightNearestTag(_timer) abort
@@ -262,7 +267,7 @@ function! s:HighlightNearestTag(_timer) abort
     let l:switch_back = 1
   endif
 
-  call s:ApplyHighlight(s:vlnum)
+  call s:ApplyHighlight(s:vlnum, v:true)
 
   if exists('l:switch_back')
     noautocmd wincmd p
@@ -351,7 +356,7 @@ function! vista#cursor#ShowTagFor(lnum) abort
     return
   endif
 
-  call s:ApplyHighlight(s:vlnum)
+  call s:ApplyHighlight(s:vlnum, v:true)
 endfunction
 
 function! vista#cursor#ShowTag() abort
