@@ -40,6 +40,23 @@ function! s:GetInfoUnderCursor() abort
     return [v:null, v:null]
   endif
 
+  " For scoped tag
+  if has_key(t:vista, 'vlnum_cache')
+    let tagline = get(t:vista.vlnum_cache, line('.') - 3, '')
+    if !empty(tagline)
+      return [tagline.name, source_line]
+    endif
+  endif
+
+  " For scopeless tag
+  " peer_ilog(PEER,FORMAT,...):90
+  let line = vista#util#Trim(getline('.'))
+  let left_parenthsis_idx = stridx(line, '(')
+  if left_parenthsis_idx > -1
+    return [line[0:left_parenthsis_idx-1], source_line]
+  endif
+
+  " logger_name:80
   let with_tag = split(cur_line[-2])
   if empty(with_tag)
     return [v:null, v:null]
@@ -48,6 +65,14 @@ function! s:GetInfoUnderCursor() abort
   let tag = with_tag[-1]
 
   return [tag, source_line]
+endfunction
+
+function! s:EchoScope(scope) abort
+  if g:vista#renderer#enable_icon
+    echohl Function | echo ' '.a:scope.': ' | echohl NONE
+  else
+    echohl Function  | echo '['.a:scope.'] '  | echohl NONE
+  endif
 endfunction
 
 " Echo the tag with detailed info in the cmdline
@@ -62,28 +87,46 @@ function! s:EchoInCmdline(msg, tag) abort
     return
   endif
 
-  " Try highlighting the scope of current tag
-  let linenr = vista#util#LowerIndentLineNr()
+  let echoed_scope = v:false
 
-  " Echo the scope of current tag if found
-  if linenr != 0
-    let pieces = split(getline(linenr), ' ')
-    if len(pieces) > 1
-      let scope = pieces[1]
-      if g:vista#renderer#enable_icon
-        echohl Function | echo ' '.scope.' ' | echohl NONE
+  if has_key(t:vista, 'vlnum_cache')
+    " should exclude the first two lines and keep in mind that the 1-based and
+    " 0-based.
+    " This is really error prone.
+    let tagline = get(t:vista.vlnum_cache, line('.') - 3, '')
+    if !empty(tagline)
+      if has_key(tagline, 'scope')
+        call s:EchoScope(tagline.scope)
       else
-        echohl Function  | echo '['.scope.'] '  | echohl NONE
+        call s:EchoScope(tagline.kind)
       endif
-      " if start is 0, msg[0:-1] will display the redundant whole msg.
-      if start != 0
-        echohl Statement | echon msg[0:start-1] | echohl NONE
+      let echoed_scope = v:true
+    endif
+  endif
+
+  " Try highlighting the scope of current tag
+  if !echoed_scope
+    let linenr = vista#util#LowerIndentLineNr()
+
+    " Echo the scope of current tag if found
+    if linenr != 0
+      let scope = matchstr(getline(linenr), '\a\+$')
+      if !empty(scope)
+        call s:EchoScope(scope)
+      else
+        " For the kind renderer
+        let pieces = split(getline(linenr), ' ')
+        if len(pieces) > 1
+          let scope = pieces[1]
+          call s:EchoScope(scope)
+        endif
       endif
     endif
-  else
-    if start != 0
-      echohl Statement | echo msg[0:start-1] | echohl NONE
-    endif
+  endif
+
+  " if start is 0, msg[0:-1] will display the redundant whole msg.
+  if start != 0
+    echohl Statement | echon msg[0 : start-1] | echohl NONE
   endif
 
   echohl Search    | echon msg[start : end-1] | echohl NONE
@@ -122,6 +165,8 @@ function! s:ShowDetail() abort
   else
     call vista#error#InvalidOption('g:vista_echo_cursor_strategy', avaliable)
   endif
+
+  call s:ApplyHighlight(line('.'), v:false)
 endfunction
 
 function! s:Jump() abort
@@ -181,20 +226,23 @@ function! s:ExistsVlnum() abort
         \ && has_key(t:vista.raw[0], 'vlnum')
 endfunction
 
-function! s:ApplyHighlight(lnum) abort
+" Highlight the line given the line number and ensure it's visible if required.
+function! s:ApplyHighlight(lnum, ensure_visible) abort
   if exists('w:vista_highlight_id')
     call matchdelete(w:vista_highlight_id)
     unlet w:vista_highlight_id
   endif
 
-  let w:vista_highlight_id = matchaddpos('Search', [a:lnum])
+  let w:vista_highlight_id = matchaddpos('IncSearch', [a:lnum])
 
-  execute 'normal!' s:vlnum.'z.'
+  if a:ensure_visible
+    execute 'normal!' a:lnum.'z.'
+  endif
 endfunction
 
 function! s:HighlightNearestTag(_timer) abort
   let winnr = t:vista.winnr()
-  if winnr == -1 || vista#ShouldSkip() || !s:ExistsVlnum()
+  if winnr == -1 || vista#ShouldSkip() || !s:ExistsVlnum() || mode() !=# 'n'
     return
   endif
 
@@ -204,7 +252,7 @@ function! s:HighlightNearestTag(_timer) abort
     return
   endif
 
-  " If the vlnum is same with previous one
+  " Skip if the vlnum is same with previous one
   if s:vlnum is v:null || s:last_vlnum == s:vlnum
     return
   endif
@@ -219,7 +267,7 @@ function! s:HighlightNearestTag(_timer) abort
     let l:switch_back = 1
   endif
 
-  call s:ApplyHighlight(s:vlnum)
+  call s:ApplyHighlight(s:vlnum, v:true)
 
   if exists('l:switch_back')
     noautocmd wincmd p
@@ -308,7 +356,7 @@ function! vista#cursor#ShowTagFor(lnum) abort
     return
   endif
 
-  call s:ApplyHighlight(s:vlnum)
+  call s:ApplyHighlight(s:vlnum, v:true)
 endfunction
 
 function! vista#cursor#ShowTag() abort

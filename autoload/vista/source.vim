@@ -42,6 +42,15 @@ function! s:EnsureExists() abort
     function! t:vista.source.extension() abort
       return fnamemodify(self.fpath, ':e')
     endfunction
+
+    function! t:vista.source.scope_seperator() abort
+      let filetype = self.filetype()
+      try
+        return g:vista#types#uctags#{filetype}#['sro']
+      catch
+        return '.'
+      endtry
+    endfunction
   endif
 endfunction
 

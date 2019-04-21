@@ -73,6 +73,9 @@ function! s:PrepareContainer() abort
   let t:vista.functions = []
   let t:vista.raw = []
   let t:vista.kinds = []
+  let t:vista.raw_by_kind = {}
+  let t:vista.with_scope = []
+  let t:vista.without_scope = []
 endfunction
 
 function! s:on_exit(_job, _data, _event) abort dict

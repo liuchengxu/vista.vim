@@ -4,7 +4,7 @@
 View and search LSP symbols, tags in Vim/NeoVim.
 
 <p align="center">
-    <img width="600px" src="https://user-images.githubusercontent.com/8850248/54874346-88a7d380-4e24-11e9-8574-fb4c56085e9d.gif">
+    <img width="600px" src="https://user-images.githubusercontent.com/8850248/56469894-14d40780-6472-11e9-802f-729ac53bd4d5.gif">
 </p>
 
 :warning: **Currently vista.vim is mostly usable, yet not stable. All the public APIs and global options can be changed or even be removed in the future.**
@@ -36,12 +36,10 @@ View and search LSP symbols, tags in Vim/NeoVim.
 
 I initially started [vista.vim](https://github.com/liuchengxu/vista.vim) with an intention of replacing [tagbar](https://github.com/majutsushi/tagbar) as it seemingly doesn't have a plan to support the promising [Language Server Protocol](https://github.com/Microsoft/language-server-protocol) and async processing.
 
-In terms of viewer for ctags-generated tags, [vista.vim](https://github.com/liuchengxu/vista.vim) is sort of the poor version of tagbar, for some details has not been worked out. Nonetheless, it's more than a tags viewer.
-
-Vista.vim can also be a symbol navigator similar to [ctrlp-funky](https://github.com/tacahiroy/ctrlp-funky). Last but not least, one important goal of [vista.vim](https://github.com/liuchengxu/vista.vim) is to support LSP symbols, which understands the semantics instead of the regex only.
+In addition to being a tags viewer, vista.vim can also be a symbol navigator similar to [ctrlp-funky](https://github.com/tacahiroy/ctrlp-funky). Last but not least, one important goal of [vista.vim](https://github.com/liuchengxu/vista.vim) is to support LSP symbols, which understands the semantics instead of the regex only.
 
 <p align="center">
-    <img width="600px" src="https://raw.githubusercontent.com/liuchengxu/img/master/vista.vim/vista.png">
+    <img width="600px" src="https://user-images.githubusercontent.com/8850248/56454822-18d82a80-6389-11e9-80cf-ef7709da3f75.png">
 </p>
 
 ## Features
@@ -58,10 +56,8 @@ Vista.vim can also be a symbol navigator similar to [ctrlp-funky](https://github
 - [x] Update automatically when switching between buffers.
 - [x] Update asynchonously in the background when `+job` avaliable.
 - [x] Find the nearest method or function to the cursor, which could be integrated into the statusline.
-- [ ] Highlight the nearest tag/symbol in the vista sidebar.
-- [ ] Supports all of the languages that ctags does.
-- [ ] Show the visibility (public/private) of tags.
-- [ ] Tree viewer for hierarchy data.
+- [x] Highlight the nearby tag in the vista sidebar.
+- [x] Nested display for ctags.
 
 Notes:
 

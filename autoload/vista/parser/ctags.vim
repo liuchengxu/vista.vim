@@ -105,6 +105,18 @@ function! vista#parser#ctags#FromJSON(line, container) abort
 
   let kind = line.kind
 
+  if has_key(t:vista.raw_by_kind, kind)
+    call add(t:vista.raw_by_kind[kind], line)
+  else
+    let t:vista.raw_by_kind[kind] = [line]
+  endif
+
+  if has_key(line, 'scope')
+    call add(t:vista.with_scope, line)
+  else
+    call add(t:vista.without_scope, line)
+  endif
+
   let picked = {'lnum': line.line, 'text': line.name }
 
   if kind =~# '^f' || kind =~# '^m'

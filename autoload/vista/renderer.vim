@@ -39,6 +39,8 @@ let s:icons = {
 \    'default': "\uf29c"
 \}
 
+let g:vista#renderer#ctags = get(g:, 'vista#renderer#ctags', 'default')
+
 let g:vista#renderer#icons = map(extend(s:icons, get(g:, 'vista#renderer#icons', {})), 'tolower(v:val)')
 
 let g:vista#renderer#enable_icon = get(g:, 'vista#renderer#enable_icon',

@@ -104,8 +104,8 @@ Vista                                                                      *Vist
 
   `:Vista`: same with `:Vista ctags` .
 
-  `:Vista show`:  jump to the tag nearby the current cursor in vista window. This
-                feature needs `let g:vista_ctags_renderer = 'default'` at the moment.
+  `:Vista show`:  jump to the tag nearby the current cursor in vista window.
+                This is for ctags `default` renderer only.
 
   `:Vista toc`:   show table of contents of the markdown file.
 
@@ -325,6 +325,17 @@ g:vista#renderer#icons                                    *g:vista#renderer#icon
 
   Type: |Dict|
   Default: See `autoload/vista/renderer.vim` .
+
+g:vista#renderer#ctags                                    *g:vista#renderer#ctags*
+
+  Type: |String|
+  Default: `default`
+
+  Options:
+
+  `default` - render tags in nestest structure.
+  `kind`    - render tags kindwise.
+  `line`    - render tags linewise.
 
 --------------------------------------------------------------------------------
 CONTRIBUTING                                                  *vista-contributing*
