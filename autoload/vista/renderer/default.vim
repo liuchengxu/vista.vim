@@ -72,11 +72,19 @@ function! s:AppendChild(line, rows, depth) abort
 endfunction
 
 " Find all descendants of the root
+" This way is more of heuristic.
+"
+" the line of child should larger than parent's, which partially fixes this issue comment:
+" https://github.com/universal-ctags/ctags/issues/2065#issuecomment-485117935
+"
+" Only the last implementation is exact.
+"
 function! s:DescendantsOf(candidates, root_line) abort
   return filter(copy(a:candidates),
         \ 'has_key(v:val, ''scope'')'.
-        \ '&& v:val.scope =~# ''^''.a:root_line.name'.
-        \ '&& v:val.scopeKind ==# a:root_line.kind'
+        \ ' && v:val.scope =~# ''^''.a:root_line.name'.
+        \ ' && v:val.scopeKind ==# a:root_line.kind'.
+        \ ' && v:val.line > a:root_line.line'
         \ )
 endfunction
 
