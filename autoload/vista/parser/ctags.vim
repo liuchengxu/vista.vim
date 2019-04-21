@@ -42,7 +42,7 @@ function! s:ParseTagfield(tagfields) abort
 
   if stridx(a:tagfields[0], ':') > -1
     let colon = stridx(a:tagfields[0], ':')
-    let value = tagfield[colon+1:]
+    let value = a:tagfields[0][colon+1:]
     let fields.kind = value
   else
     let kind = s:ShortToLong(a:tagfields[0])
