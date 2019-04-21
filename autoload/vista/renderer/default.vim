@@ -72,8 +72,12 @@ function! s:AppendChild(line, rows, depth) abort
 endfunction
 
 " Find all descendants of the root
-function! s:DescendantsOf(candidates, root_name) abort
-  return filter(copy(a:candidates), 'has_key(v:val, ''scope'') && v:val.scope =~# ''^''.a:root_name')
+function! s:DescendantsOf(candidates, root_line) abort
+  return filter(copy(a:candidates),
+        \ 'has_key(v:val, ''scope'')'.
+        \ '&& v:val.scope =~# ''^''.a:root_line.name'.
+        \ '&& v:val.scopeKind ==# a:root_line.kind'
+        \ )
 endfunction
 
 function! s:RenderDescendants(parent_name, parent_line, descendants, rows, depth) abort
@@ -117,7 +121,7 @@ function! s:RenderDescendants(parent_name, parent_line, descendants, rows, depth
     let child_name = grandchildren[idx]
     let child_line = grandchildren_line[idx]
 
-    let descendants = s:DescendantsOf(t:vista.with_scope, child_name)
+    let descendants = s:DescendantsOf(t:vista.with_scope, child_line)
 
     if !empty(descendants)
       call s:RenderDescendants(child_name, child_line, descendants, a:rows, depth)
@@ -173,7 +177,7 @@ function! s:Render() abort
 
     let root_name = potential_root_line.name
 
-    let descendants = s:DescendantsOf(t:vista.with_scope, root_name)
+    let descendants = s:DescendantsOf(t:vista.with_scope, potential_root_line)
 
     if !empty(descendants)
 
