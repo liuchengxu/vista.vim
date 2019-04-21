@@ -41,7 +41,7 @@ function! s:Execute() abort
 endfunction
 
 function! s:ApplyAutoUpdate() abort
-  if has_key(t:vista, 'bufnr')
+  if has_key(t:vista, 'bufnr') && t:vista.winnr() != -1
     let rendered = vista#renderer#markdown#Render(s:Execute())
     call vista#util#SetBufline(t:vista.bufnr, rendered)
   endif
