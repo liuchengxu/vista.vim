@@ -4,7 +4,7 @@
 View and search LSP symbols, tags in Vim/NeoVim.
 
 <p align="center">
-    <img width="600px" src="https://user-images.githubusercontent.com/8850248/56455186-eb41b000-638d-11e9-8e0c-56f980ecf3ff.gif">
+    <img width="600px" src="https://user-images.githubusercontent.com/8850248/56469894-14d40780-6472-11e9-802f-729ac53bd4d5.gif">
 </p>
 
 :warning: **Currently vista.vim is mostly usable, yet not stable. All the public APIs and global options can be changed or even be removed in the future.**
