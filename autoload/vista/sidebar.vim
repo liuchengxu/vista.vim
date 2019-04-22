@@ -88,6 +88,8 @@ function! vista#sidebar#Close() abort
   endif
 
   call s:ClearAugroups('VistaCoc', 'VistaCtags')
+
+  call vista#floating#Close()
 endfunction
 
 function! s:ClearAugroups(...) abort

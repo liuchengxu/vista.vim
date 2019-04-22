@@ -53,6 +53,16 @@ function! s:CalculatePosition(lines) abort
   return [width, height, vert.hor, row, col]
 endfunction
 
+function! s:ApplyClose() abort
+  autocmd! VistaFloatingWin
+
+  let winnr = win_id2win(s:floating_win_id)
+
+  if winnr > 0
+    execute winnr.'wincmd c'
+  endif
+endfunction
+
 function! s:CloseOnCursorMoved() abort
   " To avoid closing floating window immediately, check the cursor
   " was really moved.
@@ -60,15 +70,7 @@ function! s:CloseOnCursorMoved() abort
     return
   endif
 
-  autocmd! VistaFloatingWin
-
-  let winnr = win_id2win(s:floating_win_id)
-
-  if winnr == 0
-    return
-  endif
-
-  execute winnr.'wincmd c'
+  call s:ApplyClose()
 endfunction
 
 function! s:CloseOnWinEnter() abort
@@ -137,12 +139,17 @@ function! s:Display(msg) abort
   augroup END
 endfunction
 
+function! vista#floating#Close() abort
+  call s:ApplyClose()
+endfunction
+
 function! vista#floating#Display(lnum, tag) abort
   silent! call timer_stop(s:floating_timer)
   silent! unlet s:start s:end s:lnum
 
   let lnum = a:lnum
 
+  " Avoid blink. https://github.com/liuchengxu/vista.vim/issues/55
   if lnum == s:last_lnum
     return
   endif
