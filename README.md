@@ -7,8 +7,6 @@ View and search LSP symbols, tags in Vim/NeoVim.
     <img width="600px" src="https://user-images.githubusercontent.com/8850248/56469894-14d40780-6472-11e9-802f-729ac53bd4d5.gif">
 </p>
 
-:warning: **Currently vista.vim is mostly usable, yet not stable. All the public APIs and global options can be changed or even be removed in the future.**
-
 ## Table Of Contents
 <!-- TOC GFM -->
 
