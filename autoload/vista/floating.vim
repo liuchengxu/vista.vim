@@ -58,10 +58,12 @@ function! s:ApplyClose() abort
     autocmd! VistaFloatingWin
   endif
 
-  let winnr = win_id2win(s:floating_win_id)
+  if exists('s:floating_win_id')
+    let winnr = win_id2win(s:floating_win_id)
 
-  if winnr > 0
-    execute winnr.'wincmd c'
+    if winnr > 0
+      execute winnr.'wincmd c'
+    endif
   endif
 endfunction
 
