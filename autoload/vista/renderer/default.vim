@@ -199,9 +199,10 @@ function! s:Render() abort
 
   let rows = []
 
-  " s:vlnum_cache is a cache for recording which original tagline is related to the line in the vista sidebar,
-  " for we have to remove the duplicate parents which leads to reassign the
-  " lnum to the original tagline.
+  " s:vlnum_cache is a cache for recording which original tagline
+  " is related to the line in the vista sidebar, for we have to
+  " remove the duplicate parents which leads to reassign the lnum
+  " to the original tagline.
   let s:vlnum_cache = []
 
   let scope_less = {}
