@@ -54,7 +54,9 @@ function! s:CalculatePosition(lines) abort
 endfunction
 
 function! s:ApplyClose() abort
-  autocmd! VistaFloatingWin
+  if exists('#VistaFloatingWin')
+    autocmd! VistaFloatingWin
+  endif
 
   let winnr = win_id2win(s:floating_win_id)
 
