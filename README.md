@@ -210,7 +210,9 @@ See `:help vista-options` for more information.
 
 #### Compile ctags with JSON format support
 
-First of all, check if your ctags supports JSON format via `ctags --list-features`. If not, I recommend you to install ctags with JSON format support that would make vista's parser easier and more reliable. [universal-ctags](https://github.com/universal-ctags/ctags) has JSON output mode, it's avaliable if u-ctags is linked to libjansson.
+First of all, check if your [universal-ctags](https://github.com/universal-ctags/ctags) supports JSON format via `ctags --list-features`. If not, I recommend you to install ctags with JSON format support that would make vista's parser easier and more reliable. And we are able to reduce some overhead in JSON mode by [disabling the fixed fields](https://github.com/universal-ctags/ctags/pull/2080).
+
+The JSON support for ctags is avaliable if u-ctags is linked to libjansson when compiling.
 
 - macOS
 
