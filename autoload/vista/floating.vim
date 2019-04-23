@@ -14,7 +14,7 @@ function! s:CalculatePosition(lines) abort
   let width = max(map(copy(a:lines), 'strdisplaywidth(v:val)'))
 
   let width = max([width, 40])
-  let height = max([len(lines), 10])
+  let height = len(lines)
 
   " Calculate anchor
   " North first, fallback to South if there is no enough space.
