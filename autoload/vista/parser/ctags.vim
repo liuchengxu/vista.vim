@@ -31,6 +31,7 @@ function! s:ShortToLong(short) abort
     if has_key(types.kinds, a:short)
       return types.kinds[a:short]['long']
     endif
+
   catch /^Vim\%((\a\+)\)\=:E121/
   endtry
 
@@ -99,17 +100,17 @@ function! vista#parser#ctags#FromExtendedRaw(line, container) abort
 endfunction
 
 function! vista#parser#ctags#FromJSON(line, container) abort
+  if a:line =~# '^ctags'
+    return
+  endif
+
   let line = json_decode(a:line)
 
   call add(t:vista.raw, line)
 
   let kind = line.kind
 
-  if has_key(t:vista.raw_by_kind, kind)
-    call add(t:vista.raw_by_kind[kind], line)
-  else
-    let t:vista.raw_by_kind[kind] = [line]
-  endif
+  call s:Insert(t:vista.raw_by_kind, kind, line)
 
   if has_key(line, 'scope')
     call add(t:vista.with_scope, line)
@@ -137,7 +138,7 @@ endfunction
 "
 function! vista#parser#ctags#RecursiveFromXformat(line, container) abort
 
-  if a:line =~# '^ctags: Warning: ignoring null tag'
+  if a:line =~# '^ctags: Warning:'
     return
   endif
 

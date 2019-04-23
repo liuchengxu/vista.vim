@@ -11,21 +11,10 @@ function! s:CalculatePosition(lines) abort
   let lines = a:lines
   let pos = s:floating_opened_pos
 
-  let width = -1
+  let width = max(map(copy(a:lines), 'strdisplaywidth(v:val)'))
 
-  for idx in range(len(lines))
-    let line = lines[idx]
-    let w = strdisplaywidth(line)
-    if w > width
-      let width = w
-    endif
-  endfor
-
-  let width = width > 40 ? width : 40
-
+  let width = max([width, 40])
   let height = len(lines)
-
-  let height = height > 10 ? height : 10
 
   " Calculate anchor
   " North first, fallback to South if there is no enough space.
@@ -41,6 +30,8 @@ function! s:CalculatePosition(lines) abort
   " TODO should be tweaked accroding to the position of vista sidebar
   let hors = ['E', 'W']
 
+  let [_, _, cur_col, _, _] = getcurpos()
+
   " West first, fallback into East if there is no enough space.
   if pos[2] + width <= &columns
     let hor = hors[0]
@@ -50,7 +41,7 @@ function! s:CalculatePosition(lines) abort
     let col = 1
   endif
 
-  return [width, height, vert.hor, row, col]
+  return [width, height, vert.hor, row-1, col+4-cur_col]
 endfunction
 
 function! s:ApplyClose() abort

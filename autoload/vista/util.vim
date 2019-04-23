@@ -26,11 +26,11 @@ endfunction
 " Set the file path as the first line if possible.
 function! s:PrependFpath(lines) abort
   if exists('t:vista.source.fpath')
-    let width = &l:winwidth
+    let width = winwidth(t:vista.winnr())
     let fpath = t:vista.source.fpath
     " Shorten the file path if it's too long
     if len(fpath) > width
-      let fpath = '..'.fpath[len(fpath)-width : ]
+      let fpath = '..'.fpath[len(fpath)-width+4 : ]
     endif
     return [fpath, ''] + a:lines
   endif

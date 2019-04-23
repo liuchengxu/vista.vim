@@ -45,7 +45,7 @@ function! s:BuildCmd(file) abort
 
   " TODO vista_ctags_{filetype}_executable
   if s:support_json_format
-    let fmt = '%s %s %s --output-format=json -f- %s'
+    let fmt = '%s %s %s --output-format=json --fields=-PF -f- %s'
     let s:TagParser = function('vista#parser#ctags#FromJSON')
   else
     let fmt = '%s %s %s -f- %s'
@@ -64,6 +64,8 @@ function! s:BuildCmd(file) abort
     endif
     let cmd = printf('%s %s', custom_cmd, a:file)
   endif
+
+  let t:vista.ctags_cmd = cmd
 
   return cmd
 endfunction
