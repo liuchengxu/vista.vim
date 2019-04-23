@@ -11,21 +11,10 @@ function! s:CalculatePosition(lines) abort
   let lines = a:lines
   let pos = s:floating_opened_pos
 
-  let width = -1
+  let width = max(map(copy(a:lines), 'strdisplaywidth(v:val)'))
 
-  for idx in range(len(lines))
-    let line = lines[idx]
-    let w = strdisplaywidth(line)
-    if w > width
-      let width = w
-    endif
-  endfor
-
-  let width = width > 40 ? width : 40
-
-  let height = len(lines)
-
-  let height = height > 10 ? height : 10
+  let width = max([width, 40])
+  let height = max([len(lines), 10])
 
   " Calculate anchor
   " North first, fallback to South if there is no enough space.
@@ -50,7 +39,7 @@ function! s:CalculatePosition(lines) abort
     let col = 1
   endif
 
-  return [width, height, vert.hor, row, col]
+  return [width, height, vert.hor, row-1, col+4]
 endfunction
 
 function! s:ApplyClose() abort
