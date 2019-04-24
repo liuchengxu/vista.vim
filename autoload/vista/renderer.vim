@@ -5,8 +5,10 @@
 let s:icons = {
 \    'func': "\uf794",
 \    'function': "\uf794",
+\    'functions': "\uf794",
 \    'var': "\uf71b",
 \    'variable': "\uf71b",
+\    'variables': "\uf71b",
 \    'const': "\uf8ff",
 \    'constant': "\uf8ff",
 \    'method': "\uf6a6",

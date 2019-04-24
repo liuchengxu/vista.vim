@@ -10,6 +10,37 @@ function! s:Insert(container, kind, picked) abort
   endif
 endfunction
 
+function! s:LoadData(container, line) abort
+  let line = a:line
+
+  let kind = line.kind
+
+  call s:Insert(t:vista.raw_by_kind, kind, line)
+
+  call add(t:vista.raw, line)
+
+  if has_key(line, 'scope')
+    call add(t:vista.with_scope, line)
+  else
+    call add(t:vista.without_scope, line)
+  endif
+
+  let picked = {'lnum': line.line, 'text': line.name }
+
+  if kind =~# '^f' || kind =~# '^m'
+    if has_key(line, 'signature')
+      let picked.signature = line.signature
+    endif
+    call add(t:vista.functions, picked)
+  endif
+
+  if index(t:vista.kinds, kind) == -1
+    call add(t:vista.kinds, kind)
+  endif
+
+  call s:Insert(a:container, kind, picked)
+endfunction
+
 " Parse the output from ctags linewise and feed them into the container
 " The parsed result should be compatible with the LSP output.
 "
@@ -84,18 +115,7 @@ function! vista#parser#ctags#FromExtendedRaw(line, container) abort
 
   call extend(line, tagfields)
 
-  let kind = line.kind
-
-  let picked = {'lnum': line.line, 'text': line.name}
-
-  if kind =~# '^f' || kind =~# '^m'
-    if has_key(line, 'signature')
-      let picked.signature = line.signature
-    endif
-    call add(t:vista.functions, picked)
-  endif
-
-  call s:Insert(a:container, kind, picked)
+  call s:LoadData(a:container, line)
 
 endfunction
 
@@ -106,32 +126,8 @@ function! vista#parser#ctags#FromJSON(line, container) abort
 
   let line = json_decode(a:line)
 
-  call add(t:vista.raw, line)
+  call s:LoadData(a:container, line)
 
-  let kind = line.kind
-
-  call s:Insert(t:vista.raw_by_kind, kind, line)
-
-  if has_key(line, 'scope')
-    call add(t:vista.with_scope, line)
-  else
-    call add(t:vista.without_scope, line)
-  endif
-
-  let picked = {'lnum': line.line, 'text': line.name }
-
-  if kind =~# '^f' || kind =~# '^m'
-    if has_key(line, 'signature')
-      let picked.signature = line.signature
-    endif
-    call add(t:vista.functions, picked)
-  endif
-
-  if index(t:vista.kinds, kind) == -1
-    call add(t:vista.kinds, kind)
-  endif
-
-  call s:Insert(a:container, kind, picked)
 endfunction
 
 " ctags -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
