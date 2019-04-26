@@ -46,10 +46,13 @@ function! s:EnsureExists() abort
     function! t:vista.source.scope_seperator() abort
       let filetype = self.filetype()
       try
-        return g:vista#types#uctags#{filetype}#['sro']
-      catch
-        return '.'
+        let type = g:vista#types#uctags#{filetype}#
+      catch /^Vim\%((\a\+)\)\=:E121/
+        let type = {}
       endtry
+
+      " FIXME use a default value maybe inappropriate.
+      return get(type, 'sro', '.')
     endfunction
   endif
 endfunction
