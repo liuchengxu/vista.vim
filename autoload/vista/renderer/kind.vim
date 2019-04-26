@@ -31,6 +31,10 @@ function! s:ContainWhitespaceOnly(str) abort
   return a:str !~# '\S'
 endfunction
 
+function! s:Compare(i1, i2) abort
+  return a:i1.text > a:i2.text
+endfunction
+
 function! s:viewer.render() abort
   let try_adjust = self.prefixes[0] != self.prefixes[1]
 
@@ -40,6 +44,10 @@ function! s:viewer.render() abort
     let parent = self.prefixes[0] .vista#renderer#Decorate(kind).' ['.len(v).']'
     " Parent
     call add(self.rows, parent)
+
+    if get(t:vista, 'sort', v:false)
+      call sort(v, function('s:Compare'))
+    endif
 
     if !empty(v)
 

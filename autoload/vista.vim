@@ -26,6 +26,17 @@ function! vista#OnExecute(provider, AUF) abort
   call vista#autocmd#Init('Vista'.vista#util#ToCamelCase(a:provider), a:AUF)
 endfunction
 
+function! vista#Sort() abort
+  if !has_key(t:vista, 'sort')
+    let t:vista.sort = v:true
+  else
+    let t:vista.sort = !t:vista.sort
+  endif
+  let provider = t:vista.provider
+  let cache = vista#executive#{provider}#Cache()
+  call vista#sidebar#Reload(vista#viewer#Render(cache))
+endfunction
+
 function! vista#RunForNearestMethodOrFunction() abort
   let [bufnr, winnr, fname, fpath] = [bufnr('%'), winnr(), expand('%'), expand('%:p')]
   call vista#source#Update(bufnr, winnr, fname, fpath)

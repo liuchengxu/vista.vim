@@ -169,6 +169,10 @@ function! s:GetVisibility(line) abort
   return has_key(a:line, 'access') ? get(s:visibility_icon, a:line.access, '?') : ''
 endfunction
 
+function! s:Compare(i1, i2) abort
+  return a:i1.name > a:i2.name
+endfunction
+
 function! s:RenderScopeless(scope_less, rows) abort
   let rows = a:rows
   let scope_less = a:scope_less
@@ -177,6 +181,11 @@ function! s:RenderScopeless(scope_less, rows) abort
     call add(rows, vista#renderer#Decorate(kind))
 
     let lines = scope_less[kind]
+
+    if get(t:vista, 'sort', v:false)
+      call sort(lines, function('s:Compare'))
+    endif
+
     for line in lines
       let row = vista#util#Join(
             \ '  '.s:GetVisibility(line),
