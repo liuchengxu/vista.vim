@@ -183,7 +183,7 @@ function! s:RenderScopeless(scope_less, rows) abort
     let lines = scope_less[kind]
 
     if get(t:vista, 'sort', v:false)
-      call sort(lines, function('s:Compare'))
+      let lines = sort(copy(lines), function('s:Compare'))
     endif
 
     for line in lines

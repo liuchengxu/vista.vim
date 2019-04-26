@@ -95,7 +95,7 @@ function! s:Dispatch(F, ...) abort
 endfunction
 
 function! vista#executive#coc#Cache() abort
-  return get(s:, 'cache', {})
+  return get(s:, 'data', {})
 endfunction
 
 " Internal public APIs

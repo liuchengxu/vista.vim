@@ -34,7 +34,14 @@ function! vista#Sort() abort
   endif
   let provider = t:vista.provider
   let cache = vista#executive#{provider}#Cache()
-  call vista#sidebar#Reload(vista#viewer#Render(cache))
+
+  let cursor_position = getpos('.')
+
+  call vista#sidebar#Reload(cache)
+
+  if cursor_position != getpos('.')
+    call setpos('.', cursor_position)
+  endif
 endfunction
 
 function! vista#RunForNearestMethodOrFunction() abort

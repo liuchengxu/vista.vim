@@ -286,7 +286,7 @@ function! s:Dispatch(F, ...) abort
 endfunction
 
 function! vista#executive#ctags#Cache() abort
-  return get(s:, 'cache', {})
+  return get(s:, 'data', {})
 endfunction
 
 " Run ctags given the cmd synchronously

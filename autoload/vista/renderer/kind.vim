@@ -45,11 +45,11 @@ function! s:viewer.render() abort
     " Parent
     call add(self.rows, parent)
 
-    if get(t:vista, 'sort', v:false)
-      call sort(v, function('s:Compare'))
-    endif
-
     if !empty(v)
+
+      if get(t:vista, 'sort', v:false)
+        let v = sort(copy(v), function('s:Compare'))
+      endif
 
       " Children
       for i in v
