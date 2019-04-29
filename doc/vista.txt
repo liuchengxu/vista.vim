@@ -11,6 +11,7 @@ CONTENTS                                                          *vista-content
     1.4. Usage.......................................................|vista-usage|
         1.4.1. Commands...........................................|vista-commands|
         1.4.2. Options.............................................|vista-options|
+        1.4.3. Key Mappings...................................|vista-key-mappings|
     1.5. Contributing.........................................|vista-contributing|
     1.6. License...................................................|vista-license|
 
@@ -19,19 +20,12 @@ VISTA.VIM                                                        *vista-vista.vi
 
 View and search LSP symbols, tags in Vim/NeoVim.
 
-:warning: Currently vista.vim is mostly usable, yet not stable. All the public
-APIs and global options can be changed or even removed in the future.
->
---------------------------------------------------------------------------------
+================================================================================
 INTRODUCTION                                                  *vista-introduction*
 
 I initially started {vista.vim}{1} with an intention of replacing {tagbar}{2} as
 it seemingly does not have a plan to support the promising
 {Language Server Protocol}{3} and async processing.
-
-In terms of viewer for ctags-generated tags, vista.vim is sort of the poor version
-of tagbar, for some details has not been worked out. Nonetheless, it's more than
-a tags viewer.
 
 Vista.vim can also be a symbol navigator similar to {ctrlp-funky}{4}. Last but
 not least, one important goal of vista.vim is to support LSP symbols, which
@@ -45,7 +39,7 @@ understands the semantics instead of the regex only.
 
 {4} https://github.com/tacahiroy/ctrlp-funky
 
---------------------------------------------------------------------------------
+================================================================================
 FEATURES                                                          *vista-features*
 
 [x] View tags and LSP symbols in a sidebar.
@@ -78,7 +72,7 @@ Notes:
 {5} https://github.com/junegunn/fzf.vim
 {6} https://github.com/Yggdroot/LeaderF
 
---------------------------------------------------------------------------------
+================================================================================
 REQUIREMENT                                                    *vista-requirement*
 
 I don't know the mimimal supported version. But if you only care about the ctags
@@ -93,9 +87,10 @@ it first.
 
 {7} https://github.com/junegunn/fzf
 
---------------------------------------------------------------------------------
+================================================================================
 USAGE                                                                *vista-usage*
 
+--------------------------------------------------------------------------------
 COMMANDS                                                          *vista-commands*
 
 Vista                                                                      *Vista*
@@ -149,6 +144,7 @@ Vista!!                                                                  *Vista!
 
   Toggle the vista view window.
 
+--------------------------------------------------------------------------------
 OPTIONS                                                            *vista-options*
 
 g:vista_sidebar_position                                *g:vista_sidebar_position*
@@ -338,12 +334,23 @@ g:vista#renderer#ctags                                    *g:vista#renderer#ctag
   `line`    - render tags linewise.
 
 --------------------------------------------------------------------------------
+Key Mappings                                                  *vista-key-mappings*
+
+The following mappings are defined by default in the vista window.
+
+<CR>  - jump to the tag under the cursor
+/     - open the vista finder
+p     - preview the tag under the context via the floating window
+s     - sort the symbol
+q     - close the vista window
+
+================================================================================
 CONTRIBUTING                                                  *vista-contributing*
 
 Vista.vim is still in beta, if you run into any trouble or have any sugguestions,
 please file an issue (https://github.com/liuchengxu/vista.vim/issues/new).
 
---------------------------------------------------------------------------------
+================================================================================
 LICENSE                                                            *vista-license*
 
 MIT
