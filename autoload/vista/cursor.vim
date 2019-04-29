@@ -379,3 +379,21 @@ function! vista#cursor#ShowTag() abort
   call cursor(s:vlnum, 1)
   normal! zz
 endfunction
+
+function! vista#cursor#TogglePreview() abort
+  if get(t:vista, 'floating_visible', v:false)
+    call vista#floating#Close()
+    return
+  endif
+
+  let [tag, line] = s:GetInfoUnderCursor()
+
+  if empty(tag) || empty(line)
+    echo "\r"
+    return
+  endif
+
+  let lnum = str2nr(matchstr(getline('.'), '\d\+$'))
+
+  call s:DisplayInFloatingWin(lnum, tag)
+endfunction
