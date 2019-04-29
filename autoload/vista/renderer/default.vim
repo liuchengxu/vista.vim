@@ -99,11 +99,24 @@ function! s:RealParentOf(candidate) abort
     return parent_candidates[-1]
   endif
 
-  return v:null
+  return {}
 endfunction
 
 " Find all descendants of the root
-function! s:DescendantsOf(candidates, root_line) abort
+function! s:DescendantsOf(candidates, root_line, scope) abort
+  let candidates = filter(copy(a:candidates),
+        \ 'has_key(v:val, ''scope'')'.
+        \ ' && v:val.scope =~# ''^''.a:scope'.
+        \ ' && v:val.scopeKind ==# a:root_line.kind'.
+        \ ' && v:val.line > a:root_line.line'
+        \ )
+
+  return candidates
+  " The real parent problem seemingly has been solved?
+  " return filter(candidates, 's:RealParentOf(v:val) ==# a:root_line')
+endfunction
+
+function! s:DescendantsOfRoot(candidates, root_line) abort
   let candidates = filter(copy(a:candidates),
         \ 'has_key(v:val, ''scope'')'.
         \ ' && v:val.scope =~# ''^''.a:root_line.name'.
@@ -155,7 +168,7 @@ function! s:RenderDescendants(parent_name, parent_line, descendants, rows, depth
     let child_name = grandchildren[idx]
     let child_line = grandchildren_line[idx]
 
-    let descendants = s:DescendantsOf(t:vista.with_scope, child_line)
+    let descendants = s:DescendantsOf(t:vista.with_scope, child_line, child_name)
 
     if !empty(descendants)
       call s:RenderDescendants(child_name, child_line, descendants, a:rows, depth)
@@ -221,7 +234,7 @@ function! s:Render() abort
 
     let root_name = potential_root_line.name
 
-    let descendants = s:DescendantsOf(t:vista.with_scope, potential_root_line)
+    let descendants = s:DescendantsOfRoot(t:vista.with_scope, potential_root_line)
 
     if !empty(descendants)
 
