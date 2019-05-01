@@ -338,11 +338,12 @@ Key Mappings                                                  *vista-key-mapping
 
 The following mappings are defined by default in the vista window.
 
-<CR>  - jump to the tag under the cursor
-/     - open the vista finder
-p     - preview the tag under the context via the floating window
-s     - sort the symbol
-q     - close the vista window
+<CR>  - jump to the tag under the cursor.
+/     - open the vista finder.
+p     - preview the tag under the context via the floating window if it's
+        avaliable.
+s     - sort the symbol alphabetically or the location they are declared.
+q     - close the vista window.
 
 ================================================================================
 CONTRIBUTING                                                  *vista-contributing*
