@@ -56,6 +56,8 @@ function! s:ApplyClose() abort
       execute winnr.'wincmd c'
     endif
   endif
+
+  let t:vista.floating_visible = v:false
 endfunction
 
 function! s:CloseOnCursorMoved() abort
@@ -84,6 +86,8 @@ function! s:CloseOnWinEnter() abort
 
   autocmd! VistaFloatingWin
   execute winnr.'wincmd c'
+
+  let t:vista.floating_visible = v:false
 endfunction
 
 function! s:Display(msg) abort
@@ -132,6 +136,8 @@ function! s:Display(msg) abort
     autocmd CursorMoved <buffer> call s:CloseOnCursorMoved()
     autocmd BufEnter,WinEnter,WinLeave  * call s:CloseOnWinEnter()
   augroup END
+
+  let t:vista.floating_visible = v:true
 endfunction
 
 function! vista#floating#Close() abort
@@ -144,8 +150,8 @@ function! vista#floating#Display(lnum, tag) abort
 
   let lnum = a:lnum
 
-  " Avoid blink. https://github.com/liuchengxu/vista.vim/issues/55
-  if lnum == s:last_lnum
+  " See if it's identical to the last lnum to avoid blink. https://github.com/liuchengxu/vista.vim/issues/55
+  if lnum == s:last_lnum && get(t:vista, 'floating_visible', v:false)
     return
   endif
 

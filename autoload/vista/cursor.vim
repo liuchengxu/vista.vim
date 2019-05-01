@@ -25,7 +25,8 @@ function! s:StopHighlightTimer() abort
 endfunction
 
 " Get tag and corresponding source line at current cursor position.
-" Return: [tag, line]
+"
+" Return: [tag, source_line]
 function! s:GetInfoUnderCursor() abort
   let cur_line = split(getline('.'), ':')
 
@@ -143,27 +144,28 @@ endfunction
 
 " Show the detail of current tag/symbol under cursor.
 function! s:ShowDetail() abort
-  let [tag, line] = s:GetInfoUnderCursor()
+  let [tag, source_line] = s:GetInfoUnderCursor()
 
-  if empty(tag) || empty(line)
+  if empty(tag) || empty(source_line)
     echo "\r"
     return
   endif
 
-  let msg = vista#util#Truncate(line)
+  let msg = vista#util#Truncate(source_line)
 
   let strategy = get(g:, 'vista_echo_cursor_strategy', 'echo')
-  let avaliable = ['echo', 'floating_win', 'both']
-  let lnum = str2nr(matchstr(getline('.'), '\d\+$'))
-  if strategy == avaliable[0]
+  let opts = ['echo', 'floating_win', 'both']
+  let lnum = s:GetLnumUnderCursor()
+
+  if strategy == opts[0]
     call s:EchoInCmdline(msg, tag)
-  elseif strategy == avaliable[1]
+  elseif strategy == opts[1]
     call s:DisplayInFloatingWin(lnum, tag)
-  elseif strategy == avaliable[2]
+  elseif strategy == opts[2]
     call s:EchoInCmdline(msg, tag)
     call s:DisplayInFloatingWin(lnum, tag)
   else
-    call vista#error#InvalidOption('g:vista_echo_cursor_strategy', avaliable)
+    call vista#error#InvalidOption('g:vista_echo_cursor_strategy', opts)
   endif
 
   call s:ApplyHighlight(line('.'), v:false)
@@ -378,4 +380,27 @@ function! vista#cursor#ShowTag() abort
 
   call cursor(s:vlnum, 1)
   normal! zz
+endfunction
+
+" Extract the line number from last section of cursor line in the vista window
+function! s:GetLnumUnderCursor() abort
+  return str2nr(matchstr(getline('.'), '\d\+$'))
+endfunction
+
+function! vista#cursor#TogglePreview() abort
+  if get(t:vista, 'floating_visible', v:false)
+    call vista#floating#Close()
+    return
+  endif
+
+  let [tag, source_line] = s:GetInfoUnderCursor()
+
+  if empty(tag) || empty(source_line)
+    echo "\r"
+    return
+  endif
+
+  let lnum = s:GetLnumUnderCursor()
+
+  call s:DisplayInFloatingWin(lnum, tag)
 endfunction
