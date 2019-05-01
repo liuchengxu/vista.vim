@@ -56,6 +56,7 @@ In addition to being a tags viewer, vista.vim can also be a symbol navigator sim
 - [x] Find the nearest method or function to the cursor, which could be integrated into the statusline.
 - [x] Highlight the nearby tag in the vista sidebar.
 - [x] Nested display for ctags.
+- [x] Builtin support for displaying markdown's TOC.
 
 Notes:
 
