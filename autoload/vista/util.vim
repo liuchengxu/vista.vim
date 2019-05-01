@@ -201,3 +201,20 @@ function! vista#util#BinarySearch(array, target, cmp_key, ret_key) abort
 
   return get(found, a:ret_key, v:null)
 endfunction
+
+" CocAction only fetch symbols for current document, no way for specify the other at the moment.
+" workaround for #52
+"
+" see also #71
+function! vista#util#EnsureRunOnSourceFile(Run, ...) abort
+  if winnr() != t:vista.source.winnr()
+    execute t:vista.source.winnr().'wincmd w'
+    let l:switch_back = 1
+  endif
+
+  call call(a:Run, a:000)
+
+  if exists('l:switch_back')
+    wincmd p
+  endif
+endfunction

@@ -103,16 +103,7 @@ endfunction
 " Run and RunAsync is for internal use.
 function! vista#executive#coc#Run(_fpath) abort
   if exists('*CocAction')
-    " CocAction only fetch symbols for current document, no way for specify the other at the moment.
-    " workaround for #52
-    if winnr() != t:vista.source.winnr()
-      execute t:vista.source.winnr().'wincmd w'
-      let l:switch_back = 1
-    endif
-    call s:Run()
-    if exists('l:switch_back')
-      wincmd p
-    endif
+    call vista#util#EnsureRunOnSourceFile(function('s:Run'))
     return s:data
   endif
 endfunction
