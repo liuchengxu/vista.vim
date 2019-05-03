@@ -214,6 +214,11 @@ function! s:RenderScopeless(scope_less, rows) abort
 
     call add(rows, '')
   endfor
+
+  " Remove the last line if it's empty, i.e., ''
+  if empty(rows[-1])
+    unlet rows[-1]
+  endif
 endfunction
 
 function! s:Render() abort

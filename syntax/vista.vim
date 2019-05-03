@@ -13,14 +13,16 @@ syntax match VistaAccessPublic /^\s*+\</ contained
 syntax match VistaAccessProtected /^\s*\~\</ contained
 syntax match VistaAccessPrivate /^\s*-\</ contained
 
-syntax match VistaArgs  /(.*)/
+syntax match VistaParenthesis /(\|)/ contained
+syntax match VistaArgs  /(.*)/ contains=VistaParenthesis
 syntax match VistaColon /:/ contained
 syntax match VistaLineNr /\d\+$/
 syntax match VistaScopeKind /: .*$/ contains=VistaArgs,VistaColon,VistaLineNr
 syntax match VistaKind / \a*:\d*$/ contains=VistaColon,VistaLineNr
-syntax match VistaScope /^\S.*$/ contains=VistaAccessPrivate,VistaAccessProtected,VistaAccessPublic,VistaKind,VistaIcon
+syntax match VistaScope /^\S.*$/ contains=VistaAccessPrivate,VistaAccessProtected,VistaAccessPublic,VistaKind,VistaIcon,VistaParenthesis
 syntax region VistaTag start="^" end="$" contains=VistaLineNr,VistaScope,VistaAccessPrivate,VistaAccessProtected,VistaAccessPublic,VistaArgs,VistaScopeKind
 
+hi default link VistaParenthesis Operator
 hi default link VistaScope       Function
 hi default link VistaTag         Keyword
 hi default link VistaKind        Type

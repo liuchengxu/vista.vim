@@ -61,7 +61,7 @@ function! vista#source#GotoWin() abort
   if s:use_winid
     let winid = t:vista.source.winid()
     if winid != -1
-      call win_gotoid(winid)
+      noautocmd call win_gotoid(winid)
     else
       return vista#error#('Cannot find the source window id')
     endif
