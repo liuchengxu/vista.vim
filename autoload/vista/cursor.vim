@@ -248,14 +248,13 @@ function! s:ApplyHighlight(lnum, ensure_visible, ...) abort
     unlet w:vista_highlight_id
   endif
 
-  if get(g:, 'vista_highlight_whole_line', v:false)
+  if get(g:, 'vista_highlight_whole_line', 0)
     let hi_pos = [a:lnum]
   else
     let cur_line = getline(a:lnum)
     let [_, start, _] = matchstrpos(getline(a:lnum), '\S')
     if a:0 == 1
       let hi_pos = [[a:lnum, start+1, strlen(a:1)]]
-
     else
       let [_, end, _] = matchstrpos(getline(a:lnum), ':\d\+$')
       let hi_pos = [[a:lnum, start+1, end-2]]
