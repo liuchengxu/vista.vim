@@ -261,21 +261,26 @@ function! s:ApplyHighlight(lnum, ensure_visible, ...) abort
   endif
 
   if get(g:, 'vista_highlight_whole_line', 0)
-    let hi_pos = [a:lnum]
+    let hi_pos = a:lnum
   else
     let cur_line = getline(a:lnum)
+    " Current line may contains +,-,~, use `\S` is incorrect to find the right
+    " starting postion.
     let [_, start, _] = matchstrpos(cur_line, '[a-zA-Z0-9_#:]')
 
-    " If we know the tag, then what we have to do is to find the right starting postion.
+    " If we know the tag, then what we have to do is to use the length of tag
+    " based on the starting point.
+    "
+    " start is 0-based, while the column used in matchstrpos is 1-based.
     if a:0 == 1
-      let hi_pos = [[a:lnum, start+1, strlen(a:1)]]
+      let hi_pos = [a:lnum, start+1, strlen(a:1)]
     else
       let [_, end, _] = matchstrpos(cur_line, ':\d\+$')
-      let hi_pos = [[a:lnum, start+1, end-2]]
+      let hi_pos = [a:lnum, start+1, end-2]
     endif
   endif
 
-  let w:vista_highlight_id = matchaddpos('IncSearch', hi_pos)
+  let w:vista_highlight_id = matchaddpos('IncSearch', [hi_pos])
 
   if a:ensure_visible
     execute 'normal!' a:lnum.'z.'
