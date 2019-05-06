@@ -113,9 +113,12 @@ function! s:Display(msg) abort
 
   call nvim_buf_set_lines(s:floating_bufnr, 0, -1, 0, a:msg)
 
-  " FIXME current highlight is problematic.
-  if exists('s:start')
-    call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:lnum, s:start, s:end)
+  let target_line = getbufline(s:floating_bufnr, s:floating_lnum)[0]
+  let [_, start, end] = matchstrpos(target_line, '\C'.s:cur_tag)
+
+  if start != -1
+    " {line} is zero-based.
+    call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:floating_lnum-1, start, end)
   endif
 
   setlocal
@@ -157,14 +160,16 @@ function! vista#floating#Display(lnum, tag) abort
 
   let s:last_lnum = lnum
 
-  let [_, start, end] = matchstrpos(t:vista.source.line(lnum), '\C'.a:tag)
-
-  if start != -1
-    let [s:start, s:end] = [start, end]
-  endif
+  let s:cur_tag = a:tag
 
   " Be careful!
   let s:lnum = lnum < 6 ? lnum - 1 : 5
+
+  if lnum - 5 > 0
+    let s:floating_lnum = 5 + 1
+  else
+    let s:floating_lnum = 5 - lnum
+  endif
 
   let begin = max([lnum - 5, 1])
   let end = begin + 5 * 2
