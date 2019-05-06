@@ -9,18 +9,18 @@ endif
 let icons = join(values(g:vista#renderer#icons), '\|')
 execute 'syntax match VistaIcon' '/'.icons.'/' 'contained'
 
-syntax match VistaAccessPublic /^\s*+\</ contained
-syntax match VistaAccessProtected /^\s*\~\</ contained
-syntax match VistaAccessPrivate /^\s*-\</ contained
+syntax match VistaPublic /^\s*+\</ contained
+syntax match VistaProtected /^\s*\~\</ contained
+syntax match VistaPrivate /^\s*-\</ contained
 
 syntax match VistaParenthesis /(\|)/ contained
 syntax match VistaArgs  /(.*)/ contains=VistaParenthesis
-syntax match VistaColon /:/ contained
+syntax match VistaColon /:\ze\d\+$/ contained
 syntax match VistaLineNr /\d\+$/
-syntax match VistaScopeKind /: .*$/ contains=VistaArgs,VistaColon,VistaLineNr
 syntax match VistaKind / \a*:\d*$/ contains=VistaColon,VistaLineNr
-syntax match VistaScope /^\S.*$/ contains=VistaAccessPrivate,VistaAccessProtected,VistaAccessPublic,VistaKind,VistaIcon,VistaParenthesis
-syntax region VistaTag start="^" end="$" contains=VistaLineNr,VistaScope,VistaAccessPrivate,VistaAccessProtected,VistaAccessPublic,VistaArgs,VistaScopeKind,VistaColon
+syntax match VistaScopeKind /: .*$/ contains=VistaArgs,VistaColon,VistaLineNr
+syntax match VistaScope /^\S.*$/ contains=VistaPrivate,VistaProtected,VistaPublic,VistaKind,VistaIcon,VistaParenthesis
+syntax region VistaTag start="^" end="$" contains=VistaPublic,VistaProtected,VistaPrivate,VistaArgs,VistaScope,VistaScopeKind
 
 hi default link VistaParenthesis Operator
 hi default link VistaScope       Function
@@ -32,8 +32,8 @@ hi default link VistaColon       SpecialKey
 hi default link VistaIcon        StorageClass
 hi default link VistaArgs        Comment
 
-hi default VistaAccessPublic     guifg=Green  ctermfg=Green
-hi default VistaAccessProtected  guifg=Yellow ctermfg=Yellow
-hi default VistaAccessPrivate    guifg=Red    ctermfg=Red
+hi default VistaPublic     guifg=Green  ctermfg=Green
+hi default VistaProtected  guifg=Yellow ctermfg=Yellow
+hi default VistaPrivate    guifg=Red    ctermfg=Red
 
 let b:current_syntax = 'vista'
