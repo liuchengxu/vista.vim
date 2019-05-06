@@ -149,7 +149,6 @@ endfunction
 
 function! vista#floating#Display(lnum, tag) abort
   silent! call timer_stop(s:floating_timer)
-  silent! unlet s:start s:end s:lnum
 
   let lnum = a:lnum
 
@@ -162,17 +161,17 @@ function! vista#floating#Display(lnum, tag) abort
 
   let s:cur_tag = a:tag
 
-  " Be careful!
-  let s:lnum = lnum < 6 ? lnum - 1 : 5
+  " [lnum-5, lnum+5]
+  let range = 5
 
-  if lnum - 5 > 0
-    let s:floating_lnum = 5 + 1
+  if lnum - range > 0
+    let s:floating_lnum = range + 1
   else
     let s:floating_lnum = lnum
   endif
 
-  let begin = max([lnum - 5, 1])
-  let end = begin + 5 * 2
+  let begin = max([lnum - range, 1])
+  let end = begin + range * 2
   let lines = getbufline(t:vista.source.bufnr, begin, end)
 
   " TODO the msg could be more fruitful when using floating window
