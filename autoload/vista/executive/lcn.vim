@@ -60,7 +60,8 @@ function! s:RunAsync() abort
   if exists('*LanguageClient#textDocument_documentSymbol')
     call vista#util#EnsureRunOnSourceFile(
           \ function('LanguageClient#textDocument_documentSymbol'),
-          \ {'handle': v:false}, function('s:Handler')
+          \ {'handle': v:false},
+          \ function('s:Handler')
           \ )
   endif
 endfunction
