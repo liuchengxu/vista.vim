@@ -168,7 +168,7 @@ function! vista#floating#Display(lnum, tag) abort
   if lnum - 5 > 0
     let s:floating_lnum = 5 + 1
   else
-    let s:floating_lnum = 5 - lnum
+    let s:floating_lnum = lnum
   endif
 
   let begin = max([lnum - 5, 1])
