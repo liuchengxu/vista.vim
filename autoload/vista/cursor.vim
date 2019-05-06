@@ -52,12 +52,22 @@ function! s:GetInfoUnderCursor() abort
     endif
   endif
 
+  function! s:RemoveVisibility(tag) abort
+    if index(['+', '~', '-'], a:tag[0]) > -1
+      return a:tag[1:]
+    else
+      return a:tag
+    endif
+  endfunction
+
   " For scopeless tag
   " peer_ilog(PEER,FORMAT,...):90
   let trimmed_line = vista#util#Trim(getline('.'))
   let left_parenthsis_idx = stridx(trimmed_line, '(')
   if left_parenthsis_idx > -1
-    return [trimmed_line[0:left_parenthsis_idx-1], source_line]
+    " Ignore the visibility symbol, e.g., +test2()
+    let tag = s:RemoveVisibility(trimmed_line[0 : left_parenthsis_idx-1])
+    return [tag, source_line]
   endif
 
   " logger_name:80
@@ -73,6 +83,8 @@ function! s:GetInfoUnderCursor() abort
   if empty(tag)
     let tag = with_tag[-1]
   endif
+
+  let tag = s:RemoveVisibility(tag)
 
   return [tag, source_line]
 endfunction
@@ -252,11 +264,13 @@ function! s:ApplyHighlight(lnum, ensure_visible, ...) abort
     let hi_pos = [a:lnum]
   else
     let cur_line = getline(a:lnum)
-    let [_, start, _] = matchstrpos(getline(a:lnum), '\S')
+    let [_, start, _] = matchstrpos(cur_line, '[a-zA-Z0-9_#:]')
+
+    " If we know the tag, then what we have to do is to find the right starting postion.
     if a:0 == 1
       let hi_pos = [[a:lnum, start+1, strlen(a:1)]]
     else
-      let [_, end, _] = matchstrpos(getline(a:lnum), ':\d\+$')
+      let [_, end, _] = matchstrpos(cur_line, ':\d\+$')
       let hi_pos = [[a:lnum, start+1, end-2]]
     endif
   endif
