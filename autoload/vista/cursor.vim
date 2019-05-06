@@ -9,7 +9,10 @@ let s:highlight_timer = -1
 let s:last_vlnum = v:null
 
 function! s:GenericStopTimer(timer) abort
-  execute 'if '.a:timer.' != -1 | call timer_stop('.a:timer.') | let 'a:timer.' = -1 | endif'
+  execute 'if '.a:timer.' != -1 |'.
+        \ '  call timer_stop('.a:timer.') |'.
+        \ '  let 'a:timer.' = -1 |'.
+        \ 'endif'
 endfunction
 
 function! s:StopFindTimer() abort
@@ -51,10 +54,10 @@ function! s:GetInfoUnderCursor() abort
 
   " For scopeless tag
   " peer_ilog(PEER,FORMAT,...):90
-  let line = vista#util#Trim(getline('.'))
-  let left_parenthsis_idx = stridx(line, '(')
+  let trimmed_line = vista#util#Trim(getline('.'))
+  let left_parenthsis_idx = stridx(trimmed_line, '(')
   if left_parenthsis_idx > -1
-    return [line[0:left_parenthsis_idx-1], source_line]
+    return [trimmed_line[0:left_parenthsis_idx-1], source_line]
   endif
 
   " logger_name:80
@@ -63,7 +66,13 @@ function! s:GetInfoUnderCursor() abort
     return [v:null, v:null]
   endif
 
-  let tag = with_tag[-1]
+  let matched = matchlist(trimmed_line, '\([a-zA-Z:#_]\+\):\(\d\+\)$')
+
+  let tag = get(matched, 1, '')
+
+  if empty(tag)
+    let tag = with_tag[-1]
+  endif
 
   return [tag, source_line]
 endfunction
@@ -168,7 +177,7 @@ function! s:ShowDetail() abort
     call vista#error#InvalidOption('g:vista_echo_cursor_strategy', opts)
   endif
 
-  call s:ApplyHighlight(line('.'), v:false)
+  call s:ApplyHighlight(line('.'), v:false, tag)
 endfunction
 
 function! s:Jump() abort
@@ -221,7 +230,7 @@ function! s:FindNearestMethodOrFunction(_timer) abort
   endif
 endfunction
 
-function! s:ExistsVlnum() abort
+function! s:HasVlnum() abort
   return exists('t:vista')
         \ && has_key(t:vista, 'raw')
         \ && !empty(t:vista.raw)
@@ -229,13 +238,30 @@ function! s:ExistsVlnum() abort
 endfunction
 
 " Highlight the line given the line number and ensure it's visible if required.
-function! s:ApplyHighlight(lnum, ensure_visible) abort
+"
+" lnum - current line number in vista window
+" ensure_visible - kepp this line visible
+" optional: tag - accurate tag
+function! s:ApplyHighlight(lnum, ensure_visible, ...) abort
   if exists('w:vista_highlight_id')
     call matchdelete(w:vista_highlight_id)
     unlet w:vista_highlight_id
   endif
 
-  let w:vista_highlight_id = matchaddpos('IncSearch', [a:lnum])
+  if get(g:, 'vista_highlight_whole_line', 0)
+    let hi_pos = [a:lnum]
+  else
+    let cur_line = getline(a:lnum)
+    let [_, start, _] = matchstrpos(getline(a:lnum), '\S')
+    if a:0 == 1
+      let hi_pos = [[a:lnum, start+1, strlen(a:1)]]
+    else
+      let [_, end, _] = matchstrpos(getline(a:lnum), ':\d\+$')
+      let hi_pos = [[a:lnum, start+1, end-2]]
+    endif
+  endif
+
+  let w:vista_highlight_id = matchaddpos('IncSearch', hi_pos)
 
   if a:ensure_visible
     execute 'normal!' a:lnum.'z.'
@@ -244,7 +270,10 @@ endfunction
 
 function! s:HighlightNearestTag(_timer) abort
   let winnr = t:vista.winnr()
-  if winnr == -1 || vista#ShouldSkip() || !s:ExistsVlnum() || mode() !=# 'n'
+  if winnr == -1
+        \ || vista#ShouldSkip()
+        \ || !s:HasVlnum()
+        \ || mode() !=# 'n'
     return
   endif
 
@@ -261,7 +290,7 @@ function! s:HighlightNearestTag(_timer) abort
 
   let s:last_vlnum = s:vlnum
 
-  let winnr = bufwinnr('__vista__')
+  let winnr = t:vista.winnr()
   " noautocmd is necessary, otherwise it may interfere the echoed message by
   " other plugins, e.g., the warning/error message from ALE.
   if winnr() != winnr
@@ -298,8 +327,11 @@ function! vista#cursor#FoldOrJump() abort
   call s:Jump()
 endfunction
 
+" This happens when you are in the window of source file
 function! vista#cursor#FindNearestMethodOrFunction() abort
-  if !exists('t:vista') || !has_key(t:vista, 'functions') || bufnr('') != t:vista.source.bufnr
+  if !exists('t:vista')
+        \ || !has_key(t:vista, 'functions')
+        \ || bufnr('') != t:vista.source.bufnr
     return
   endif
 
@@ -330,7 +362,7 @@ function! vista#cursor#ShowDetail(_timer) abort
     let scope = join(splitted[1:-2], ' ')
     let cnt = matchstr(splitted[-1], '\d\+')
     echohl Keyword  | echo '['.scope.']: ' | echohl NONE
-    echohl Function | echon cnt          | echohl NONE
+    echohl Function | echon cnt            | echohl NONE
     return
   endif
 
@@ -349,7 +381,7 @@ endfunction
 
 " This happens on calling `:Vista show` but the vista window is still invisible.
 function! vista#cursor#ShowTagFor(lnum) abort
-  if !s:ExistsVlnum()
+  if !s:HasVlnum()
     return
   endif
 
@@ -362,7 +394,7 @@ function! vista#cursor#ShowTagFor(lnum) abort
 endfunction
 
 function! vista#cursor#ShowTag() abort
-  if !s:ExistsVlnum()
+  if !s:HasVlnum()
     return
   endif
 

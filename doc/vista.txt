@@ -310,6 +310,14 @@ g:vista_disable_statusline                            *g:vista_disable_statuslin
   if you use other statusline plugins at the same time. Hence it's disabled
   by default if you have installed airline or lightline.
 
+g:vista_highlight_whole_line                        *g:vista_highlight_whole_line*
+
+  Type: |Number|
+  Default: `0`
+
+  By default vista.vim will try to highlight the tag precisely in the vista window.
+  Set this to `1` to always higlight the whole line.
+
 g:vista#renderer#enable_icon                        *g:vista#renderer#enable_icon*
 
   Type: |Number|
