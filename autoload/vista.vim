@@ -26,24 +26,27 @@ function! vista#OnExecute(provider, AUF) abort
   call vista#autocmd#Init('Vista'.vista#util#ToCamelCase(a:provider), a:AUF)
 endfunction
 
+" Sort the items under some kind alphabetically.
 function! vista#Sort() abort
   if !has_key(t:vista, 'sort')
     let t:vista.sort = v:true
   else
     let t:vista.sort = !t:vista.sort
   endif
+
   let provider = t:vista.provider
   let cache = vista#executive#{provider}#Cache()
 
-  let cursor_position = getpos('.')
+  let cur_pos = getpos('.')
 
   call vista#sidebar#Reload(cache)
 
-  if cursor_position != getpos('.')
-    call setpos('.', cursor_position)
+  if cur_pos != getpos('.')
+    call setpos('.', cur_pos)
   endif
 endfunction
 
+" Used for running vista.vim on startup
 function! vista#RunForNearestMethodOrFunction() abort
   let [bufnr, winnr, fname, fpath] = [bufnr('%'), winnr(), expand('%'), expand('%:p')]
   call vista#source#Update(bufnr, winnr, fname, fpath)
@@ -55,6 +58,7 @@ function! vista#RunForNearestMethodOrFunction() abort
   endif
 endfunction
 
+" Main entrance to interact with vista.vim
 function! vista#(bang, ...) abort
   if a:bang
     if a:0 == 0
