@@ -49,14 +49,14 @@ In addition to being a tags viewer, vista.vim can also be a symbol navigator sim
     - [x] [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
 - [x] Finder for tags and LSP symbols.
     - [x] [fzf](https://github.com/junegunn/fzf)
-- [x] Display decent detailed symbol info in cmdline, also supports neovim's floating window.
-- [x] Jump to the tag/symbol from vista sidebar with a blink.
+- [x] Nested display for ctags.
+- [x] Highlight the nearby tag in the vista sidebar.
+- [x] Builtin support for displaying markdown's TOC.
 - [x] Update automatically when switching between buffers.
+- [x] Jump to the tag/symbol from vista sidebar with a blink.
 - [x] Update asynchonously in the background when `+job` avaliable.
 - [x] Find the nearest method or function to the cursor, which could be integrated into the statusline.
-- [x] Highlight the nearby tag in the vista sidebar.
-- [x] Nested display for ctags.
-- [x] Builtin support for displaying markdown's TOC.
+- [x] Display decent detailed symbol info in cmdline, also supports previewing the tag via neovim's floating window.
 
 Notes:
 
