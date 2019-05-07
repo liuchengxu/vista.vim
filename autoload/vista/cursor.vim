@@ -166,6 +166,7 @@ endfunction
 " Show the detail of current tag/symbol under cursor.
 function! s:ShowDetail() abort
   let [tag, source_line] = s:GetInfoUnderCursor()
+  let s:cur_tag = tag
 
   if empty(tag) || empty(source_line)
     echo "\r"
@@ -207,9 +208,7 @@ function! s:Jump() abort
     return
   endif
 
-  let line = line[0]
-  let tag = split(cur_line[-2], ' ')[-1]
-  let [_, start, _] = matchstrpos(line, tag)
+  let [_, start, _] = matchstrpos(line[0], s:cur_tag)
 
   call vista#source#GotoWin()
   " Move cursor to the column of tag located, otherwise the first column
