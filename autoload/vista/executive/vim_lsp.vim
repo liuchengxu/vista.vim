@@ -52,7 +52,8 @@ function! s:HasAvaliableServers() abort
   if !exists('*lsp#get_whitelisted_servers')
     return 0
   endif
-  let s:servers = filter(lsp#get_whitelisted_servers(), 'lsp#capabilities#has_document_symbol_provider(v:val)')
+  let s:servers = filter(lsp#get_whitelisted_servers(),
+        \ 'lsp#capabilities#has_document_symbol_provider(v:val)')
   return len(s:servers)
 endfunction
 

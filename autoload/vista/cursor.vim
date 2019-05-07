@@ -52,12 +52,22 @@ function! s:GetInfoUnderCursor() abort
     endif
   endif
 
+  function! s:RemoveVisibility(tag) abort
+    if index(['+', '~', '-'], a:tag[0]) > -1
+      return a:tag[1:]
+    else
+      return a:tag
+    endif
+  endfunction
+
   " For scopeless tag
   " peer_ilog(PEER,FORMAT,...):90
   let trimmed_line = vista#util#Trim(getline('.'))
   let left_parenthsis_idx = stridx(trimmed_line, '(')
   if left_parenthsis_idx > -1
-    return [trimmed_line[0:left_parenthsis_idx-1], source_line]
+    " Ignore the visibility symbol, e.g., +test2()
+    let tag = s:RemoveVisibility(trimmed_line[0 : left_parenthsis_idx-1])
+    return [tag, source_line]
   endif
 
   " logger_name:80
@@ -73,6 +83,8 @@ function! s:GetInfoUnderCursor() abort
   if empty(tag)
     let tag = with_tag[-1]
   endif
+
+  let tag = s:RemoveVisibility(tag)
 
   return [tag, source_line]
 endfunction
@@ -154,6 +166,7 @@ endfunction
 " Show the detail of current tag/symbol under cursor.
 function! s:ShowDetail() abort
   let [tag, source_line] = s:GetInfoUnderCursor()
+  let s:cur_tag = tag
 
   if empty(tag) || empty(source_line)
     echo "\r"
@@ -195,9 +208,7 @@ function! s:Jump() abort
     return
   endif
 
-  let line = line[0]
-  let tag = split(cur_line[-2], ' ')[-1]
-  let [_, start, _] = matchstrpos(line, tag)
+  let [_, start, _] = matchstrpos(line[0], s:cur_tag)
 
   call vista#source#GotoWin()
   " Move cursor to the column of tag located, otherwise the first column
@@ -249,19 +260,26 @@ function! s:ApplyHighlight(lnum, ensure_visible, ...) abort
   endif
 
   if get(g:, 'vista_highlight_whole_line', 0)
-    let hi_pos = [a:lnum]
+    let hi_pos = a:lnum
   else
     let cur_line = getline(a:lnum)
-    let [_, start, _] = matchstrpos(getline(a:lnum), '\S')
+    " Current line may contains +,-,~, use `\S` is incorrect to find the right
+    " starting postion.
+    let [_, start, _] = matchstrpos(cur_line, '[a-zA-Z0-9_#:]')
+
+    " If we know the tag, then what we have to do is to use the length of tag
+    " based on the starting point.
+    "
+    " start is 0-based, while the column used in matchstrpos is 1-based.
     if a:0 == 1
-      let hi_pos = [[a:lnum, start+1, strlen(a:1)]]
+      let hi_pos = [a:lnum, start+1, strlen(a:1)]
     else
-      let [_, end, _] = matchstrpos(getline(a:lnum), ':\d\+$')
-      let hi_pos = [[a:lnum, start+1, end-2]]
+      let [_, end, _] = matchstrpos(cur_line, ':\d\+$')
+      let hi_pos = [a:lnum, start+1, end-2]
     endif
   endif
 
-  let w:vista_highlight_id = matchaddpos('IncSearch', hi_pos)
+  let w:vista_highlight_id = matchaddpos('IncSearch', [hi_pos])
 
   if a:ensure_visible
     execute 'normal!' a:lnum.'z.'

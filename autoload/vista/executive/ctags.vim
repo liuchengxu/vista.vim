@@ -11,6 +11,7 @@ let s:ctags = get(g:, 'vista_ctags_executable', 'ctags')
 let s:support_json_format =
       \ len(filter(split(system(s:ctags.' --list-features'), '\n'), 'v:val =~# ''^json''')) > 0
 
+" Expose this variable for debugging
 let g:vista#executive#ctags#support_json_format = s:support_json_format
 
 function! s:GetCustomCmd(ft) abort
@@ -45,7 +46,6 @@ function! s:BuildCmd(file) abort
   let common_opt = '--format=2 --excmd=pattern --fields=nksSaf --extras= --file-scope=yes --sort=no --append=no'
   let language_specific_opt = s:GetLanguageSpecificOptition(ft)
 
-  " TODO vista_ctags_{filetype}_executable
   if s:support_json_format
     let fmt = '%s %s %s --output-format=json --fields=-PF -f- %s'
     let s:TagParser = function('vista#parser#ctags#FromJSON')

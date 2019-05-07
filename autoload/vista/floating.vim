@@ -113,9 +113,12 @@ function! s:Display(msg) abort
 
   call nvim_buf_set_lines(s:floating_bufnr, 0, -1, 0, a:msg)
 
-  " FIXME current highlight is problematic.
-  if exists('s:start')
-    call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:lnum, s:start, s:end)
+  let target_line = getbufline(s:floating_bufnr, s:floating_lnum)[0]
+  let [_, start, end] = matchstrpos(target_line, '\C'.s:cur_tag)
+
+  if start != -1
+    " {line} is zero-based.
+    call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:floating_lnum-1, start, end)
   endif
 
   setlocal
@@ -146,31 +149,37 @@ endfunction
 
 function! vista#floating#Display(lnum, tag) abort
   silent! call timer_stop(s:floating_timer)
-  silent! unlet s:start s:end s:lnum
 
   let lnum = a:lnum
 
-  " See if it's identical to the last lnum to avoid blink. https://github.com/liuchengxu/vista.vim/issues/55
-  if lnum == s:last_lnum && get(t:vista, 'floating_visible', v:false)
+  " See if it's identical to the last lnum to avoid blink. Ref #55
+  "
+  " No need to display again when it's already visible.
+  if lnum == s:last_lnum
+        \ && get(t:vista, 'floating_visible', v:false)
     return
   endif
 
+  " We save the tag info so that it could be used later for adding the tag highlight.
+  "
+  " It's problematic when calculating the highlight position here, leading to
+  " the displacement of current tag highlighting position.
   let s:last_lnum = lnum
+  let s:cur_tag = a:tag
 
-  let [_, start, end] = matchstrpos(t:vista.source.line(lnum), '\C'.a:tag)
+  " Show 5 lines around the tag source line [lnum-5, lnum+5]
+  let range = 5
 
-  if start != -1
-    let [s:start, s:end] = [start, end]
+  if lnum - range > 0
+    let s:floating_lnum = range + 1
+  else
+    let s:floating_lnum = lnum
   endif
 
-  " Be careful!
-  let s:lnum = lnum < 6 ? lnum - 1 : 5
-
-  let begin = max([lnum - 5, 1])
-  let end = begin + 5 * 2
+  let begin = max([lnum - range, 1])
+  let end = begin + range * 2
   let lines = getbufline(t:vista.source.bufnr, begin, end)
 
-  " TODO the msg could be more fruitful when using floating window
   let delay = get(g:, 'vista_floating_delay', 100)
   let s:floating_timer = timer_start(
         \ delay,
