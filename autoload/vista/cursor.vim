@@ -208,7 +208,7 @@ function! s:Jump() abort
     return
   endif
 
-  let [_, start, _] = matchstrpos(line[0], s:cur_tag)
+  let [_, start, _] = matchstrpos(line[0], get(s:, 'cur_tag', ''))
 
   call vista#source#GotoWin()
   " Move cursor to the column of tag located, otherwise the first column
