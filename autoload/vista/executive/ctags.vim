@@ -282,6 +282,7 @@ function! s:Dispatch(F, ...) abort
     return
   endif
 
+  call vista#SetProvider(s:provider)
   return call(function(a:F), a:000)
 endfunction
 

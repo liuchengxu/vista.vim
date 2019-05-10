@@ -58,6 +58,7 @@ endfunction
 
 function! s:RunAsync() abort
   if exists('*LanguageClient#textDocument_documentSymbol')
+    call vista#SetProvider(s:provider)
     call vista#util#EnsureRunOnSourceFile(
           \ function('LanguageClient#textDocument_documentSymbol'),
           \ {'handle': v:false},

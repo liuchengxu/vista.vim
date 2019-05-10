@@ -2,7 +2,7 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
-if exists('b:current_syntax')
+if exists('b:current_syntax') && b:current_syntax ==# 'vista_kind'
   finish
 endif
 
