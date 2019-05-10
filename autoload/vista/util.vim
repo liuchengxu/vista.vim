@@ -73,6 +73,8 @@ function! vista#util#SetBufline(bufnr, lines) abort
 
   if t:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default'
     runtime! syntax/vista.vim
+  elseif t:vista.provider ==# 'markdown'
+    runtime! syntax/vista_markdown.vim
   else
     runtime! syntax/vista_kind.vim
   endif
