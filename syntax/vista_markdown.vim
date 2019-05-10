@@ -9,15 +9,18 @@ endif
 syntax match VistaColon /:/ contained
 syntax match VistaLineNr /\d\+$/
 
-syntax match VistaH1 /.*H1/ contains=VistaColon,VistaLineNr
-syntax match VistaH2 /.*H2/ contains=VistaColon,VistaLineNr
-syntax match VistaH3 /.*H3/ contains=VistaColon,VistaLineNr
-syntax match VistaH4 /.*H4/ contains=VistaColon,VistaLineNr
-syntax match VistaH5 /.*H5/ contains=VistaColon,VistaLineNr
-syntax match VistaH6 /.*H6/ contains=VistaColon,VistaLineNr
+syntax match VistaHeadNr /H1\|H2\|H3\|H4\|H5\|H6:\d\+$/ contains=VistaLineNr contained
+
+syntax match VistaH1 /.*H1/ contains=VistaColon,VistaLineNr,VistaHeadNr
+syntax match VistaH2 /.*H2/ contains=VistaColon,VistaLineNr,VistaHeadNr
+syntax match VistaH3 /.*H3/ contains=VistaColon,VistaLineNr,VistaHeadNr
+syntax match VistaH4 /.*H4/ contains=VistaColon,VistaLineNr,VistaHeadNr
+syntax match VistaH5 /.*H5/ contains=VistaColon,VistaLineNr,VistaHeadNr
+syntax match VistaH6 /.*H6/ contains=VistaColon,VistaLineNr,VistaHeadNr
 
 hi default link VistaColon       SpecialKey
 hi default link VistaLineNr      LineNr
+hi default link VistaHeadNr      Comment
 
 highlight default link VistaH1 markdownH1
 highlight default link VistaH2 markdownH2
