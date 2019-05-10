@@ -46,7 +46,7 @@ function! s:GetInfoUnderCursor() abort
 
   " For scoped tag
   if has_key(t:vista, 'vlnum_cache')
-    let tagline = get(t:vista.vlnum_cache, line('.') - 3, '')
+    let tagline = t:vista.get_tagline_under_cursor()
     if !empty(tagline)
       return [tagline.name, source_line]
     endif

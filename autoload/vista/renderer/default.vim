@@ -10,6 +10,8 @@ let s:visibility_icon = {
       \ 'private': '-',
       \ }
 
+let g:vista#renderer#default#vlnum_offset = 3
+
 " Return the rendered row to be displayed given the depth
 function! s:Assemble(line, depth) abort
   let line = a:line
@@ -182,7 +184,7 @@ function! s:GetVisibility(line) abort
   return has_key(a:line, 'access') ? get(s:visibility_icon, a:line.access, '?') : ''
 endfunction
 
-function! s:Compare(i1, i2) abort
+function! s:SortCompare(i1, i2) abort
   return a:i1.name > a:i2.name
 endfunction
 
@@ -196,7 +198,7 @@ function! s:RenderScopeless(scope_less, rows) abort
     let lines = scope_less[kind]
 
     if get(t:vista, 'sort', v:false)
-      let lines = sort(copy(lines), function('s:Compare'))
+      let lines = sort(copy(lines), function('s:SortCompare'))
     endif
 
     for line in lines
@@ -230,6 +232,9 @@ function! s:Render() abort
   " is related to the line in the vista sidebar, for we have to
   " remove the duplicate parents which leads to reassign the lnum
   " to the original tagline.
+  "
+  " The item of s:vlnum_cache is some original tagline dict with
+  " `vlnum` field added later.
   let s:vlnum_cache = []
 
   let scope_less = {}
@@ -260,12 +265,13 @@ function! s:Render() abort
 
   call s:RenderScopeless(scope_less, rows)
 
+  " The original tagline is positioned in which line in the vista sidebar.
   let idx = 0
   while idx < len(s:vlnum_cache)
     if !empty(s:vlnum_cache[idx])
       " idx is 0-based, while the line number is 1-based, and we prepend the
-      " two lines first.
-      let s:vlnum_cache[idx].vlnum = idx + 1 + 2
+      " two lines first, so the final offset is 1+2=3
+      let s:vlnum_cache[idx].vlnum = idx + g:vista#renderer#default#vlnum_offset
     endif
     let idx += 1
   endwhile
