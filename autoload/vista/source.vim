@@ -19,7 +19,7 @@ function! s:EnsureExists() abort
     " Get original tagline given the lnum in vista sidebar
     "
     " Mind the offset
-    function! t:vista.get_tagline_under_cursor()
+    function! t:vista.get_tagline_under_cursor() abort
       return get(t:vista.vlnum_cache, line('.') - g:vista#renderer#default#vlnum_offset, '')
     endfunction
 
