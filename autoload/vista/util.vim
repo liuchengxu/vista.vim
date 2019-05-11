@@ -102,15 +102,16 @@ function! vista#util#ToCamelCase(s) abort
 endfunction
 
 " Blink current line under cursor, from junegunn/vim-slash
-function! vista#util#Blink(times, delay) abort
+function! vista#util#Blink(times, delay, ...) abort
   let s:blink = { 'ticks': 2 * a:times, 'delay': a:delay }
+  let s:hi_pos = get(a:000, 0, line('.'))
 
   function! s:blink.tick(_) abort
     let self.ticks -= 1
     let active = self == s:blink && self.ticks > 0
 
     if !self.clear() && active && &hlsearch
-      let w:blink_id = matchaddpos('IncSearch', [line('.')])
+      let w:blink_id = matchaddpos('IncSearch', [s:hi_pos])
     endif
     if active
       call timer_start(self.delay, self.tick)

@@ -76,7 +76,7 @@ function! s:GetInfoUnderCursor() abort
     return [v:null, v:null]
   endif
 
-  let matched = matchlist(trimmed_line, '\([a-zA-Z:#_]\+\):\(\d\+\)$')
+  let matched = matchlist(trimmed_line, '\([a-zA-Z:#_.]\+\):\(\d\+\)$')
 
   let tag = get(matched, 1, '')
 
@@ -163,6 +163,18 @@ function! s:DisplayInFloatingWin(...) abort
   endif
 endfunction
 
+function! s:RevealInSourceFile(lnum, tag) abort
+  noautocmd execute t:vista.source.winnr().'wincmd w'
+
+  silent execute 'normal!' a:lnum.'z.'
+
+  let [_, start, end] = matchstrpos(getline('.'), a:tag)
+
+  call vista#util#Blink(1, 100, [a:lnum, start+1, strlen(a:tag)])
+
+  noautocmd wincmd p
+endfunction
+
 " Show the detail of current tag/symbol under cursor.
 function! s:ShowDetail() abort
   let [tag, source_line] = s:GetInfoUnderCursor()
@@ -176,7 +188,7 @@ function! s:ShowDetail() abort
   let msg = vista#util#Truncate(source_line)
 
   let strategy = get(g:, 'vista_echo_cursor_strategy', 'echo')
-  let opts = ['echo', 'floating_win', 'both']
+  let opts = ['echo', 'floating_win', 'scroll', 'both']
   let lnum = s:GetLnumUnderCursor()
 
   if strategy == opts[0]
@@ -184,6 +196,8 @@ function! s:ShowDetail() abort
   elseif strategy == opts[1]
     call s:DisplayInFloatingWin(lnum, tag)
   elseif strategy == opts[2]
+    call s:RevealInSourceFile(lnum, tag)
+  elseif strategy == opts[3]
     call s:EchoInCmdline(msg, tag)
     call s:DisplayInFloatingWin(lnum, tag)
   else
