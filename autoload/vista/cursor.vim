@@ -46,7 +46,7 @@ function! s:GetInfoUnderCursor() abort
 
   " For scoped tag
   if has_key(t:vista, 'vlnum_cache')
-    let tagline = get(t:vista.vlnum_cache, line('.') - 3, '')
+    let tagline = t:vista.get_tagline_under_cursor()
     if !empty(tagline)
       return [tagline.name, source_line]
     endif
@@ -379,8 +379,8 @@ function! vista#cursor#ShowDetail(_timer) abort
     " Join the scope parts in case of they contains spaces, e.g., structure names
     let scope = join(splitted[1:-2], ' ')
     let cnt = matchstr(splitted[-1], '\d\+')
-    echohl Keyword  | echo '['.scope.']: ' | echohl NONE
-    echohl Function | echon cnt            | echohl NONE
+    call s:EchoScope(scope)
+    echohl Keyword | echon cnt | echohl NONE
     return
   endif
 

@@ -71,6 +71,14 @@ function! vista#util#SetBufline(bufnr, lines) abort
   call setbufvar(a:bufnr, '&readonly', 1)
   call setbufvar(a:bufnr, '&modifiable', 0)
 
+  if t:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default'
+    runtime! syntax/vista.vim
+  elseif t:vista.provider ==# 'markdown'
+    runtime! syntax/vista_markdown.vim
+  else
+    runtime! syntax/vista_kind.vim
+  endif
+
   if exists('l:switch_back')
     noautocmd wincmd p
   endif

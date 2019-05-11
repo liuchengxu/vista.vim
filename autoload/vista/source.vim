@@ -7,12 +7,22 @@ let s:use_winid = exists('*bufwinid')
 function! s:EnsureExists() abort
   if !exists('t:vista')
     let t:vista = {}
+
     function! t:vista.winnr() abort
       return bufwinnr('__vista__')
     endfunction
+
     function! t:vista.winid() abort
       return bufwinid('__vista__')
     endfunction
+
+    " Get original tagline given the lnum in vista sidebar
+    "
+    " Mind the offset
+    function! t:vista.get_tagline_under_cursor() abort
+      return get(t:vista.vlnum_cache, line('.') - g:vista#renderer#default#vlnum_offset, '')
+    endfunction
+
   endif
 
   if !has_key(t:vista, 'source')

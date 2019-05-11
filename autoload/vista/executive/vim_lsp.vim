@@ -66,6 +66,7 @@ function! s:Run() abort
 endfunction
 
 function! s:RunAsync() abort
+  call vista#SetProvider(s:provider)
   for server in s:servers
     call lsp#send_request(server, {
         \ 'method': 'textDocument/documentSymbol',

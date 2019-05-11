@@ -11,6 +11,9 @@ function! s:PrepareContainer() abort
   let s:data = {}
   let t:vista.functions = []
   let t:vista.raw = []
+  let t:vista.without_containerName = []
+  let t:vista.with_containerName = []
+  let t:vista.containerName_map = {}
 endfunction
 
 " Extract fruitful infomation from raw symbols
@@ -91,6 +94,7 @@ function! s:Dispatch(F, ...) abort
     return
   endif
 
+  call vista#SetProvider(s:provider)
   return call(function(a:F), a:000)
 endfunction
 
@@ -103,6 +107,7 @@ endfunction
 " Run and RunAsync is for internal use.
 function! vista#executive#coc#Run(_fpath) abort
   if exists('*CocAction')
+    call vista#SetProvider(s:provider)
     call vista#util#EnsureRunOnSourceFile(function('s:Run'))
     return s:data
   endif
