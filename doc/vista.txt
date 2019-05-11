@@ -184,6 +184,8 @@ g:vista_echo_cursor_strategy                        *g:vista_echo_cursor_strateg
   How to show the detailed formation of current cursor symbol. Avaliable
   options:
 
+  `scroll`       - make the source line of current tag at the center of the
+                 window.
   `echo`         - echo in the cmdline.
   `floating_win` - display in neovim's floating window. See if you have the
                  floating window support via `:echo exists(*nvim_open_win)` .
