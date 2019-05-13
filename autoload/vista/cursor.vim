@@ -76,7 +76,7 @@ function! s:GetInfoUnderCursor() abort
     return [v:null, v:null]
   endif
 
-  let matched = matchlist(trimmed_line, '\([a-zA-Z:#_.]\+\):\(\d\+\)$')
+  let matched = matchlist(trimmed_line, '\([a-zA-Z:#_.,<> ]\+\):\(\d\+\)$')
 
   let tag = get(matched, 1, '')
 
