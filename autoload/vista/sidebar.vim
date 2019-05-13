@@ -51,8 +51,7 @@ function! vista#sidebar#OpenOrUpdate(rows) abort
   else
     let winnr = t:vista.winnr()
     if winnr ==  -1
-      silent execute 'botright vsplit +buffer'.t:vista.bufnr
-      execute 'vertical resize' get(g:, 'vista_sidebar_width', 30)
+      call s:NewWindow()
     else
       if winnr() != winnr
         noautocmd execute winnr.'wincmd w'
