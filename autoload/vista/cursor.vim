@@ -2,6 +2,8 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
+let s:has_floating_win = exists('*nvim_open_win')
+
 let s:find_timer = -1
 let s:cursor_timer = -1
 let s:highlight_timer = -1
@@ -156,7 +158,7 @@ function! s:EchoInCmdline(msg, tag) abort
 endfunction
 
 function! s:DisplayInFloatingWin(...) abort
-  if exists('*nvim_open_win')
+  if s:has_floating_win
     call call('vista#floating#Display', a:000)
   else
     call vista#error#Need('neovim compiled with floating window support')
@@ -185,11 +187,11 @@ function! s:ShowDetail() abort
     return
   endif
 
-  let msg = vista#util#Truncate(source_line)
-
-  let strategy = get(g:, 'vista_echo_cursor_strategy', 'echo')
   let opts = ['echo', 'floating_win', 'scroll', 'both']
-  let lnum = s:GetLnumUnderCursor()
+  let strategy = get(g:, 'vista_echo_cursor_strategy', 'echo')
+
+  let msg = vista#util#Truncate(source_line)
+  let lnum = s:GetTrailingLnum()
 
   if strategy == opts[0]
     call s:EchoInCmdline(msg, tag)
@@ -199,7 +201,11 @@ function! s:ShowDetail() abort
     call s:RevealInSourceFile(lnum, tag)
   elseif strategy == opts[3]
     call s:EchoInCmdline(msg, tag)
-    call s:DisplayInFloatingWin(lnum, tag)
+    if s:has_floating_win
+      call s:DisplayInFloatingWin(lnum, tag)
+    else
+      call s:RevealInSourceFile(lnum, tag)
+    endif
   else
     call vista#error#InvalidOption('g:vista_echo_cursor_strategy', opts)
   endif
@@ -447,7 +453,7 @@ function! vista#cursor#ShowTag() abort
 endfunction
 
 " Extract the line number from last section of cursor line in the vista window
-function! s:GetLnumUnderCursor() abort
+function! s:GetTrailingLnum() abort
   return str2nr(matchstr(getline('.'), '\d\+$'))
 endfunction
 
@@ -464,7 +470,7 @@ function! vista#cursor#TogglePreview() abort
     return
   endif
 
-  let lnum = s:GetLnumUnderCursor()
+  let lnum = s:GetTrailingLnum()
 
   call s:DisplayInFloatingWin(lnum, tag)
 endfunction
