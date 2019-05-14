@@ -185,9 +185,12 @@ g:vista_echo_cursor_strategy                        *g:vista_echo_cursor_strateg
   options:
 
   `echo`         - echo in the cmdline.
+  `scroll`       - make the source line of current tag at the center of the
+                 window.
   `floating_win` - display in neovim's floating window. See if you have the
                  floating window support via `:echo exists(*nvim_open_win)` .
-  `both`         - both `echo` and `floating_win` will be used.
+  `both`         - both `echo` and `floating_win` if it's avaliable otherwise
+                 `scroll` will be used.
 
 g:vista_close_on_jump                                      *g:vista_close_on_jump*
 
