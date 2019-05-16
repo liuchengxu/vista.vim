@@ -28,7 +28,7 @@ function! s:Assemble(line, depth) abort
         \ get(line, 'name'),
         \ get(line, 'signature', ''),
         \ ' : '.kind,
-        \ ':'.line.line
+        \ ':'.get(line, 'line', '')
         \ )
 
   return row
@@ -218,7 +218,7 @@ function! s:RenderScopeless(scope_less, rows) abort
   endfor
 
   " Remove the last line if it's empty, i.e., ''
-  if empty(rows[-1])
+  if !empty(rows) && empty(rows[-1])
     unlet rows[-1]
   endif
 endfunction
@@ -239,8 +239,32 @@ function! s:Render() abort
 
   let scope_less = {}
 
+  let without_scope = t:vista.without_scope
+
+  " Build psedu tags for cpp anonymous namespace tags . Ref #83
+  if t:vista.source.filetype() == 'cpp'
+    let anons = []
+
+    for ws in t:vista.with_scope
+      if ws.scope =~# '^__anon' && index(anons,  ws.scope) == -1
+        call add(anons, ws.scope)
+      endif
+    endfor
+
+    let psedu_anonymous_cpp_namespace_tags = []
+
+    for anon in anons
+      let ps = filter(copy(t:vista.with_scope), 'v:val.scope ==# anon')
+      let p = ps[0]
+      let line = str2nr(p.line) - 1
+      call add(psedu_anonymous_cpp_namespace_tags, { 'name': p.scope, 'kind': p.scopeKind, 'line': line })
+    endfor
+
+    call extend(without_scope, psedu_anonymous_cpp_namespace_tags)
+  endif
+
   " The root of hierarchy structure doesn't have scope field.
-  for potential_root_line in t:vista.without_scope
+  for potential_root_line in without_scope
 
     let root_name = potential_root_line.name
 

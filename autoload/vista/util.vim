@@ -65,6 +65,9 @@ function! vista#util#SetBufline(bufnr, lines) abort
     let l:switch_back = 1
   endif
 
+  call setbufvar(a:bufnr, '&readonly', 0)
+  call setbufvar(a:bufnr, '&modifiable', 1)
+
   silent 1,$delete _
   call setline(1, lines)
 
