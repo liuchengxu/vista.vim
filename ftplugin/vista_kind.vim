@@ -46,6 +46,7 @@ augroup VistaCursor
   if get(g:, 'vista_echo_cursor', 1)
     autocmd CursorMoved <buffer> call vista#cursor#ShowDetailWithDelay()
   endif
+  autocmd BufLeave <buffer> call vista#floating#Close()
 augroup END
 
 if !exists('#VistaMOF')

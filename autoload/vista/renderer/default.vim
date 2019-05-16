@@ -242,7 +242,7 @@ function! s:Render() abort
   let without_scope = t:vista.without_scope
 
   " Build psedu tags for cpp anonymous namespace tags . Ref #83
-  if t:vista.source.filetype() == 'cpp'
+  if t:vista.source.filetype() ==# 'cpp'
     let anons = []
 
     for ws in t:vista.with_scope
