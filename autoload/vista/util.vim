@@ -51,8 +51,6 @@ function! s:SetBufline(bufnr, lines) abort
 endfunction
 
 function! vista#util#SetBufline(bufnr, lines) abort
-  call setbufvar(a:bufnr, '&readonly', 0)
-  call setbufvar(a:bufnr, '&modifiable', 1)
   let lines = s:PrependFpath(a:lines)
 
   " This approach runes into the internal error E315.
@@ -65,15 +63,18 @@ function! vista#util#SetBufline(bufnr, lines) abort
     let l:switch_back = 1
   endif
 
-  call setbufvar(a:bufnr, '&readonly', 0)
-  call setbufvar(a:bufnr, '&modifiable', 1)
+  let bufnr = bufnr('')
+  call setbufvar(bufnr, '&readonly', 0)
+  call setbufvar(bufnr, '&modifiable', 1)
 
   silent 1,$delete _
   call setline(1, lines)
 
-  call setbufvar(a:bufnr, '&readonly', 1)
-  call setbufvar(a:bufnr, '&modifiable', 0)
+  call setbufvar(bufnr, '&readonly', 1)
+  call setbufvar(bufnr, '&modifiable', 0)
 
+  " Reload vista syntax since you may switch between serveral
+  " executives/extensions.
   if t:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default'
     runtime! syntax/vista.vim
   elseif t:vista.provider ==# 'markdown'
