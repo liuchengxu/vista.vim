@@ -47,7 +47,8 @@ function! s:GetInfoUnderCursor() abort
   endif
 
   " For scoped tag
-  if has_key(t:vista, 'vlnum_cache')
+  " Currently vlnum_cache is ctags provider only.
+  if has_key(t:vista, 'vlnum_cache') && t:vista.provider ==# 'ctags'
     let tagline = t:vista.get_tagline_under_cursor()
     if !empty(tagline)
       return [tagline.name, source_line]
@@ -78,6 +79,7 @@ function! s:GetInfoUnderCursor() abort
     return [v:null, v:null]
   endif
 
+  " Since we include the space ` `, we need to trim the result later.
   let matched = matchlist(trimmed_line, '\([a-zA-Z:#_.,<> ]\+\):\(\d\+\)$')
 
   let tag = get(matched, 1, '')
@@ -87,6 +89,7 @@ function! s:GetInfoUnderCursor() abort
   endif
 
   let tag = s:RemoveVisibility(tag)
+  let tag = vista#util#Trim(tag)
 
   return [tag, source_line]
 endfunction
