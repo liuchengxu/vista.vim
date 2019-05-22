@@ -57,7 +57,7 @@ function! vista#autocmd#Init(group_name, AUF) abort
     "
     " CursorHold and CursorHoldI event have been removed in order to
     " highlight the nearest tag automatically.
-    autocmd BufWritePost,BufReadPost, *
+    autocmd BufEnter,BufWritePost,BufReadPost, *
           \ call s:GenericAutoUpdate(fnamemodify(expand('<afile>'), ':p'))
   augroup END
 endfunction

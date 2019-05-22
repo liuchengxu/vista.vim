@@ -250,6 +250,9 @@ function! s:Compare(s1, s2) abort
 endfunction
 
 function! s:FindNearestMethodOrFunction(_timer) abort
+  if !exists('t:vista') || !has_key(t:vista, 'functions')
+    return
+  endif
   call sort(t:vista.functions, function('s:Compare'))
   let result = vista#util#BinarySearch(t:vista.functions, line('.'), 'lnum', 'text')
   if empty(result)
