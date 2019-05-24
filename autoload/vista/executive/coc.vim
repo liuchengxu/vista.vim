@@ -57,7 +57,7 @@ function! s:Cb(error, response) abort
     endif
     call s:Extract(a:response)
   else
-    call vista#error#("Error when calling CocActionAsync('documentSymbols')")
+    call vista#error#("Error when calling CocActionAsync('documentSymbols'): ".string(a:error))
   endif
 endfunction
 
