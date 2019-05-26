@@ -17,6 +17,10 @@ function! vista#ShouldSkip() abort
 endfunction
 
 function! vista#SetProvider(provider) abort
+  if get(t:vista, 'skip_set_provider', v:false)
+    let t:vista.skip_set_provider = v:false
+    return
+  endif
   let t:vista.provider = a:provider
   call vista#statusline#Render()
 endfunction

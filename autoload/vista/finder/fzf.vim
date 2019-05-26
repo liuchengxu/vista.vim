@@ -264,6 +264,7 @@ function! vista#finder#fzf#Run(...) abort
       let [bufnr, winnr, fname] = [bufnr('%'), winnr(), expand('%')]
       call vista#source#Update(bufnr, winnr, fname, fpath)
     endif
+    let t:vista.skip_set_provider = v:true
     " In this case, we normally want to run synchronously IMO.
     let s:data = vista#executive#{executive}#Run(fpath)
   endif
