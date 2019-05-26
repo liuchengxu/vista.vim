@@ -56,9 +56,9 @@ FEATURES                                                          *vista-feature
 [x] Find the nearest method or function to the cursor, which could be
     integrated into the statusline.
 [ ] Supports all of the languages that ctags does.
-[ ] Highlight current tag/symbol.
-[ ] Show the visibility (public/private) of tags.
-[ ] Tree viewer for hierarchy data.
+[x] Highlight current tag/symbol.
+[x] Show the visibility (public/private) of tags.
+[x] Tree viewer for hierarchy data, only works for ctags for now.
 
 Notes:
 
@@ -187,8 +187,10 @@ g:vista_echo_cursor_strategy                        *g:vista_echo_cursor_strateg
   `echo`         - echo in the cmdline.
   `scroll`       - make the source line of current tag at the center of the
                  window.
-  `floating_win` - display in neovim's floating window. See if you have the
-                 floating window support via `:echo exists(*nvim_open_win)` .
+  `floating_win` - display in neovim's floating window or vim's popup window.
+                 See if you have neovim's floating window support via
+                 `:echo exists(*nvim_open_win)` or vim's popup feature
+                 via `:echo exists('*popup_create')`
   `both`         - both `echo` and `floating_win` if it's avaliable otherwise
                  `scroll` will be used.
 
