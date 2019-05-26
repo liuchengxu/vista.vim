@@ -150,7 +150,7 @@ function! s:Run(...) abort
 
   if exists('g:vista_fzf_preview')
     let preview_opts = call('fzf#vim#with_preview', g:vista_fzf_preview).options
-    let preview_opts[-1] = preview_opts[-1][0:-3] . expand('%S') . ':{}'
+    let preview_opts[-1] = preview_opts[-1][0:-3] . t:vista.source.fpath . ':{}'
     call extend(opts.options, preview_opts)
   endif
 
