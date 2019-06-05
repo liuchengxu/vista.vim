@@ -3,13 +3,14 @@
 " vim: ts=2 sw=2 sts=2 et
 
 let s:last_lnum = -1
+let s:popup_timer = -1
 
 function! s:ClosePopup() abort
   if exists('s:popup_winid')
-    call popup_close(s:popup_winid)
+    call popup_hide(s:popup_winid)
     autocmd! VistaPopup
-    unlet s:popup_winid
   endif
+  let t:vista.popup_visible = v:false
 endfunction
 
 function! s:HiTag() abort
@@ -33,15 +34,22 @@ function! s:OpenPopup(lnum, tag) abort
 
   let max_length = max(map(copy(lines), 'strlen(v:val)')) + 2
 
-  let s:popup_winid = popup_create(lines, {
-        \ 'pos': 'botleft',
-        \ 'line': 'cursor-2',
-        \ 'col': 'cursor-'.max_length,
-        \ 'moved': 'WORD',
-        \ })
+  if !exists('s:popup_winid')
+    let s:popup_winid = popup_create(lines, {
+          \ 'pos': 'botleft',
+          \ 'line': 'cursor-2',
+          \ 'col': 'cursor-'.max_length,
+          \ 'moved': 'WORD',
+          \ })
+    let s:popup_bufnr = winbufnr(s:popup_winid)
 
-  let filetype = getbufvar(t:vista.source.bufnr, '&ft')
-  call win_execute(s:popup_winid, 'setlocal filetype='.filetype)
+    let filetype = getbufvar(t:vista.source.bufnr, '&ft')
+    call win_execute(s:popup_winid, 'setlocal filetype='.filetype)
+  else
+    call deletebufline(s:popup_bufnr, 1, 100000000000)
+    call setbufline(s:popup_bufnr, 1, lines)
+    call popup_show(s:popup_winid)
+  endif
 
   let target_line = lines[s:popup_lnum - 1]
   let [_, s:popup_start, s:popup_end] = matchstrpos(target_line, '\C'.a:tag)
@@ -53,6 +61,8 @@ function! s:OpenPopup(lnum, tag) abort
     autocmd CursorMoved <buffer> call s:ClosePopup()
     autocmd BufEnter,WinEnter,WinLeave  * call s:ClosePopup()
   augroup END
+
+  let t:vista.popup_visible = v:true
 endfunction
 
 function! vista#popup#Close() abort
@@ -61,8 +71,15 @@ endfunction
 
 function! vista#popup#Display(lnum, tag) abort
   if a:lnum == s:last_lnum
+        \ || get(t:vista, 'popup_visible', v:false)
     return
   endif
+
   let s:last_lnum = a:lnum
-  call s:OpenPopup(a:lnum, a:tag)
+
+  let delay = get(g:, 'vista_floating_delay', 100)
+  let s:popup_timer = timer_start(
+        \ delay,
+        \ { -> s:OpenPopup(a:lnum, a:tag)},
+        \ )
 endfunction
