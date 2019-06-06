@@ -34,13 +34,15 @@ function! s:OpenPopup(lnum, tag) abort
 
   let max_length = max(map(copy(lines), 'strlen(v:val)')) + 2
 
+  let pos_opts = {
+        \ 'pos': 'botleft',
+        \ 'line': 'cursor-2',
+        \ 'col': 'cursor-'.max_length,
+        \ 'moved': 'WORD',
+        \ }
+
   if !exists('s:popup_winid')
-    let s:popup_winid = popup_create(lines, {
-          \ 'pos': 'botleft',
-          \ 'line': 'cursor-2',
-          \ 'col': 'cursor-'.max_length,
-          \ 'moved': 'WORD',
-          \ })
+    let s:popup_winid = popup_create(lines, pos_opts)
     let s:popup_bufnr = winbufnr(s:popup_winid)
 
     let filetype = getbufvar(t:vista.source.bufnr, '&ft')
@@ -49,6 +51,7 @@ function! s:OpenPopup(lnum, tag) abort
     call deletebufline(s:popup_bufnr, 1, 100000000000)
     call setbufline(s:popup_bufnr, 1, lines)
     call popup_show(s:popup_winid)
+    call popup_move(s:popup_winid, pos_opts)
   endif
 
   let target_line = lines[s:popup_lnum - 1]
