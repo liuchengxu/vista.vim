@@ -3,6 +3,7 @@
 " vim: ts=2 sw=2 sts=2 et
 
 let s:has_floating_win = exists('*nvim_open_win')
+let s:has_popup = exists('*popup_create')
 
 let s:find_timer = -1
 let s:cursor_timer = -1
@@ -161,10 +162,12 @@ function! s:EchoInCmdline(msg, tag) abort
 endfunction
 
 function! s:DisplayInFloatingWin(...) abort
-  if s:has_floating_win
+  if s:has_popup
+    call call('vista#popup#Display', a:000)
+  elseif s:has_floating_win
     call call('vista#floating#Display', a:000)
   else
-    call vista#error#Need('neovim compiled with floating window support')
+    call vista#error#Need('neovim compiled with floating window support or vim compiled with popup feature')
   endif
 endfunction
 
@@ -239,6 +242,8 @@ function! s:Jump() abort
   normal! zz
 
   call call('vista#util#Blink', get(g:, 'vista_blink', [2, 100]))
+
+  call vista#popup#Close()
 
   if get(g:, 'vista_close_on_jump', 0)
     call vista#sidebar#Close()
