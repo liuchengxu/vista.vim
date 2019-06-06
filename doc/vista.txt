@@ -323,6 +323,14 @@ g:vista_highlight_whole_line                        *g:vista_highlight_whole_lin
   By default vista.vim will try to highlight the tag precisely in the vista window.
   Set this to `1` to always higlight the whole line.
 
+g:vista_floating_delay                                    *g:vista_floating_delay*
+
+  Type: |Number|
+  Default: 100
+
+  Given any integer, this option controls the number of milliseconds before
+  vista will show a popup or floating win of the target line context near the cursor.
+
 g:vista#renderer#enable_icon                        *g:vista#renderer#enable_icon*
 
   Type: |Number|
