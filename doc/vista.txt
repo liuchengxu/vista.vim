@@ -215,8 +215,16 @@ g:vista_blink                                                      *g:vista_blin
   Type: |List|
   Default: `[2, 100]`
 
+  By default blinking cursor 2 times with 100ms interval after jumping to
+  the source line of tag.Disable blinking by setting it to `[0, 0]` .
+>
+g:vista_top_level_blink                                  *g:vista_top_level_blink*
+
+  Type: |List|
+  Default: `[2, 100]`
+
   By default blinking cursor 2 times with 100ms interval after
-  jumping to the source line of tag.
+  jumping to top-level tag. Disable blinking by setting it to `[0, 0]` .
 >
 g:vista_icon_indent                                          *g:vista_icon_indent*
 

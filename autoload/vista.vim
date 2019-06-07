@@ -50,6 +50,14 @@ function! vista#Sort() abort
   endif
 endfunction
 
+function! vista#GenericCloseOverlay() abort
+  if has('*nvim_open_win')
+    call vista#floating#Close()
+  elseif has('*popup_create')
+    call vista#popup#Close()
+  endif
+endfunction
+
 " Used for running vista.vim on startup
 function! vista#RunForNearestMethodOrFunction() abort
   let [bufnr, winnr, fname, fpath] = [bufnr('%'), winnr(), expand('%'), expand('%:p')]
