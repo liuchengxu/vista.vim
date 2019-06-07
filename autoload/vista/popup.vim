@@ -34,12 +34,25 @@ function! s:OpenPopup(lnum, tag) abort
 
   let max_length = max(map(copy(lines), 'strlen(v:val)')) + 2
 
-  let pos_opts = {
-        \ 'pos': 'botleft',
-        \ 'line': 'cursor-2',
-        \ 'col': 'cursor-'.max_length,
-        \ 'moved': 'WORD',
-        \ }
+  if get(g:, 'vista_sidebar_position', 'vertical botright') =~# 'right'
+    let pos_opts = {
+          \ 'pos': 'botleft',
+          \ 'line': 'cursor-2',
+          \ 'col': 'cursor-'.max_length,
+          \ 'moved': 'WORD',
+          \ }
+  else
+    let winwidth = winwidth(0)
+    let cur_length = strlen(getline('.'))
+    let offset = min([cur_length + 4, winwidth])
+    let col = 'cursor+'.offset
+    let pos_opts = {
+          \ 'pos': 'botleft',
+          \ 'line': 'cursor-2',
+          \ 'col': col,
+          \ 'moved': 'WORD',
+          \ }
+  endif
 
   if !exists('s:popup_winid')
     let s:popup_winid = popup_create(lines, pos_opts)
