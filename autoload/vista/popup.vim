@@ -34,7 +34,7 @@ function! s:OpenPopup(lnum, tag) abort
 
   let max_length = max(map(copy(lines), 'strlen(v:val)')) + 2
 
-  if get(g:, 'vista_sidebar_position', 'vertical botright') =~ 'right'
+  if get(g:, 'vista_sidebar_position', 'vertical botright') =~# 'right'
     let pos_opts = {
           \ 'pos': 'botleft',
           \ 'line': 'cursor-2',
