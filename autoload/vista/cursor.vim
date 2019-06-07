@@ -219,37 +219,6 @@ function! s:ShowDetail() abort
   call s:ApplyHighlight(line('.'), v:false, tag)
 endfunction
 
-function! s:Jump() abort
-  let cur_line = split(getline('.'), ':')
-
-  " Skip if the current line or the target line is empty
-  if empty(cur_line)
-    return
-  endif
-
-  let lnum = cur_line[-1]
-  let line = getbufline(t:vista.source.bufnr, lnum)
-
-  if empty(line)
-    return
-  endif
-
-  let [_, start, _] = matchstrpos(line[0], get(s:, 'cur_tag', ''))
-
-  call vista#source#GotoWin()
-  " Move cursor to the column of tag located, otherwise the first column
-  call cursor(lnum, start > -1 ? start+1 : 1)
-  normal! zz
-
-  call call('vista#util#Blink', get(g:, 'vista_blink', [2, 100]))
-
-  call vista#popup#Close()
-
-  if get(g:, 'vista_close_on_jump', 0)
-    call vista#sidebar#Close()
-  endif
-endfunction
-
 function! s:Compare(s1, s2) abort
   return a:s1.lnum - a:s2.lnum
 endfunction
@@ -373,7 +342,7 @@ function! vista#cursor#FoldOrJump() abort
     return
   endif
 
-  call s:Jump()
+  call vista#jump#TagLine(get(s:, 'cur_tag', ''))
 endfunction
 
 " This happens when you are in the window of source file
