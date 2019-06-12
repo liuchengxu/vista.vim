@@ -331,9 +331,8 @@ function! vista#cursor#FoldOrJump() abort
     return
   endif
 
-  " Fold or unfold when meets scope line
-  " FIXME this only work for the kind renderer.
-  if getline('.') =~# ']$'
+  " Fold or unfold when meets the top level tag line
+  if indent('.') == 0
     if foldclosed('.') != -1
       normal! zo
     else
