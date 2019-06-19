@@ -82,6 +82,11 @@ function! vista#sidebar#Close() abort
       noautocmd execute winnr.'wincmd c'
     endif
 
+    " Jump back to the previous window if we are in the vista sidebar atm.
+    if winnr == winnr()
+      wincmd p
+    endif
+
     silent execute  t:vista.bufnr.'bwipe!'
     unlet t:vista.bufnr
   endif
@@ -130,6 +135,19 @@ endfunction
 
 function! vista#sidebar#IsVisible() abort
   return bufwinnr('__vista__') != -1
+endfunction
+
+function! vista#sidebar#ToggleFocus() abort
+  if !exists('t:vista') || t:vista.winnr() == -1
+    call vista#sidebar#Open()
+    return
+  endif
+  let winnr = t:vista.winnr()
+  if winnr != winnr()
+    execute winnr.'wincmd w'
+  else
+    execute t:vista.source.winnr().'wincmd w'
+  endif
 endfunction
 
 function! vista#sidebar#Toggle() abort

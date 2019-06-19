@@ -104,6 +104,10 @@ Vista                                                                      *Vist
 
   `:Vista toc`:   show table of contents of the markdown file.
 
+                                                                      *vista-focus*
+  `:Vista focus`: jump back and forth between the vista sidebar and the source
+                code window.
+
                                                                  *vista-executive*
 
   `:Vista coc`:     open vista window based on coc.nvim.

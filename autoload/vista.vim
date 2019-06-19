@@ -110,6 +110,8 @@ function! vista#(bang, ...) abort
       else
         return vista#error#For('Vista toc', 'markdown')
       endif
+    elseif a:1 ==# 'focus'
+      call vista#sidebar#ToggleFocus()
     elseif a:1 ==# 'show'
       if vista#sidebar#IsVisible()
         call vista#cursor#ShowTag()
