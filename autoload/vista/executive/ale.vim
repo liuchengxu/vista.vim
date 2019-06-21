@@ -46,11 +46,11 @@ function! s:AutoUpdate(fpath) abort
 endfunction
 
 function! s:Run() abort
+  let s:fetching = v:false
   call s:RunAsync()
   while s:fetching
     sleep 100m
   endwhile
-  let s:fetching = v:false
   return get(s:, 'data', {})
 endfunction
 
