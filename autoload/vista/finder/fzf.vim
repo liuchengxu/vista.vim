@@ -206,6 +206,10 @@ function! s:TryAlternatives(tried, fpath) abort
   " TODO when more executives added allow configuring this list
   let executives = get(g:, 'vista_finder_alternative_executives', g:vista#executives)
 
+  if empty(executives)
+    return v:false
+  endif
+
   let alternatives = filter(copy(executives), 'v:val != a:tried')
 
   for alternative in alternatives
