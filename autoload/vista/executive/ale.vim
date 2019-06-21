@@ -73,6 +73,7 @@ function! s:RunAsync() abort
 
   for linter in linters
     call ale#lsp_linter#SendRequest(bufnr, linter, message, Callback)
+    let s:fetching = v:true
   endfor
 endfunction
 
