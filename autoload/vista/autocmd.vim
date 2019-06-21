@@ -12,7 +12,7 @@ function! s:ClearOtherEvents(group) abort
   endfor
 endfunction
 
-function! s:GenericAutoUpdate(fpath) abort
+function! s:GenericAutoUpdate(fpath, trigger) abort
   if vista#ShouldSkip()
     return
   endif
@@ -21,6 +21,7 @@ function! s:GenericAutoUpdate(fpath) abort
 
   call vista#source#Update(bufnr, winnr, fname, a:fpath)
 
+  let t:vista.update_trigger = a:trigger
   call s:ApplyAutoUpdate(a:fpath)
 endfunction
 
@@ -57,8 +58,12 @@ function! vista#autocmd#Init(group_name, AUF) abort
     "
     " CursorHold and CursorHoldI event have been removed in order to
     " highlight the nearest tag automatically.
-    autocmd BufEnter,BufWritePost,BufReadPost, *
-          \ call s:GenericAutoUpdate(fnamemodify(expand('<afile>'), ':p'))
+    autocmd BufEnter,BufReadPost, *
+          \ call s:GenericAutoUpdate(
+                \ fnamemodify(expand('<afile>'), ':p'), 'BufEnterOrRead')
+    autocmd BufWritePost, *
+          \ call s:GenericAutoUpdate(
+                \ fnamemodify(expand('<afile>'), ':p'), 'BufWrite')
   augroup END
 endfunction
 

@@ -55,9 +55,14 @@ endfunction
 
 " Notify the error message when required.
 function! vista#error#Notify(msg) abort
-  if !get(t:vista, 'silent', v:true)
-    call vista#error#(a:msg)
-    let t:vista.silent = v:true
+  if vista#sidebar#IsVisible()
+    if get(t:vista, 'update_trigger', 'Command') != 'BufWrite'
+      call vista#error#(a:msg)
+    endif
+  else
+    if get(t:vista, 'update_trigger', 'Command') == 'Command'
+      call vista#error#(a:msg)
+    endif
   endif
 endfunction
 

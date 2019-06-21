@@ -72,6 +72,10 @@ endfunction
 
 " Main entrance to interact with vista.vim
 function! vista#(bang, ...) abort
+  if exists('t:vista')
+    let t:vista.update_trigger = 'Command'
+  endif
+
   if a:bang
     if a:0 == 0
       call vista#sidebar#Close()

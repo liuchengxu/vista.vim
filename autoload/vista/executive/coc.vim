@@ -121,6 +121,5 @@ endfunction
 " outside, where sets the provider and auto update events.
 function! vista#executive#coc#Execute(bang, should_display, ...) abort
   call vista#OnExecute(s:provider, function('s:AutoUpdate'))
-  let t:vista.silent = v:false
   return s:Dispatch('s:Execute', a:bang, a:should_display)
 endfunction

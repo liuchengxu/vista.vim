@@ -78,7 +78,6 @@ endfunction
 function! vista#executive#lcn#Execute(bang, should_display, ...) abort
   call vista#OnExecute(s:provider, function('s:AutoUpdate'))
 
-  let t:vista.silent = v:false
   let s:should_display = a:should_display
   if a:bang
     return s:Run()
