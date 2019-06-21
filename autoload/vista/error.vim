@@ -53,7 +53,15 @@ function! vista#error#InvalidOption(opt, ...) abort
   call s:Echon('Underlined', a:0 > 0 ? string(a:1) : '')
 endfunction
 
+" Notify the error message when required.
+function! vista#error#Notify(msg) abort
+  if !get(t:vista, 'silent', v:true)
+    call vista#error#(a:msg)
+    let t:vista.silent = v:true
+  endif
+endfunction
+
 function! vista#error#(msg) abort
   call s:Echo('ErrorMsg', '[vista.vim]')
-  call s:Echon('Normal', a:msg)
+  call s:Echon('Normal', ' '.a:msg)
 endfunction

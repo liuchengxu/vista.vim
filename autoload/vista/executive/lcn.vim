@@ -11,7 +11,7 @@ let s:fetching = v:true
 
 function! s:Handler(output) abort
   if !has_key(a:output, 'result')
-    call vista#error#('No result via LanguageClient#textDocument_documentSymbol()')
+    call vista#error#Notify('No result via LanguageClient#textDocument_documentSymbol()')
     let s:fetching = v:false
     return
   endif
@@ -78,6 +78,7 @@ endfunction
 function! vista#executive#lcn#Execute(bang, should_display, ...) abort
   call vista#OnExecute(s:provider, function('s:AutoUpdate'))
 
+  let t:vista.silent = v:false
   let s:should_display = a:should_display
   if a:bang
     return s:Run()
