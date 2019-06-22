@@ -78,6 +78,7 @@ function! vista#(bang, ...) abort
       return
     elseif a:0 == 1
       if a:1 ==# '!'
+        let t:vista.lnum = line('.')
         call vista#sidebar#Toggle()
         return
       else
@@ -99,6 +100,7 @@ function! vista#(bang, ...) abort
     if index(g:vista#executives, a:1) > -1
       call vista#source#Update(bufnr, winnr, fname, fpath)
       call vista#executive#{a:1}#Execute(v:false, v:true)
+      let t:vista.lnum = line('.')
     elseif a:1 ==# 'finder'
       call vista#finder#fzf#Run('coc')
     elseif a:1 ==# 'finder!'
