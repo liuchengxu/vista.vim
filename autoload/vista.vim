@@ -72,6 +72,11 @@ endfunction
 
 " Main entrance to interact with vista.vim
 function! vista#(bang, ...) abort
+
+  let [bufnr, winnr, fname, fpath] = [bufnr('%'), winnr(), expand('%'), expand('%:p')]
+
+  call vista#source#Update(bufnr, winnr, fname, fpath)
+
   if a:bang
     if a:0 == 0
       call vista#sidebar#Close()
@@ -94,11 +99,8 @@ function! vista#(bang, ...) abort
     return
   endif
 
-  let [bufnr, winnr, fname, fpath] = [bufnr('%'), winnr(), expand('%'), expand('%:p')]
-
   if a:0 == 1
     if index(g:vista#executives, a:1) > -1
-      call vista#source#Update(bufnr, winnr, fname, fpath)
       call vista#executive#{a:1}#Execute(v:false, v:true)
       let t:vista.lnum = line('.')
     elseif a:1 ==# 'finder'
@@ -107,7 +109,6 @@ function! vista#(bang, ...) abort
       call vista#finder#fzf#ProjectRun()
     elseif a:1 ==# 'toc'
       if &filetype ==# 'markdown'
-        call vista#source#Update(bufnr, winnr, fname, fpath)
         call vista#extension#markdown#Execute(v:false, v:true)
       else
         return vista#error#For('Vista toc', 'markdown')
