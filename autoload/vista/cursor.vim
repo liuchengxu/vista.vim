@@ -354,7 +354,7 @@ function! vista#cursor#FindNearestMethodOrFunction() abort
 
   call s:StopFindTimer()
 
-  if empty(t:vista.functions)
+  if empty(t:vista.functions) || get(g:, 'vista_disable_find_nearest_method', 0)
     call setbufvar(t:vista.source.bufnr, 'vista_nearest_method_or_function', '')
     return
   endif

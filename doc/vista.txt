@@ -327,6 +327,14 @@ g:vista_disable_statusline                            *g:vista_disable_statuslin
   if you use other statusline plugins at the same time. Hence it's disabled
   by default if you have installed airline or lightline.
 
+g:vista_disable_find_nearest_method          *g:vista_disable_find_nearest_method*
+
+  Type: |Number|
+  Default: `0`
+
+  When set to `1`, the function of finding the nearest method or function will
+  be disabled.
+
 g:vista_highlight_whole_line                        *g:vista_highlight_whole_line*
 
   Type: |Number|
