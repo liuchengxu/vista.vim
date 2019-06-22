@@ -43,7 +43,8 @@ understands the semantics instead of the regex only.
 FEATURES                                                          *vista-features*
 
 [x] View tags and LSP symbols in a sidebar.
-    [x] ctags (https://github.com/universal-ctags/ctags)
+    [x] universal-ctags (https://github.com/universal-ctags/ctags)
+    [x] ale (https://github.com/w0rp/ale)
     [x] vim-lsp (https://github.com/prabirshrestha/vim-lsp)
     [x] coc.nvim (https://github.com/neoclide/coc.nvim)
     [x] LanguageClient-neovim (https://github.com/autozimu/LanguageClient-neovim)
@@ -55,7 +56,6 @@ FEATURES                                                          *vista-feature
 [x] Update asynchonously in the background when `+job` avaliable.
 [x] Find the nearest method or function to the cursor, which could be
     integrated into the statusline.
-[ ] Supports all of the languages that ctags does.
 [x] Highlight current tag/symbol.
 [x] Show the visibility (public/private) of tags.
 [x] Tree viewer for hierarchy data, only works for ctags for now.
@@ -111,6 +111,8 @@ Vista                                                                      *Vist
                                                                  *vista-executive*
 
   `:Vista coc`:     open vista window based on coc.nvim.
+
+  `:Vista ale`:     open vista window based on ale.
 
   `:Vista lcn`:     open vista window based on LanguageClient-neovim.
 
