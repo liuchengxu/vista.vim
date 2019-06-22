@@ -56,7 +56,7 @@ endfunction
 
 function! s:RunAsync() abort
   let method = 'textDocument/documentSymbol'
-  let bufnr = bufnr('')
+  let bufnr = t:vista.source.bufnr
   let params = {
     \   'textDocument': {
     \       'uri': ale#path#ToURI(expand('#' . bufnr . ':p')),
