@@ -44,6 +44,7 @@ In addition to being a tags viewer, vista.vim can also be a symbol navigator sim
 
 - [x] View tags and LSP symbols in a sidebar.
     - [x] [universal-ctags](https://github.com/universal-ctags/ctags)
+    - [x] [ale](https://github.com/w0rp/ale)
     - [x] [vim-lsp](https://github.com/prabirshrestha/vim-lsp)
     - [x] [coc.nvim](https://github.com/neoclide/coc.nvim)
     - [x] [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
