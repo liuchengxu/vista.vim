@@ -82,11 +82,15 @@ function! vista#executive#ale#Cache() abort
 endfunction
 
 function! vista#executive#ale#Run(fpath) abort
-  return s:Run()
+  if exists('g:loaded_ale_dont_use_this_in_other_plugins_please')
+    return s:Run()
+  endif
 endfunction
 
 function! vista#executive#ale#RunAsync() abort
-  call s:RunAsync()
+  if exists('g:loaded_ale_dont_use_this_in_other_plugins_please')
+    call s:RunAsync()
+  endif
 endfunction
 
 function! vista#executive#ale#Execute(bang, should_display, ...) abort

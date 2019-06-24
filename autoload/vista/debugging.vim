@@ -20,6 +20,10 @@ function! s:GetAvaliableExecutives() abort
     call add(avaliable, 'vim_lsp')
   endif
 
+  if exists('*ale#lsp_linter#SendRequest')
+    call add(avaliable, 'ale')
+  endif
+
   return avaliable
 endfunction
 
