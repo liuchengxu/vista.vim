@@ -245,7 +245,9 @@ g:vista_default_executive                              *g:vista_default_executiv
   Type: |String|
   Default: `ctags`
 
-  Executive used when opening vista sidebar without specifying it.
+  Executive used when opening vista sidebar without specifying it. This also
+  applys to the vista finder.
+
   See all the avaliable executives via `:echo g:vista#executives` .
 
 g:vista_executive_for                                      *g:vista_executive_for*

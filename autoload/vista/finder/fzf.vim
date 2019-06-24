@@ -245,7 +245,7 @@ function! vista#finder#fzf#Run(...) abort
     return
   endif
 
-  let executive = a:0 > 0 ? a:1 : 'ctags'
+  let executive = a:0 > 0 ? a:1 : get(g:, 'vista_default_executive', 'ctags')
 
   if index(g:vista#executives, executive) == -1
     call vista#error#InvalidExecutive(executive)
