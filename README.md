@@ -217,20 +217,28 @@ The JSON support for ctags is avaliable if u-ctags is linked to libjansson when 
 - macOS
 
     ```bash
-    brew install --with-jansson universal-ctags/universal-ctags/universal-ctags
+    $ brew install --with-jansson universal-ctags/universal-ctags/universal-ctags
     ```
 
 - Ubuntu
 
     ```bash
     # install libjansson first
-    sudo apt-get install libjansson-dev
+    $ sudo apt-get install libjansson-dev
 
-    # then compile and install ctags
+    # then compile and install universal-ctags.
+    #
+    # NOTE: Don't use `sudo apt install ctags`, which will install exuberant-ctags and it's not guaranteed to work with vista.vim.
+    #
+    $ git clone https://github.com/universal-ctags/ctags.git --depth=1
+    $ cd ctags
+    $ ./autogen.sh
+    $ ./configure
+    $ make
+    $ sudo make install
     ```
 
     Refer to [Compiling and Installing Jansson](https://jansson.readthedocs.io/en/latest/gettingstarted.html#compiling-and-installing-jansson) as well.
-
 
 ## Contributing
 
