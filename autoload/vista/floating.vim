@@ -129,6 +129,7 @@ function! s:Display(msg) abort
         \ nonumber
         \ norelativenumber
         \ signcolumn=no
+        \ nofoldenable
 
   let &l:filetype = getbufvar(t:vista.source.bufnr, '&ft')
 

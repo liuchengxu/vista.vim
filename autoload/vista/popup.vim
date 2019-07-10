@@ -59,7 +59,7 @@ function! s:OpenPopup(lnum, tag) abort
     let s:popup_bufnr = winbufnr(s:popup_winid)
 
     let filetype = getbufvar(t:vista.source.bufnr, '&ft')
-    call win_execute(s:popup_winid, 'setlocal filetype='.filetype)
+    call win_execute(s:popup_winid, 'setlocal filetype='.filetype.' nofoldenable')
   else
     call deletebufline(s:popup_bufnr, 1, 100000000000)
     call setbufline(s:popup_bufnr, 1, lines)
