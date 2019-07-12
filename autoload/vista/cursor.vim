@@ -366,6 +366,10 @@ function! vista#cursor#FindNearestMethodOrFunction() abort
         \ )
 endfunction
 
+function! vista#cursor#NearestSymbol() abort
+  return vista#util#BinarySearch(t:vista.raw, line('.'), 'line', 'name')
+endfunction
+
 function! vista#cursor#ShowDetail(_timer) abort
   let cur_line = getline('.')
   if empty(cur_line)
