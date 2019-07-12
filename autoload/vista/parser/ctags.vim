@@ -109,9 +109,17 @@ function! vista#parser#ctags#FromExtendedRaw(line, container) abort
 
   let line.name = items[0]
   let line.tagfile = items[1]
-  let line.tagaddress = items[2]
 
-  let tagfields = s:ParseTagfield(items[3:])
+  " tagaddress itself possibly contains <Tab>, so we have to restore the
+  " original content and then split by `;"` to get the tagaddress and other
+  " fields.
+  let rejoined = join(items[2:], "\t")
+  let resplitted = split(rejoined, ';"')
+
+  let line.tagaddress = resplitted[0]
+
+  let fields = split(resplitted[1], '\t')
+  let tagfields = s:ParseTagfield(fields)
 
   call extend(line, tagfields)
 
