@@ -184,10 +184,23 @@ endfunction
 " slow down Tagbar for files that sit on slow network drives.
 " This idea comes from tagbar.
 function! s:IntoTemp(...) abort
-  let tmp = tempname()
   let ext = t:vista.source.extension()
-  if !empty(ext)
-    let tmp = join([tmp, ext], '.')
+  " Don't use tempname() if possible since it would cause the changing of the anonymous tag name.
+  "
+  " Ref: https://github.com/liuchengxu/vista.vim/issues/122#issuecomment-511115932
+  if exists('$TMPDIR')
+    if empty($TMPDIR)
+      let $TMPDIR = '/tmp'
+    endif
+    let tmp = sha256(fnamemodify(bufname(t:vista.source.bufnr), ":p"))
+    if !empty(ext)
+      let tmp = $TMPDIR.join([tmp, ext], '.')
+    endif
+  else
+    let tmp = tempname()
+    if !empty(ext)
+      let tmp = join([tmp, ext], '.')
+    endif
   endif
 
   if empty(a:1)
