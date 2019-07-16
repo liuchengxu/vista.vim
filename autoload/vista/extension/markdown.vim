@@ -25,7 +25,7 @@ function! s:Execute() abort
       let is_fenced_block = !is_fenced_block
     endif
 
-    let is_header =s:IsHeader(l:line, l:next_line)
+    let is_header = s:IsHeader(l:line, l:next_line)
 
     if is_header && !is_fenced_block
         let item = {'lnum': idx+1, 'text': l:line}

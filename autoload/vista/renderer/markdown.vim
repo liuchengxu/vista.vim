@@ -1,4 +1,4 @@
-let s:default_icon = ['╰─▸ ', '├─▸ ']
+let s:default_icon = get(g:, 'vista_icon_indent', ['╰─▸ ', '├─▸ '])
 
 function! vista#renderer#markdown#Render(data) abort
   " {'lnum': 1, 'level': '4', 'text': '# Vista.vim'}

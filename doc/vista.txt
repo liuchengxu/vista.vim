@@ -354,6 +354,13 @@ g:vista#renderer#enable_icon                        *g:vista#renderer#enable_ico
 
   Add pretty symbols for the kind of tags or LSP symbols.
 
+g:vista_enable_markdown_extension              *g:vista_enable_markdown_extension*
+
+  Type: |Number|
+  Default: `1`
+
+  Use markdown extension instead of the ctags executive.
+
 g:vista#renderer#icons                                    *g:vista#renderer#icons*
 
   Type: |Dict|

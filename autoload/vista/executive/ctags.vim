@@ -135,15 +135,17 @@ function! s:ExtractLinewise(raw_data) abort
 endfunction
 
 function! s:AutoUpdate(fpath) abort
-  if t:vista.source.filetype() ==# 'markdown'
-    call vista#extension#markdown#AutoUpdate(a:fpath)
+  if t:vista.source.filetype() ==# 'markdown' && get(g:, 'vista_enable'.&ft.'_extension', 1)
+    call vista#extension#{&ft}#AutoUpdate(a:fpath)
   else
+    call vista#OnExecute(s:provider, function('s:AutoUpdate'))
     let s:reload_only = v:true
     call s:ApplyExecute(v:false, a:fpath)
   endif
 endfunction
 
 function! vista#executive#ctags#AutoUpdate(fpath) abort
+  call vista#OnExecute(s:provider, function('s:AutoUpdate'))
   call s:AutoUpdate(a:fpath)
 endfunction
 
