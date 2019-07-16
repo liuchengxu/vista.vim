@@ -192,7 +192,7 @@ function! s:IntoTemp(...) abort
   " Ref: https://github.com/liuchengxu/vista.vim/issues/122#issuecomment-511115932
   if exists('$TMPDIR')
     if empty($TMPDIR)
-      let $TMPDIR = '/tmp'
+      let $TMPDIR = '/tmp/'
     endif
     let tmp = sha256(fnamemodify(bufname(t:vista.source.bufnr), ":p"))
     if !empty(ext)
