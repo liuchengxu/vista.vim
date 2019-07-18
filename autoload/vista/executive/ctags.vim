@@ -199,7 +199,7 @@ function! s:IntoTemp(...) abort
       if tmpdir !~# '/$'
         let tmpdir .= '/'
       endif
-      let tmp = sha256(fnamemodify(bufname(t:vista.source.bufnr), ":p"))
+      let tmp = sha256(fnamemodify(bufname(t:vista.source.bufnr), ':p'))
       if !empty(ext)
         let tmp = tmpdir.join([tmp, ext], '.')
       endif
