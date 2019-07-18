@@ -190,20 +190,26 @@ function! s:IntoTemp(...) abort
   " Don't use tempname() if possible since it would cause the changing of the anonymous tag name.
   "
   " Ref: https://github.com/liuchengxu/vista.vim/issues/122#issuecomment-511115932
-  if exists('$TMPDIR')
-    if empty($TMPDIR)
-      let $TMPDIR = '/tmp/'
+  try
+    if exists('$TMPDIR')
+      let tmpdir = $TMPDIR
+      if empty(tmpdir)
+        let tmpdir = '/tmp/'
+      endif
+      if tmpdir !~# '/$'
+        let tmpdir .= '/'
+      endif
+      let tmp = sha256(fnamemodify(bufname(t:vista.source.bufnr), ":p"))
+      if !empty(ext)
+        let tmp = tmpdir.join([tmp, ext], '.')
+      endif
     endif
-    let tmp = sha256(fnamemodify(bufname(t:vista.source.bufnr), ":p"))
-    if !empty(ext)
-      let tmp = $TMPDIR.join([tmp, ext], '.')
-    endif
-  else
+  catch
     let tmp = tempname()
     if !empty(ext)
       let tmp = join([tmp, ext], '.')
     endif
-  endif
+  endtry
 
   if empty(a:1)
     let lines = t:vista.source.lines()
