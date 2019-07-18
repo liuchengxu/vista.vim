@@ -205,11 +205,14 @@ function! s:IntoTemp(...) abort
       endif
     endif
   catch
+  endtry
+
+  if !exists('l:tmp')
     let tmp = tempname()
     if !empty(ext)
       let tmp = join([tmp, ext], '.')
     endif
-  endtry
+  endif
 
   if empty(a:1)
     let lines = t:vista.source.lines()
