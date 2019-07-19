@@ -63,8 +63,6 @@ Notes:
 
 - The feature of finder in vista.vim `:Vista finder [EXECUTIVE]` is a bit like `:BTags` or `:Tags` in [fzf.vim](https://github.com/junegunn/fzf.vim), `:CocList` in [coc.nvim](https://github.com/neoclide/coc.nvim), `:LeaderfBufTag` in [leaderf.vim](https://github.com/Yggdroot/LeaderF), etc. You can choose whatever you like.
 
-- I personally don't use all the features I have listed. Hence some of them may be on the TODOs forever :(.
-
 ## Requirement
 
 I don't know the mimimal supported version. But if you only care about the ctags related feature, vim 7.4.1154+ should be enough.
