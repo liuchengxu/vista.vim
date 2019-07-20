@@ -231,6 +231,9 @@ function! s:IntoTemp(...) abort
     else
       if s:is_mac || s:is_linux
         let tmpdir = '/tmp/vista.vim_ctags_tmp/'
+        if !isdirectory(tmpdir)
+          call mkdir(tmpdir)
+        endif
         let tempname = s:TempnameBasedOnSourceBufname()
         let tmp = tmpdir.tempname
       endif
