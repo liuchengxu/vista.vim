@@ -50,7 +50,7 @@ In addition to being a tags viewer, vista.vim can also be a symbol navigator sim
     - [x] [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
 - [x] Finder for tags and LSP symbols.
     - [x] [fzf](https://github.com/junegunn/fzf)
-- [x] Nested display for ctags.
+- [x] Nested display for ctags, list display for LSP symbols.
 - [x] Highlight the nearby tag in the vista sidebar.
 - [x] Builtin support for displaying markdown's TOC.
 - [x] Update automatically when switching between buffers.
@@ -62,6 +62,7 @@ In addition to being a tags viewer, vista.vim can also be a symbol navigator sim
 Notes:
 
 - The feature of finder in vista.vim `:Vista finder [EXECUTIVE]` is a bit like `:BTags` or `:Tags` in [fzf.vim](https://github.com/junegunn/fzf.vim), `:CocList` in [coc.nvim](https://github.com/neoclide/coc.nvim), `:LeaderfBufTag` in [leaderf.vim](https://github.com/Yggdroot/LeaderF), etc. You can choose whatever you like.
+- Due to limitations of the Language Server Protocol, a tree view of nested tags is currently only available for the ctags executive. Other executives will have symbols grouped by modules, classes, functions and variables.
 
 ## Requirement
 
