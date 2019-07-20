@@ -11,6 +11,9 @@ let s:ctags = get(g:, 'vista_ctags_executable', 'ctags')
 let s:support_json_format =
       \ len(filter(split(system(s:ctags.' --list-features'), '\n'), 'v:val =~# ''^json''')) > 0
 
+let s:is_mac = has('macunix')
+let s:is_linux = has('unix') && !has('macunix') && !has('win32unix')
+
 " Expose this variable for debugging
 let g:vista#executive#ctags#support_json_format = s:support_json_format
 
@@ -181,27 +184,45 @@ function! s:ApplyRunAsync(cmd) abort
   return jobid > 0 ? jobid : 0
 endfunction
 
+function! s:TempnameBasedOnSourceBufname() abort
+  let tempname = sha256(fnamemodify(bufname(t:vista.source.bufnr), ':p'))
+  let ext = t:vista.source.extension()
+  if !empty(ext)
+    let tempname = join([tempname, ext], '.')
+  endif
+  return tempname
+endfunction
+
+function! s:Tempdir() abort
+  let tmpdir = $TMPDIR
+  if empty(tmpdir)
+    let tmpdir = '/tmp/'
+  else
+    if tmpdir !~# '/$'
+      let tmpdir .= '/'
+    endif
+  endif
+  return tmpdir
+endfunction
+
 " Use a temporary files for ctags processing instead of the original one.
 " This allows using Tagbar for files accessed with netrw, and also doesn't
 " slow down Tagbar for files that sit on slow network drives.
 " This idea comes from tagbar.
 function! s:IntoTemp(...) abort
-  let ext = t:vista.source.extension()
   " Don't use tempname() if possible since it would cause the changing of the anonymous tag name.
   "
   " Ref: https://github.com/liuchengxu/vista.vim/issues/122#issuecomment-511115932
   try
     if exists('$TMPDIR')
-      let tmpdir = $TMPDIR
-      if empty(tmpdir)
-        let tmpdir = '/tmp/'
-      endif
-      if tmpdir !~# '/$'
-        let tmpdir .= '/'
-      endif
-      let tmp = sha256(fnamemodify(bufname(t:vista.source.bufnr), ':p'))
-      if !empty(ext)
-        let tmp = tmpdir.join([tmp, ext], '.')
+      let tmpdir = s:Tempdir()
+      let tempname = s:TempnameBasedOnSourceBufname()
+      let tmp = tmpdir.tempname
+    else
+      if s:is_mac || s:is_linux
+        let tmpdir = '/tmp/vista.vim_ctags_tmp/'
+        let tempname = s:TempnameBasedOnSourceBufname()
+        let tmp = tmpdir.tempname
       endif
     endif
   catch
