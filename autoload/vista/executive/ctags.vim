@@ -184,13 +184,23 @@ function! s:ApplyRunAsync(cmd) abort
   return jobid > 0 ? jobid : 0
 endfunction
 
-function! s:TempnameBasedOnSourceBufname() abort
-  let tempname = sha256(fnamemodify(bufname(t:vista.source.bufnr), ':p'))
+function! s:TryAppendExtension(tempname) abort
   let ext = t:vista.source.extension()
   if !empty(ext)
-    let tempname = join([tempname, ext], '.')
+    return join([a:tempname, ext], '.')
+  else
+    return a:tempname
   endif
-  return tempname
+endfunction
+
+function! s:BuiltinTempname() abort
+  let tempname = tempname()
+  return s:TryAppendExtension(tempname)
+endfunction
+
+function! s:TempnameBasedOnSourceBufname() abort
+  let tempname = sha256(fnamemodify(bufname(t:vista.source.bufnr), ':p'))
+  return s:TryAppendExtension(tempname)
 endfunction
 
 function! s:Tempdir() abort
@@ -229,10 +239,7 @@ function! s:IntoTemp(...) abort
   endtry
 
   if !exists('l:tmp')
-    let tmp = tempname()
-    if !empty(ext)
-      let tmp = join([tmp, ext], '.')
-    endif
+    let tmp = s:BuiltinTempname()
   endif
 
   if empty(a:1)
