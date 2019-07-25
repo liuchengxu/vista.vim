@@ -245,16 +245,21 @@ function! s:IntoTemp(...) abort
     let tmp = s:BuiltinTempname()
   endif
 
-  if empty(a:1)
+  if get(t:vista, 'on_text_changed', 0)
     let lines = t:vista.source.lines()
+    let t:vista.on_text_changed = 0
   else
-    try
-      let lines = readfile(a:1)
-    " Vim cannot read a temporary file, this may happen when you open vim with
-    " a file which does not exist yet, e.g., 'vim does_exist_yet.txt'
-    catch /E484/
-      return
-    endtry
+    if empty(a:1)
+      let lines = t:vista.source.lines()
+    else
+      try
+        let lines = readfile(a:1)
+      " Vim cannot read a temporary file, this may happen when you open vim with
+      " a file which does not exist yet, e.g., 'vim does_exist_yet.txt'
+      catch /E484/
+        return
+      endtry
+    endif
   endif
 
   if writefile(lines, tmp) == 0

@@ -3,6 +3,8 @@
 " vim: ts=2 sw=2 sts=2 et
 
 let s:registered = []
+let s:update_timer = -1
+let s:update_delay = get(g:, 'vista_update_on_text_changed_delay', 500)
 
 function! s:ClearOtherEvents(group) abort
   for augroup in s:registered
@@ -22,6 +24,19 @@ function! s:GenericAutoUpdate(fpath) abort
   call vista#source#Update(bufnr, winnr, fname, a:fpath)
 
   call s:ApplyAutoUpdate(a:fpath)
+endfunction
+
+function! s:AutoUpdateWithDelay(fpath) abort
+  if s:update_timer != -1
+    call timer_stop(s:update_timer)
+    let s:update_timer = -1
+  endif
+
+  let t:vista.on_text_changed = 1
+  let s:update_timer = timer_start(
+        \ s:update_delay,
+        \ { -> s:GenericAutoUpdate(a:fpath)}
+        \ )
 endfunction
 
 " Every time we call :Vista foo, we should clear other autocmd events and only
@@ -59,6 +74,10 @@ function! vista#autocmd#Init(group_name, AUF) abort
     " highlight the nearest tag automatically.
     autocmd BufEnter,BufWritePost,BufReadPost, *
           \ call s:GenericAutoUpdate(fnamemodify(expand('<afile>'), ':p'))
+
+    if get(g:, 'vista_update_on_text_changed', 0)
+      autocmd TextChanged,TextChangedI * call s:AutoUpdateWithDelay(fnamemodify(expand('<afile>'), ':p'))
+    endif
   augroup END
 endfunction
 

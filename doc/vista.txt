@@ -200,6 +200,20 @@ g:vista_echo_cursor_strategy                        *g:vista_echo_cursor_strateg
   `both`         - both `echo` and `floating_win` if it's avaliable otherwise
                  `scroll` will be used.
 
+g:vista_update_on_text_changed                    *g:vista_update_on_text_changed*
+
+  Type: |Number|
+  Default: `0`
+
+  Update the vista on `TextChanged` and `TextChangedI`.
+
+g:vista_update_on_text_changed_delay         *g:vista_update_on_text_changed_delay*
+
+  Type: |Number|
+  Default: `500`
+
+  Time delay for updating the vista on `TextChanged` and `TextChangedI`.
+
 g:vista_close_on_jump                                      *g:vista_close_on_jump*
 
   Type: |Number|
