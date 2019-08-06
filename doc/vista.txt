@@ -274,12 +274,16 @@ g:vista_executive_for                                      *g:vista_executive_fo
   filetypes you ensured the LSP functionality is good. The rationality is the
   LSP server needs to be installed explicitly and people normally only install
   a few frequently used ones, but ctags supports much more languages by default.
+
+  You can also set `toc` for markdown to use the builtin markdown extension in
+  vista.vim.
   >
   let g:vista_default_executive = 'ctags'
 
   let g:vista_executive_for = {
       \ 'cpp': 'vim_lsp',
       \ 'php': 'vim_lsp',
+      \ 'markdown': 'toc',
       \ }
 
 g:vista_{&filetype}_executive                      *g:vista_{&filetype}_executive*

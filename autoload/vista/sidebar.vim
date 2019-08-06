@@ -130,7 +130,12 @@ function! vista#sidebar#Open() abort
     let executive = get(g:, 'vista_default_executive', 'ctags')
   endif
 
-  call vista#executive#{executive}#Execute(v:false, v:true, v:false)
+  " Support the builtin markdown toc extension as an executive
+  if &filetype ==# 'markdown' && executive ==# 'toc'
+    call vista#extension#markdown#Execute(v:false, v:true)
+  else
+    call vista#executive#{executive}#Execute(v:false, v:true, v:false)
+  endif
 endfunction
 
 function! vista#sidebar#IsVisible() abort
