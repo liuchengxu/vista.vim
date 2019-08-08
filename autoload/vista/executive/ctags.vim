@@ -138,7 +138,8 @@ function! s:ExtractLinewise(raw_data) abort
 endfunction
 
 function! s:AutoUpdate(fpath) abort
-  if t:vista.source.filetype() ==# 'markdown' && get(g:, 'vista_enable'.&ft.'_extension', 1)
+  if t:vista.source.filetype() ==# 'markdown'
+        \ && get(g:, 'vista_enable'.&ft.'_extension', 1)
     call vista#extension#{&ft}#AutoUpdate(a:fpath)
   else
     call vista#OnExecute(s:provider, function('s:AutoUpdate'))
@@ -274,6 +275,8 @@ function! s:ApplyExecute(bang, fpath) abort
   if empty(file)
     return
   endif
+
+  let s:fpath = a:fpath
 
   let cmd = s:BuildCmd(file)
 
