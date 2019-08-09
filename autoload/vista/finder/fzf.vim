@@ -40,11 +40,13 @@ function! s:aligner.project_ctags() abort
   let [max_len_scope, max_len_lnum_and_text, max_len_relpath] = s:cols_layout.project_ctags()
 
   for [kind, v] in items(s:data)
+    let icon = vista#renderer#IconFor(kind)
     for item in v
       " FIXME handle ctags -R better
       let lnum_and_text = printf('%s:%s', item.lnum, item.text)
       let relpath = item.tagfile
-      let row = printf("%s%s\t[%s]%s\t%s%s\t%s",
+      let row = printf("%s %s%s  [%s]%s  %s%s  %s",
+            \ icon,
             \ lnum_and_text, repeat(' ', max_len_lnum_and_text- strwidth(lnum_and_text)),
             \ kind, repeat(' ', max_len_scope - strwidth(kind)),
             \ relpath, repeat(' ', max_len_relpath - strwidth(relpath)),
@@ -84,10 +86,12 @@ function! s:AlignSource() abort
   let [max_len_scope, max_len_lnum_and_text] = s:FindMaxLen()
 
   for [kind, v] in items(s:data)
+    let icon = vista#renderer#IconFor(kind)
     for item in v
       let line = t:vista.source.line(item.lnum)
       let lnum_and_text = printf('%s:%s', item.lnum, item.text)
-      let row = printf("%s%s\t[%s]%s\t%s",
+      let row = printf("%s %s%s  [%s]%s  %s",
+            \ icon,
             \ lnum_and_text, repeat(' ', max_len_lnum_and_text- strwidth(lnum_and_text)),
             \ kind, repeat(' ', max_len_scope - strwidth(kind)),
             \ line)
@@ -179,12 +183,16 @@ function! s:ProjectRun(...) abort
 endfunction
 
 function! s:Highlight() abort
-  syntax match FZFVistaNumber /^\s*\zs\d*:\ze\w/
-  syntax match FZFVistaTag    /^[^\[]*\(\[\)\@=/ contains=FZFVistaNumber
+  let icons = join(values(g:vista#renderer#icons), '\|')
+  execute 'syntax match FZFVistaIcon' '/'.icons.'/' 'contained'
+
+  syntax match FZFVistaNumber /\s*\zs\d*:\ze\w/ contains=FZFVistaIcon
+  syntax match FZFVistaTag    /^[^\[]*\(\[\)\@=/ contains=FZFVistaNumber,FZFVistaIcon
   syntax match FZFVistaScope  /^[^]]*]/ contains=FZFVistaTag,FZFVistaBracket
   syntax match FZFVista /^[^│┌└]*/ contains=FZFVistaBracket,FZFVistaNumber,FZFVistaTag,FZFVistaScope
   syntax match FZFVistaBracket /\[\|\]/ contained
 
+  hi default link FZFVistaIcon     Float
   hi default link FZFVistaBracket  SpecialKey
   hi default link FZFVistaNumber   Number
   hi default link FZFVistaTag      Tag
