@@ -58,7 +58,7 @@ endfunction
 
 function! vista#renderer#Decorate(kind) abort
   if g:vista#renderer#enable_icon
-    return vista#renderer#IconFor(kind).'  '.a:kind
+    return vista#renderer#IconFor(a:kind).'  '.a:kind
   else
     return a:kind
   endif
