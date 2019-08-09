@@ -135,7 +135,7 @@ function! s:ApplyRun(opts, Hi) abort
   "
   "  &modifiable is to avoid error in MacVim - E948: Job still running (add ! to end the job)
   if !has('nvim') && &modifiable
-    edit
+    edit!
   endif
 endfunction
 
