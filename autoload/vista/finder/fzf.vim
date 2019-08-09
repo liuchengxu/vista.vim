@@ -45,7 +45,7 @@ function! s:aligner.project_ctags() abort
       " FIXME handle ctags -R better
       let lnum_and_text = printf('%s:%s', item.lnum, item.text)
       let relpath = item.tagfile
-      let row = printf("%s %s%s  [%s]%s  %s%s  %s",
+      let row = printf('%s %s%s  [%s]%s  %s%s  %s',
             \ icon,
             \ lnum_and_text, repeat(' ', max_len_lnum_and_text- strwidth(lnum_and_text)),
             \ kind, repeat(' ', max_len_scope - strwidth(kind)),
@@ -90,7 +90,7 @@ function! s:AlignSource() abort
     for item in v
       let line = t:vista.source.line(item.lnum)
       let lnum_and_text = printf('%s:%s', item.lnum, item.text)
-      let row = printf("%s %s%s  [%s]%s  %s",
+      let row = printf('%s %s%s  [%s]%s  %s',
             \ icon,
             \ lnum_and_text, repeat(' ', max_len_lnum_and_text- strwidth(lnum_and_text)),
             \ kind, repeat(' ', max_len_scope - strwidth(kind)),
@@ -192,7 +192,7 @@ function! s:Highlight() abort
   syntax match FZFVista /^[^│┌└]*/ contains=FZFVistaBracket,FZFVistaNumber,FZFVistaTag,FZFVistaScope
   syntax match FZFVistaBracket /\[\|\]/ contained
 
-  hi default link FZFVistaIcon     Float
+  hi default link FZFVistaIcon     Special
   hi default link FZFVistaBracket  SpecialKey
   hi default link FZFVistaNumber   Number
   hi default link FZFVistaTag      Tag
