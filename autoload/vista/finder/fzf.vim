@@ -107,6 +107,7 @@ function! s:sink(line) abort
   let items = matchlist(icon_lnum_tag, '\(.*\) \(\d\+\):\(.*\)')
   let lnum = items[2]
   let tag = items[3]
+  " FIXME this seemingly doesn't work
   let col = match(t:vista.source.line(lnum), '\C'.tag)
   let col = col == -1 ? 1 : col + 1
   call vista#source#GotoWin()
