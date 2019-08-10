@@ -132,14 +132,18 @@ function! s:ApplyRun(opts, Hi) abort
     endif
   endtry
 
-  call call(function(a:Hi), [])
+  " Only add highlights when using nvim, since vim has an issue with the highlight.
+  " Ref #139
+  if has('nvim')
+    call call(function(a:Hi), [])
 
-  " https://unix.stackexchange.com/questions/149209/refresh-changed-content-of-file-opened-in-vim
-  " Vim Highlight does not work at times
-  "
-  "  &modifiable is to avoid error in MacVim - E948: Job still running (add ! to end the job)
-  if !has('nvim') && &modifiable
-    edit
+    " https://unix.stackexchange.com/questions/149209/refresh-changed-content-of-file-opened-in-vim
+    " Vim Highlight does not work at times
+    "
+    "  &modifiable is to avoid error in MacVim - E948: Job still running (add ! to end the job)
+    " if !has('nvim') && &modifiable
+      " edit
+    " endif
   endif
 endfunction
 
