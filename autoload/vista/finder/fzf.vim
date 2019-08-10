@@ -103,10 +103,11 @@ function! s:AlignSource() abort
 endfunction
 
 function! s:sink(line) abort
-  let lnum_tag = split(a:line)[0]
-  let idx = stridx(lnum_tag, ':')
-  let [lnum, tag] = [lnum_tag[0 : idx], lnum_tag[idx+1 : ]]
-  let col = match(t:vista.source.line(lnum), tag)
+  let icon_lnum_tag = split(a:line, '[')[0]
+  let items = matchlist(icon_lnum_tag, '\(.*\) \(\d\+\):\(.*\)')
+  let lnum = items[2]
+  let tag = items[3]
+  let col = match(t:vista.source.line(lnum), '\C'.tag)
   let col = col == -1 ? 1 : col + 1
   call vista#source#GotoWin()
   call cursor(lnum, col)
