@@ -48,9 +48,17 @@ let g:vista#renderer#icons = map(extend(s:icons, get(g:, 'vista#renderer#icons',
 let g:vista#renderer#enable_icon = get(g:, 'vista#renderer#enable_icon',
       \ exists('g:vista#renderer#icons') || exists('g:airline_powerline_fonts'))
 
+function! vista#renderer#IconFor(kind) abort
+  if g:vista#renderer#enable_icon
+    return get(g:vista#renderer#icons, tolower(a:kind), g:vista#renderer#icons.default)
+  else
+    return ''
+  endif
+endfunction
+
 function! vista#renderer#Decorate(kind) abort
   if g:vista#renderer#enable_icon
-    return get(g:vista#renderer#icons, tolower(a:kind), g:vista#renderer#icons.default).'  '.a:kind
+    return vista#renderer#IconFor(a:kind).'  '.a:kind
   else
     return a:kind
   endif
