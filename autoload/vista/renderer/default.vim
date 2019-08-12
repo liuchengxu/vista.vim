@@ -12,24 +12,37 @@ let s:visibility_icon = {
 
 let g:vista#renderer#default#vlnum_offset = 3
 
+let s:kind_position = 'before'
+
 " Return the rendered row to be displayed given the depth
 function! s:Assemble(line, depth) abort
   let line = a:line
 
-  let kind = get(line, 'kind', '')
+  if s:kind_position ==# 'before'
+    let row = vista#util#Join(
+          \ repeat(' ', a:depth * 4),
+          \ s:GetVisibility(line),
+          \ get(line, 'name'),
+          \ get(line, 'signature', ''),
+          \ ':'.get(line, 'line', '')
+          \ )
+  else
 
-  if !empty(kind)
-    let kind = vista#renderer#Decorate(kind)
+    let kind = get(line, 'kind', '')
+
+    if !empty(kind)
+      let kind = vista#renderer#Decorate(kind)
+    endif
+
+    let row = vista#util#Join(
+          \ repeat(' ', a:depth * 4),
+          \ s:GetVisibility(line),
+          \ get(line, 'name'),
+          \ get(line, 'signature', ''),
+          \ ' : '.kind,
+          \ ':'.get(line, 'line', '')
+          \ )
   endif
-
-  let row = vista#util#Join(
-        \ repeat(' ', a:depth * 4),
-        \ s:GetVisibility(line),
-        \ get(line, 'name'),
-        \ get(line, 'signature', ''),
-        \ ' : '.kind,
-        \ ':'.get(line, 'line', '')
-        \ )
 
   return row
 endfunction
@@ -65,6 +78,16 @@ endfunction
 function! s:AppendChild(line, rows, depth) abort
   if has_key(a:line, 'scope')
     call s:Append(a:line, a:rows, a:depth)
+    let parent_name = a:line.scope
+    let next_root_name = parent_name . s:scope_seperator . a:line.name
+    return [next_root_name, a:line]
+  endif
+
+  return [v:null, v:null]
+endfunction
+
+function! s:MockAppendChild(line, rows, depth) abort
+  if has_key(a:line, 'scope')
     let parent_name = a:line.scope
     let next_root_name = parent_name . s:scope_seperator . a:line.name
     return [next_root_name, a:line]
@@ -157,13 +180,41 @@ function! s:RenderDescendants(parent_name, parent_line, descendants, rows, depth
   let grandchildren = []
   let grandchildren_line = []
 
+  let children_to_append = []
+  let children_dict = {}
+
   for child in children
-    let [next_potentioal_root, next_potentioal_root_line] = s:AppendChild(child, rows, depth)
+
+    if s:kind_position ==# 'before'
+      let [next_potentioal_root, next_potentioal_root_line] = s:MockAppendChild(child, rows, depth)
+      if has_key(children_dict, child.kind)
+        call add(children_to_append, child)
+        call add(children_dict[child.kind], child)
+      else
+        let children_dict[child.kind] = [child]
+      endif
+    else
+      let [next_potentioal_root, next_potentioal_root_line] = s:AppendChild(child, rows, depth)
+    endif
+
     if !empty(next_potentioal_root)
       call add(grandchildren, next_potentioal_root)
       call add(grandchildren_line, next_potentioal_root_line)
     endif
+
   endfor
+
+  if s:kind_position ==# 'before'
+    for group in keys(children_dict)
+      let row = vista#util#Join(repeat(' ', depth * 4), '['.group.']')
+      let line = ''
+      call add(rows, row)
+      call add(s:vlnum_cache, line)
+      for child in children_dict[group]
+        call s:Append(child, rows, depth)
+      endfor
+    endfor
+  endif
 
   let idx = 0
   while idx < len(grandchildren)
