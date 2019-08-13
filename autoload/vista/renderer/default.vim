@@ -37,10 +37,19 @@ function! s:Assemble(line, depth) abort
   endif
 
   if a:depth == 0
+
+    " Append line number
+    let lnum = get(line, 'line', '')
+    if !empty(lnum)
+      let row .= ':'.lnum
+    endif
+
     let kind = get(line, 'kind', '')
     if !empty(kind)
-      let row .= '['.kind.']'
+      let row .= ' ['.kind.']'
     endif
+
+    return row
   endif
 
   " Append line number
