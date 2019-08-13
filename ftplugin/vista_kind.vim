@@ -37,7 +37,6 @@ endif
 
 nnoremap <buffer> <silent> q    :close<CR>
 nnoremap <buffer> <silent> <CR> :<c-u>call vista#cursor#FoldOrJump()<CR>
-nnoremap <buffer> <silent> /    :<c-u>call vista#finder#fzf#Run()<CR>
 nnoremap <buffer> <silent> s    :<c-u>call vista#Sort()<CR>
 nnoremap <buffer> <silent> p    :<c-u>call vista#cursor#TogglePreview()<CR>
 
