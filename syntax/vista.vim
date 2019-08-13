@@ -13,6 +13,8 @@ syntax match VistaPublic /^\s*+\</ contained
 syntax match VistaProtected /^\s*\~\</ contained
 syntax match VistaPrivate /^\s*-\</ contained
 
+syntax match VistaRootKind '^\S\+\zs\[[^]]\+\]\ze:\d\+$' contains=VistaLineNr
+
 syntax match VistaNestedKind '^\s\+\[[^]]\+\]$'
 
 syntax match VistaParenthesis /(\|)/ contained
@@ -21,10 +23,11 @@ syntax match VistaColon /:\ze\d\+$/ contained
 syntax match VistaLineNr /\d\+$/
 syntax match VistaKind / \a*:\d*$/ contains=VistaColon,VistaLineNr
 syntax match VistaScopeKind /: .*$/ contains=VistaArgs,VistaColon,VistaLineNr
-syntax match VistaScope /^\S.*$/ contains=VistaPrivate,VistaProtected,VistaPublic,VistaKind,VistaIcon,VistaParenthesis
-syntax region VistaTag start="^" end="$" contains=VistaPublic,VistaProtected,VistaPrivate,VistaArgs,VistaScope,VistaScopeKind,VistaLineNr,VistaColon,VistaNestedKind
+syntax match VistaScope /^\S.*$/ contains=VistaPrivate,VistaProtected,VistaPublic,VistaKind,VistaIcon,VistaParenthesis,VistaRootKind
+syntax region VistaTag start="^" end="$" contains=VistaPublic,VistaProtected,VistaPrivate,VistaArgs,VistaScope,VistaScopeKind,VistaLineNr,VistaColon,VistaNestedKind,VistaRootKind
 
 hi default link VistaNestedKind Number
+hi default link VistaRootKind Number
 
 hi default link VistaParenthesis Operator
 hi default link VistaScope       Function

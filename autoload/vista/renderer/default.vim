@@ -18,30 +18,35 @@ let s:kind_position = 'before'
 function! s:Assemble(line, depth) abort
   let line = a:line
 
-  if s:kind_position ==# 'before'
-    let row = vista#util#Join(
+  let common = vista#util#Join(
           \ repeat(' ', a:depth * 4),
           \ s:GetVisibility(line),
           \ get(line, 'name'),
           \ get(line, 'signature', ''),
-          \ ':'.get(line, 'line', '')
           \ )
+
+  if s:kind_position ==# 'before'
+    let row = common
   else
-
     let kind = get(line, 'kind', '')
-
     if !empty(kind)
       let kind = vista#renderer#Decorate(kind)
     endif
 
-    let row = vista#util#Join(
-          \ repeat(' ', a:depth * 4),
-          \ s:GetVisibility(line),
-          \ get(line, 'name'),
-          \ get(line, 'signature', ''),
-          \ ' : '.kind,
-          \ ':'.get(line, 'line', '')
-          \ )
+    let row = vista#util#Join(common, ' : '.kind)
+  endif
+
+  if a:depth == 0
+    let kind = get(line, 'kind', '')
+    if !empty(kind)
+      let row .= '['.kind.']'
+    endif
+  endif
+
+  " Append line number
+  let lnum = get(line, 'line', '')
+  if !empty(lnum)
+    let row .= ':'.lnum
   endif
 
   return row
@@ -206,13 +211,15 @@ function! s:RenderDescendants(parent_name, parent_line, descendants, rows, depth
 
   if s:kind_position ==# 'before'
     for group in keys(children_dict)
-      let row = vista#util#Join(repeat(' ', depth * 4), '['.group.']')
-      let line = ''
-      call add(rows, row)
-      call add(s:vlnum_cache, line)
-      for child in children_dict[group]
-        call s:Append(child, rows, depth)
-      endfor
+      if !empty(children_dict[group])
+        let row = vista#util#Join(repeat(' ', depth * 4), '['.group.']')
+        let line = ''
+        call add(rows, row)
+        call add(s:vlnum_cache, line)
+        for child in children_dict[group]
+          call s:Append(child, rows, depth)
+        endfor
+      endif
     endfor
   endif
 
