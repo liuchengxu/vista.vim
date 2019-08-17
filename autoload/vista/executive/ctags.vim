@@ -77,6 +77,7 @@ endfunction
 
 function! s:PrepareContainer() abort
   let s:data = {}
+  let t:vista = get(t:, 'vista', {})
   let t:vista.functions = []
   let t:vista.raw = []
   let t:vista.kinds = []
