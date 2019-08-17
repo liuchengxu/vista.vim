@@ -13,7 +13,14 @@ syntax match VistaPublic /^\s*+\</ contained
 syntax match VistaProtected /^\s*\~\</ contained
 syntax match VistaPrivate /^\s*-\</ contained
 
-syntax match VistaRootKind '^\S\+\zs\[[^]]\+\]\ze:\d\+$' contains=VistaLineNr
+syntax match VistaRootLineNr ':\d\+'
+syntax match VistaRootTag '^\S\+:\d\+' contains=VistaRootLineNr
+
+" Middle
+" syntax match VistaRootKind '^\S\+\zs\[[^]]\+\]\ze:\d\+$' contains=VistaLineNr
+
+" Tail
+syntax match VistaRootKind '^\S\+:\d\+\s\+\[[^]]\+\]$' contains=VistaRootTag
 
 syntax match VistaNestedKind '^\s\+\[[^]]\+\]$'
 
@@ -27,7 +34,9 @@ syntax match VistaScope /^\S.*$/ contains=VistaPrivate,VistaProtected,VistaPubli
 syntax region VistaTag start="^" end="$" contains=VistaPublic,VistaProtected,VistaPrivate,VistaArgs,VistaScope,VistaScopeKind,VistaLineNr,VistaColon,VistaNestedKind,VistaRootKind
 
 hi default link VistaNestedKind Number
+hi default link VistaRootTag Tag
 hi default link VistaRootKind Number
+hi default link VistaRootLineNr      LineNr
 
 hi default link VistaParenthesis Operator
 hi default link VistaScope       Function

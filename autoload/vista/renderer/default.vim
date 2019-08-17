@@ -12,8 +12,6 @@ let s:visibility_icon = {
 
 let g:vista#renderer#default#vlnum_offset = 3
 
-let s:kind_position = 'before'
-
 " Return the rendered row to be displayed given the depth
 function! s:Assemble(line, depth) abort
   let line = a:line
@@ -25,7 +23,7 @@ function! s:Assemble(line, depth) abort
           \ get(line, 'signature', ''),
           \ )
 
-  if s:kind_position ==# 'before'
+  if s:tag_kind_position ==# 'group'
     let row = common
   else
     let kind = get(line, 'kind', '')
@@ -44,9 +42,12 @@ function! s:Assemble(line, depth) abort
       let row .= ':'.lnum
     endif
 
-    let kind = get(line, 'kind', '')
-    if !empty(kind)
-      let row .= ' ['.kind.']'
+    if s:tag_kind_position ==# 'group'
+      let kind = get(line, 'kind', '')
+      if !empty(kind)
+          let kind = vista#renderer#Decorate(kind)
+        let row .= ' ['.kind.']'
+      endif
     endif
 
     return row
@@ -199,7 +200,7 @@ function! s:RenderDescendants(parent_name, parent_line, descendants, rows, depth
 
   for child in children
 
-    if s:kind_position ==# 'before'
+    if s:tag_kind_position ==# 'group'
       let [next_potentioal_root, next_potentioal_root_line] = s:MockAppendChild(child, rows, depth)
       if has_key(children_dict, child.kind)
         call add(children_to_append, child)
@@ -218,10 +219,11 @@ function! s:RenderDescendants(parent_name, parent_line, descendants, rows, depth
 
   endfor
 
-  if s:kind_position ==# 'before'
+  if s:tag_kind_position ==# 'group'
     for group in keys(children_dict)
       if !empty(children_dict[group])
-        let row = vista#util#Join(repeat(' ', depth * 4), '['.group.']')
+        let kind = vista#renderer#Decorate(group)
+        let row = vista#util#Join(repeat(' ', depth * 4), '['.kind.']')
         let line = ''
         call add(rows, row)
         call add(s:vlnum_cache, line)
@@ -292,6 +294,9 @@ endfunction
 
 function! s:Render() abort
   let s:scope_seperator = t:vista.source.scope_seperator()
+
+  " group, inline
+  let s:tag_kind_position = get(g:, 'vista_tag_kind_position', 'group')
 
   let rows = []
 
