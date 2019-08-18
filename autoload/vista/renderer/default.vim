@@ -167,22 +167,49 @@ function! s:DescendantsOfRoot(candidates, root_line) abort
   return filter(candidates, 's:RealParentOf(v:val) ==# a:root_line')
 endfunction
 
+" Some items having the children will be duplicated possibly.
+function! s:RemoveDuplicateLines(rows) abort
+  let rows = a:rows
+
+  let i = 0
+  while i < len(rows)
+    if rows[i] =~ '^\s\+\[.*\]$'
+      let i += 1
+      continue
+    endif
+
+    let j = i+1
+    while j < len(rows)
+      if rows[j] == rows[i]
+
+        unlet rows[i]
+        unlet s:vlnum_cache[i]
+
+        if i > 0
+          let prev_row = rows[i-1]
+          if prev_row =~ '^\s\+\[.*\]$'
+            unlet rows[i-1]
+            unlet s:vlnum_cache[i-1]
+
+            " The later duplicated item as well as its group icon is retained.
+            call insert(rows, prev_row, j-2)
+            call insert(s:vlnum_cache, '', j-2)
+          endif
+        endif
+
+      endif
+      let j += 1
+    endwhile
+
+    let i += 1
+  endwhile
+endfunction
+
 function! s:RenderDescendants(parent_name, parent_line, descendants, rows, depth) abort
   let depth = a:depth
   let rows = a:rows
 
-  " Clear the previous duplicate parent line that is about to be added.
-  "
-  " This is a little bit stupid actually :(.
   let about_to_append = s:Assemble(a:parent_line, depth)
-  let idx = 0
-  while idx < len(rows)
-    if rows[idx] ==# about_to_append
-      unlet rows[idx]
-      unlet s:vlnum_cache[idx]
-    endif
-    let idx += 1
-  endwhile
 
   " Append the root actually
   call s:ApplyAppend(a:parent_line, about_to_append, rows)
@@ -361,6 +388,11 @@ function! s:Render() abort
   endfor
 
   call s:RenderScopeless(scope_less, rows)
+
+  call s:RemoveDuplicateLines(rows)
+
+  " FIXME why needs twice?
+  call s:RemoveDuplicateLines(rows)
 
   " The original tagline is positioned in which line in the vista sidebar.
   let idx = 0
