@@ -132,7 +132,12 @@ function! vista#parser#ctags#FromJSON(line, container) abort
     return
   endif
 
-  let line = json_decode(a:line)
+  try
+    let line = json_decode(a:line)
+  catch
+    echom "Fail to decode from JSON: ".a:line.", error: ".v:exception
+    return
+  endtry
 
   call s:LoadData(a:container, line)
 
