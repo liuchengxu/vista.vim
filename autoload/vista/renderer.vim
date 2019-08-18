@@ -14,29 +14,29 @@ let s:icons = {
 \    'method': "\uf6a6",
 \    'package': "\ue612",
 \    'packages': "\ue612",
-\    'enum': "\uf435",
-\    'enumerator': "\uf435",
-\    'module': "\uf668",
-\    'modules': "\uf668",
-\    'type': "\ue22b",
-\    'typedef': "\ue22b",
-\    'types': "\ue22b",
-\    'field': "\uf93d",
-\    'fields': "\uf93d",
+\    'enum': "\uf702",
+\    'enumerator': "\uf702",
+\    'module': "\uf136",
+\    'modules': "\uf136",
+\    'type': "\uf7fd",
+\    'typedef': "\uf7fd",
+\    'types': "\uf7fd",
+\    'field': "\uf30b",
+\    'fields': "\uf30b",
 \    'macro': "\uf8a3",
 \    'macros': "\uf8a3",
 \    'map': "\ufb44",
 \    'class': "\uf0e8",
 \    'augroup': "\ufb44",
-\    'struct': "\ufb44",
+\    'struct': "\uf9af",
 \    'union': "\ufacd",
 \    'member': "\uf02b",
 \    'target': "\uf893",
 \    'property': "\ufab6",
-\    'interface': "\ufa52",
+\    'interface': "\uf7fe",
 \    'namespace': "\uf475",
 \    'subroutine': "\uf915",
-\    'implementation': "\uf87a",
+\    'implementation': "\uf776",
 \    'typeParameter': "\uf278",
 \    'default': "\uf29c"
 \}
@@ -58,7 +58,7 @@ endfunction
 
 function! vista#renderer#Decorate(kind) abort
   if g:vista#renderer#enable_icon
-    return vista#renderer#IconFor(a:kind).'  '.a:kind
+    return vista#renderer#IconFor(a:kind).' '.a:kind
   else
     return a:kind
   endif
