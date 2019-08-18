@@ -172,13 +172,20 @@ function! s:DescendantsOfRoot(candidates, root_line) abort
   return filter(candidates, 's:RealParentOf(v:val) ==# a:root_line')
 endfunction
 
+" Is this line the group icon, e.g,
+"     [function]
+function! s:IsGroupIconLine(row) abort
+  return a:row =~ '^\s\+\[.*\]$'
+endfunction
+
 " Some items having the children will be duplicated possibly.
+" So the current workaround is to remove these duplicated ones at last.
 function! s:RemoveDuplicateLines(rows) abort
   let rows = a:rows
 
   let i = 0
   while i < len(rows)
-    if rows[i] =~ '^\s\+\[.*\]$'
+    if s:IsGroupIconLine(rows[i])
       let i += 1
       continue
     endif
@@ -192,7 +199,7 @@ function! s:RemoveDuplicateLines(rows) abort
 
         if i > 0
           let prev_row = rows[i-1]
-          if prev_row =~ '^\s\+\[.*\]$'
+          if s:IsGroupIconLine(prev_row)
             unlet rows[i-1]
             unlet s:vlnum_cache[i-1]
 
