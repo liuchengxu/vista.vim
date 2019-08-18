@@ -12,16 +12,21 @@ let s:visibility_icon = {
 
 let g:vista#renderer#default#vlnum_offset = 3
 
+" Given a string to diplay, return the string padded with spaces given the depth
+function! s:Pad(depth, str) abort
+  return vista#util#Join(repeat(' ', a:depth * 4), a:str)
+endfunction
+
 " Return the rendered row to be displayed given the depth
-function! s:Assemble(line, depth) abort
+function! s:AssembleDisplayRow(line, depth) abort
   let line = a:line
 
-  let common = vista#util#Join(
-          \ repeat(' ', a:depth * 4),
-          \ s:GetVisibility(line),
-          \ get(line, 'name'),
-          \ get(line, 'signature', ''),
-          \ )
+  let common = s:Pad(a:depth,
+        \ vista#util#Join(
+        \   s:GetVisibility(line),
+        \   get(line, 'name'),
+        \   get(line, 'signature', ''),
+        \ ))
 
   if s:tag_kind_position ==# 'group'
     let row = common
@@ -45,7 +50,7 @@ function! s:Assemble(line, depth) abort
     if s:tag_kind_position ==# 'group'
       let kind = get(line, 'kind', '')
       if !empty(kind)
-          let kind = vista#renderer#Decorate(kind)
+        let kind = vista#renderer#Decorate(kind)
         let row .= ' ['.kind.']'
       endif
     endif
@@ -67,7 +72,7 @@ function! s:Append(line, rows, depth) abort
   let line = a:line
   let rows = a:rows
 
-  let row = s:Assemble(line, a:depth)
+  let row = s:AssembleDisplayRow(line, a:depth)
 
   call add(rows, row)
   call add(s:vlnum_cache, line)
@@ -209,7 +214,7 @@ function! s:RenderDescendants(parent_name, parent_line, descendants, rows, depth
   let depth = a:depth
   let rows = a:rows
 
-  let about_to_append = s:Assemble(a:parent_line, depth)
+  let about_to_append = s:AssembleDisplayRow(a:parent_line, depth)
 
   " Append the root actually
   call s:ApplyAppend(a:parent_line, about_to_append, rows)
@@ -250,7 +255,7 @@ function! s:RenderDescendants(parent_name, parent_line, descendants, rows, depth
     for group in keys(children_dict)
       if !empty(children_dict[group])
         let kind = vista#renderer#Decorate(group)
-        let row = vista#util#Join(repeat(' ', depth * 4), '['.kind.']')
+        let row = s:Pad(depth, '['.kind.']')
         let line = ''
         call add(rows, row)
         call add(s:vlnum_cache, line)
