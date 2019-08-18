@@ -175,7 +175,7 @@ endfunction
 " Is this line the group icon, e.g,
 "     [function]
 function! s:IsGroupIconLine(row) abort
-  return a:row =~ '^\s\+\[.*\]$'
+  return a:row =~? '^\s\+\[.*\]$'
 endfunction
 
 " Some items having the children will be duplicated possibly.
