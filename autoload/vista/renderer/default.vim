@@ -12,9 +12,28 @@ let s:visibility_icon = {
 
 let g:vista#renderer#default#vlnum_offset = 3
 
-" Given a string to diplay, return the string padded with spaces given the depth
+" Given a string to diplay.
+" Return the string padded with spaces given the depth
 function! s:Pad(depth, str) abort
   return vista#util#Join(repeat(' ', a:depth * 4), a:str)
+endfunction
+
+function! s:GetDecoratedKind(line_dict) abort
+  let kind = get(a:line_dict, 'kind', '')
+  if !empty(kind)
+    let kind = vista#renderer#Decorate(kind)
+  endif
+  return kind
+endfunction
+
+" Append line number
+function! s:AppendLineNr(line_dict, row) abort
+  let row = a:row
+  let lnum = get(a:line_dict, 'line', '')
+  if !empty(lnum)
+    let row .= ':'.lnum
+  endif
+  return row
 endfunction
 
 " Return the rendered row to be displayed given the depth
@@ -31,37 +50,22 @@ function! s:AssembleDisplayRow(line, depth) abort
   if s:tag_kind_position ==# 'group'
     let row = common
   else
-    let kind = get(line, 'kind', '')
+    " Show the kind of tag inline
+    let kind = s:GetDecoratedKind(line)
     if !empty(kind)
-      let kind = vista#renderer#Decorate(kind)
+      let row = vista#util#Join(common, ' : '.kind)
     endif
-
-    let row = vista#util#Join(common, ' : '.kind)
   endif
 
+  let row = s:AppendLineNr(line, row)
+
   if a:depth == 0
-
-    " Append line number
-    let lnum = get(line, 'line', '')
-    if !empty(lnum)
-      let row .= ':'.lnum
-    endif
-
     if s:tag_kind_position ==# 'group'
-      let kind = get(line, 'kind', '')
+      let kind = s:GetDecoratedKind(line)
       if !empty(kind)
-        let kind = vista#renderer#Decorate(kind)
         let row .= ' ['.kind.']'
       endif
     endif
-
-    return row
-  endif
-
-  " Append line number
-  let lnum = get(line, 'line', '')
-  if !empty(lnum)
-    let row .= ':'.lnum
   endif
 
   return row
@@ -195,7 +199,9 @@ function! s:RemoveDuplicateLines(rows) abort
       if rows[j] == rows[i]
 
         unlet rows[i]
-        unlet s:vlnum_cache[i]
+        if i < len(s:vlnum_cache)
+          unlet s:vlnum_cache[i]
+        endif
 
         if i > 0
           let prev_row = rows[i-1]
