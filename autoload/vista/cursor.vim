@@ -274,8 +274,8 @@ function! s:ApplyHighlight(lnum, ensure_visible, ...) abort
     if a:0 == 1
       let hi_pos = [a:lnum, start+1, strlen(a:1)]
     else
-      let [_, end, _] = matchstrpos(cur_line, ':\d\+$')
-      let hi_pos = [a:lnum, start+1, end-2]
+      let [matched, end, _] = matchstrpos(cur_line, ':\d\+$')
+      let hi_pos = [a:lnum, start+1, end-len(matched)]
     endif
   endif
 
