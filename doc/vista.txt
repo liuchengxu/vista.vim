@@ -365,6 +365,16 @@ g:vista_floating_delay                                    *g:vista_floating_dela
   Given any integer, this option controls the number of milliseconds before
   vista will show a popup or floating win of the target line context near the cursor.
 
+g:vista_tag_kind_position                               *g:vista_tag_kind_position*
+
+  Type: |String|
+  Default: `group`
+
+  Show all the child items under a certain group or show the kind of tag
+  inline. This is only avaliable for the ctags executive and default renderer.
+
+  Options: `group`, `inline`
+
 g:vista#renderer#enable_icon                        *g:vista#renderer#enable_icon*
 
   Type: |Number|

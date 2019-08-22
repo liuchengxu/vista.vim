@@ -13,19 +13,19 @@ syntax match VistaPublic /^\s*+\</ contained
 syntax match VistaProtected /^\s*\~\</ contained
 syntax match VistaPrivate /^\s*-\</ contained
 
-syntax match VistaRootLineNr ':\d\+'
-syntax match VistaRootTag '^\S\+:\d\+' contains=VistaRootLineNr
+syntax match VistaRootLineNr /:\d\+/
+syntax match VistaRootTag /^\S\+:\d\+/ contains=VistaRootLineNr
 
 " Middle
-" syntax match VistaRootKind '^\S\+\zs\[[^]]\+\]\ze:\d\+$' contains=VistaLineNr
+" syntax match VistaRootKind /^\S\+\zs\[[^]]\+\]\ze:\d\+$/ contains=VistaLineNr
 
 " Tail
-syntax match VistaRootKind '^\S\+:\d\+\s\+\[[^]]\+\]$' contains=VistaRootTag
+syntax match VistaRootKind /^\S\+:\d\+\s\+\[[^]]\+\]$/ contains=VistaRootTag
 
-syntax match VistaNestedKind '^\s\+\[[^]]\+\]$'
+syntax match VistaNestedKind /^\s\+\[[^]]\+\]$/
 
 syntax match VistaParenthesis /(\|)/ contained
-syntax match VistaArgs  /(.*)/ contains=VistaParenthesis
+syntax match VistaArgs  /(\zs.*\ze)/
 syntax match VistaColon /:\ze\d\+$/ contained
 syntax match VistaLineNr /\d\+$/
 syntax match VistaKind / \a*:\d*$/ contains=VistaColon,VistaLineNr
