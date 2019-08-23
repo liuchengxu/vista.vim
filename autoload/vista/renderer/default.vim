@@ -265,16 +265,14 @@ function! s:RenderDescendants(parent_name, parent_line, descendants, rows, depth
   endfor
 
   if s:tag_kind_position ==# 'group'
-    for group in keys(children_dict)
-      if !empty(children_dict[group])
+    for [group, children] in items(children_dict)
+      if !empty(children)
         let kind = vista#renderer#Decorate(group)
         let row = s:Pad(depth, '['.kind.']')
         let line = ''
         call add(rows, row)
         call add(s:vlnum_cache, line)
-        for child in children_dict[group]
-          call s:Append(child, rows, depth)
-        endfor
+        call map(children, 's:Append(v:val, rows, depth)')
       endif
     endfor
   endif
@@ -394,7 +392,6 @@ function! s:Render() abort
 
       call add(rows, '')
       call add(s:vlnum_cache, '')
-
     else
 
       if has_key(potential_root_line, 'kind')

@@ -192,7 +192,7 @@ function! s:Highlight() abort
   let icons = join(values(g:vista#renderer#icons), '\|')
   execute 'syntax match FZFVistaIcon' '/'.icons.'/' 'contained'
 
-  syntax match FZFVistaNumber /\s*\zs\d*:\ze\w/ contains=FZFVistaIcon
+  syntax match FZFVistaNumber /\s*\zs\d*\ze:\w/ contains=FZFVistaIcon
   syntax match FZFVistaTag    /^[^\[]*\(\[\)\@=/ contains=FZFVistaNumber,FZFVistaIcon
   syntax match FZFVistaScope  /^[^]]*]/ contains=FZFVistaTag,FZFVistaBracket
   syntax match FZFVista /^[^│┌└]*/ contains=FZFVistaBracket,FZFVistaNumber,FZFVistaTag,FZFVistaScope
