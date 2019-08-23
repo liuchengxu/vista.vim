@@ -46,6 +46,11 @@ function! s:EnsureExists() abort
 
     function! t:vista.source.line(lnum) abort
       let bufline = getbufline(self.bufnr, a:lnum)
+      return empty(bufline) ? '' : bufline[0]
+    endfunction
+
+    function! t:vista.source.line_trimmed(lnum) abort
+      let bufline = getbufline(self.bufnr, a:lnum)
       return empty(bufline) ? '' : vista#util#Trim(bufline[0])
     endfunction
 

@@ -88,7 +88,7 @@ function! s:AlignSource() abort
   for [kind, v] in items(s:data)
     let icon = vista#renderer#IconFor(kind)
     for item in v
-      let line = t:vista.source.line(item.lnum)
+      let line = t:vista.source.line_trimmed(item.lnum)
       let lnum_and_text = printf('%s:%s', item.lnum, item.text)
       let row = printf('%s %s%s  [%s]%s  %s',
             \ icon,
@@ -104,10 +104,11 @@ endfunction
 
 function! s:sink(line) abort
   let icon_lnum_tag = split(a:line, '[')[0]
-  let items = matchlist(icon_lnum_tag, '\(.*\) \(\d\+\):\(.*\)')
+  " [a-zA-Z:#_.,<>]
+  " matching tag can't contain whitespace, but a tag does have a chance to contain whitespace?
+  let items = matchlist(icon_lnum_tag, '\(.*\) \(\d\+\):\([a-zA-Z:#_.,<>]*\)')
   let lnum = items[2]
-  " Trim?!
-  let tag = vista#util#Trim(items[3])
+  let tag = items[3]
   let col = stridx(t:vista.source.line(lnum), tag)
   let col = col == -1 ? 1 : col + 1
   call vista#source#GotoWin()

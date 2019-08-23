@@ -42,7 +42,7 @@ function! s:GetInfoUnderCursor() abort
 
   let lnum = cur_line[-1]
 
-  let source_line = t:vista.source.line(lnum)
+  let source_line = t:vista.source.line_trimmed(lnum)
   if empty(source_line)
     return [v:null, v:null]
   endif
