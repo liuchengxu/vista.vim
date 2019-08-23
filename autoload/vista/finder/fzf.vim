@@ -88,7 +88,7 @@ function! s:AlignSource() abort
   for [kind, v] in items(s:data)
     let icon = vista#renderer#IconFor(kind)
     for item in v
-      let line = t:vista.source.line(item.lnum)
+      let line = t:vista.source.line_trimmed(item.lnum)
       let lnum_and_text = printf('%s:%s', item.lnum, item.text)
       let row = printf('%s %s%s  [%s]%s  %s',
             \ icon,
