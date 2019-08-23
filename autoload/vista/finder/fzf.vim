@@ -104,10 +104,11 @@ endfunction
 
 function! s:sink(line) abort
   let icon_lnum_tag = split(a:line, '[')[0]
-  let items = matchlist(icon_lnum_tag, '\(.*\) \(\d\+\):\(.*\)')
+  " [a-zA-Z:#_.,<>]
+  " matching tag can't contain whitespace, but a tag does have a chance to contain whitespace?
+  let items = matchlist(icon_lnum_tag, '\(.*\) \(\d\+\):\([a-zA-Z:#_.,<>]*\)')
   let lnum = items[2]
-  " Trim?!
-  let tag = vista#util#Trim(items[3])
+  let tag = items[3]
   let col = stridx(t:vista.source.line(lnum), tag)
   let col = col == -1 ? 1 : col + 1
   call vista#source#GotoWin()
@@ -192,7 +193,7 @@ function! s:Highlight() abort
   let icons = join(values(g:vista#renderer#icons), '\|')
   execute 'syntax match FZFVistaIcon' '/'.icons.'/' 'contained'
 
-  syntax match FZFVistaNumber /\s*\zs\d*:\ze\w/ contains=FZFVistaIcon
+  syntax match FZFVistaNumber /\s*\zs\d*\ze:\w/ contains=FZFVistaIcon
   syntax match FZFVistaTag    /^[^\[]*\(\[\)\@=/ contains=FZFVistaNumber,FZFVistaIcon
   syntax match FZFVistaScope  /^[^]]*]/ contains=FZFVistaTag,FZFVistaBracket
   syntax match FZFVista /^[^│┌└]*/ contains=FZFVistaBracket,FZFVistaNumber,FZFVistaTag,FZFVistaScope

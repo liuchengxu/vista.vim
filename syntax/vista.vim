@@ -14,7 +14,7 @@ syntax match VistaProtected /^\s*\~\</ contained
 syntax match VistaPrivate /^\s*-\</ contained
 
 syntax match VistaParenthesis /(\|)/ contained
-syntax match VistaArgs  /(.*)/ contains=VistaParenthesis
+syntax match VistaArgs  /(\zs.*\ze)/
 syntax match VistaColon /:\ze\d\+$/ contained
 syntax match VistaLineNr /\d\+$/
 syntax match VistaKind / \a*:\d*$/ contains=VistaColon,VistaLineNr

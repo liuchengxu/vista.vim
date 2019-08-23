@@ -42,7 +42,7 @@ function! s:GetInfoUnderCursor() abort
 
   let lnum = cur_line[-1]
 
-  let source_line = t:vista.source.line(lnum)
+  let source_line = t:vista.source.line_trimmed(lnum)
   if empty(source_line)
     return [v:null, v:null]
   endif
@@ -274,8 +274,8 @@ function! s:ApplyHighlight(lnum, ensure_visible, ...) abort
     if a:0 == 1
       let hi_pos = [a:lnum, start+1, strlen(a:1)]
     else
-      let [_, end, _] = matchstrpos(cur_line, ':\d\+$')
-      let hi_pos = [a:lnum, start+1, end-2]
+      let [matched, end, _] = matchstrpos(cur_line, ':\d\+$')
+      let hi_pos = [a:lnum, start+1, end-len(matched)]
     endif
   endif
 
