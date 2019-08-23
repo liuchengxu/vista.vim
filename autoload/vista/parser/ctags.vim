@@ -135,7 +135,7 @@ function! vista#parser#ctags#FromJSON(line, container) abort
   try
     let line = json_decode(a:line)
   catch
-    echom 'Fail to decode from JSON: '.a:line.', error: '.v:exception
+    call vista#error#('Fail to decode from JSON: '.a:line.', error: '.v:exception)
     return
   endtry
 
