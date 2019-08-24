@@ -327,6 +327,7 @@ function! s:RenderScopeless(scope_less, rows) abort
     endfor
 
     call add(rows, '')
+    call add(s:vlnum_cache, '')
   endfor
 
   " Remove the last line if it's empty, i.e., ''
