@@ -26,6 +26,16 @@ function! s:GetDecoratedKind(line_dict) abort
   return kind
 endfunction
 
+" Given a line dict
+" Return the joined common fields, visibility+name+signature
+function! s:JoinCommonFields(line) abort
+  return vista#util#Join(
+        \ s:GetVisibility(a:line),
+        \ get(a:line, 'name'),
+        \ get(a:line, 'signature', ''),
+        \ )
+endfunction
+
 " Append line number
 function! s:AppendLineNr(line_dict, row) abort
   let row = a:row
@@ -40,12 +50,7 @@ endfunction
 function! s:AssembleDisplayRow(line, depth) abort
   let line = a:line
 
-  let common = s:Pad(a:depth,
-        \ vista#util#Join(
-        \   s:GetVisibility(line),
-        \   get(line, 'name'),
-        \   get(line, 'signature', ''),
-        \ ))
+  let common = s:Pad(a:depth, s:JoinCommonFields(line))
 
   if s:tag_kind_position ==# 'group'
     let row = common
@@ -315,9 +320,8 @@ function! s:RenderScopeless(scope_less, rows) abort
 
     for line in lines
       let row = vista#util#Join(
-            \ '  '.s:GetVisibility(line),
-            \ get(line, 'name'),
-            \ get(line, 'signature', ''),
+            \ '  ',
+            \ s:JoinCommonFields(line),
             \ ':'.line.line
             \ )
 
