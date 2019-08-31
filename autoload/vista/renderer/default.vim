@@ -194,7 +194,7 @@ function! s:RemoveDuplicateLines(rows) abort
 
   let i = 0
   while i < len(rows)
-    if s:IsGroupIconLine(rows[i])
+    if s:IsGroupIconLine(rows[i]) || empty(rows[i])
       let i += 1
       continue
     endif
@@ -412,7 +412,7 @@ function! s:Render() abort
   call s:RemoveDuplicateLines(rows)
 
   " FIXME why needs twice?
-  call s:RemoveDuplicateLines(rows)
+  " call s:RemoveDuplicateLines(rows)
 
   " The original tagline is positioned in which line in the vista sidebar.
   let idx = 0
