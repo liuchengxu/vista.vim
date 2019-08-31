@@ -190,16 +190,31 @@ function! s:ProjectRun(...) abort
 endfunction
 
 function! s:Highlight() abort
-  let icons = join(values(g:vista#renderer#icons), '\|')
-  execute 'syntax match FZFVistaIcon' '/'.icons.'/' 'contained'
+  let groups = ['Character', 'Float', 'Identifier', 'Statement', 'Label', 'Boolean', 'Delimiter', 'Constant', 'String', 'Operator', 'PreCondit', 'Include', 'Conditional', 'PreProc', 'TypeDef',]
+  let len_groups = len(groups)
 
-  syntax match FZFVistaNumber /\s*\zs\d*\ze:\w/ contains=FZFVistaIcon
-  syntax match FZFVistaTag    /^[^\[]*\(\[\)\@=/ contains=FZFVistaNumber,FZFVistaIcon
+  let icons = values(g:vista#renderer#icons)
+
+  let idx = 0
+  let hi_idx = 0
+
+  let icon_groups = []
+  for icon in icons
+    let cur_group = 'FZFVistaIcon'.idx
+    call add(icon_groups, cur_group)
+    execute 'syntax match' cur_group '/'.icon.'/' 'contained'
+    execute 'hi default link' cur_group groups[hi_idx]
+    let hi_idx += 1
+    let hi_idx = hi_idx % len_groups
+    let idx += 1
+  endfor
+
+  execute 'syntax match FZFVistaNumber /\s*\zs\d*\ze:\w/' 'contains=FZFVistaIcon,'.join(icon_groups, ',')
+  execute 'syntax match FZFVistaTag    /^[^\[]*\(\[\)\@=/' 'contains=FZFVistaNumber,FZFVistaIcon,'.join(icon_groups, ',')
   syntax match FZFVistaScope  /^[^]]*]/ contains=FZFVistaTag,FZFVistaBracket
   syntax match FZFVista /^[^│┌└]*/ contains=FZFVistaBracket,FZFVistaNumber,FZFVistaTag,FZFVistaScope
   syntax match FZFVistaBracket /\[\|\]/ contained
 
-  hi default link FZFVistaIcon     Special
   hi default link FZFVistaBracket  SpecialKey
   hi default link FZFVistaNumber   Number
   hi default link FZFVistaTag      Tag
