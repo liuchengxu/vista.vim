@@ -376,6 +376,16 @@ function! vista#cursor#ShowDetail(_timer) abort
     return
   endif
 
+  " g:vista_tag_kind_position = 'group'
+  if cur_line =~ '\[.*\]' && indent('.') == 0
+    echohl Function | echon cur_line | echohl NONE
+    return
+  endif
+
+  if cur_line =~ '^\s.*\[.*\]$'
+    return
+  endif
+
   " scope line
   if cur_line[-1:] ==# ']'
     let splitted = split(cur_line)
