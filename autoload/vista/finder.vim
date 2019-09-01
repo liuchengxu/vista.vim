@@ -136,7 +136,7 @@ function! vista#finder#PrepareOpts(source, prompt) abort
 endfunction
 
 " Actually call fzf#run() with a highlighter given the opts
-function! vista#finder#RunFZFOrSkim(apply_run, hi_fn) abort
+function! vista#finder#RunFZFOrSkim(apply_run) abort
   echo "\r"
 
   call a:apply_run()
@@ -144,7 +144,7 @@ function! vista#finder#RunFZFOrSkim(apply_run, hi_fn) abort
   " Only add highlights when using nvim, since vim has an issue with the highlight.
   " Ref #139
   if has('nvim')
-    call call(function(a:hi_fn), [])
+    call vista#finder#fzf#Highlight()
 
     " https://unix.stackexchange.com/questions/149209/refresh-changed-content-of-file-opened-in-vim
     " Vim Highlight does not work at times

@@ -96,7 +96,7 @@ function! s:Run(...) abort
 
   let s:opts = vista#finder#PrepareOpts(source, prompt)
 
-  call vista#finder#RunFZFOrSkim(function('s:ApplyRun'), 'vista#finder#fzf#Highlight')
+  call vista#finder#RunFZFOrSkim(function('s:ApplyRun'))
 endfunction
 
 function! s:project_sink(line) abort
