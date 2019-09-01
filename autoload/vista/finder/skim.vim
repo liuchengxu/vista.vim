@@ -1,3 +1,9 @@
+" Copyright (c) 2019 Liu-Cheng Xu
+" MIT License
+" vim: ts=2 sw=2 sts=2 et
+
+let s:finder = fnamemodify(expand('<sfile>'), ':t:r')
+
 " Actually call skim#run()
 function! s:ApplyRun() abort
   try
@@ -18,7 +24,8 @@ endfunction
 
 function! s:Run(...) abort
   let source = vista#finder#PrepareSource(s:data)
-  let prompt = (get(s:, 'using_alternative', v:false) ? '*' : '').s:cur_executive.'> '
+  let using_alternative = get(s:, 'using_alternative', v:false) ? '*' : ''
+  let prompt = using_alternative.s:finder.':'.s:cur_executive.'> '
 
   let s:opts = vista#finder#PrepareOpts(source, prompt)
 

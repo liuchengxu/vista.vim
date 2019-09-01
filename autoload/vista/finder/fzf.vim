@@ -4,6 +4,8 @@
 
 scriptencoding utf-8
 
+let s:finder = fnamemodify(expand('<sfile>'), ':t:r')
+
 let s:cols_layout = {}
 let s:aligner = {}
 
@@ -92,7 +94,8 @@ endfunction
 
 function! s:Run(...) abort
   let source  = vista#finder#PrepareSource(s:data)
-  let prompt = (get(s:, 'using_alternative', v:false) ? '*' : '').s:cur_executive.'> '
+  let using_alternative = get(s:, 'using_alternative', v:false) ? '*' : ''
+  let prompt = using_alternative.s:finder.':'.s:cur_executive.'> '
 
   let s:opts = vista#finder#PrepareOpts(source, prompt)
 
