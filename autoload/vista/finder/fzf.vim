@@ -58,51 +58,7 @@ function! s:aligner.project_ctags() abort
   return source
 endfunction
 
-" Find the maximum length of each column of items to be displayed
-function! s:FindMaxLen() abort
-  let [max_len_scope, max_len_lnum_and_text] = [-1, -1]
-
-  for [kind, v] in items(s:data)
-    let scope_len = strwidth(kind)
-    if scope_len > max_len_scope
-      let max_len_scope = scope_len
-    endif
-
-    for item in v
-      let lnum_and_text = printf('%s:%s', item.lnum, item.text)
-      let len_lnum_and_text = strwidth(lnum_and_text)
-      if len_lnum_and_text > max_len_lnum_and_text
-        let max_len_lnum_and_text = len_lnum_and_text
-      endif
-    endfor
-  endfor
-
-  return [max_len_scope, max_len_lnum_and_text]
-endfunction
-
-function! s:AlignSource() abort
-  let source = []
-
-  let [max_len_scope, max_len_lnum_and_text] = s:FindMaxLen()
-
-  for [kind, v] in items(s:data)
-    let icon = vista#renderer#IconFor(kind)
-    for item in v
-      let line = t:vista.source.line_trimmed(item.lnum)
-      let lnum_and_text = printf('%s:%s', item.lnum, item.text)
-      let row = printf('%s %s%s  [%s]%s  %s',
-            \ icon,
-            \ lnum_and_text, repeat(' ', max_len_lnum_and_text- strwidth(lnum_and_text)),
-            \ kind, repeat(' ', max_len_scope - strwidth(kind)),
-            \ line)
-      call add(source, row)
-    endfor
-  endfor
-
-  return source
-endfunction
-
-function! s:sink(line) abort
+function! vista#finder#fzf#sink(line) abort
   let icon_lnum_tag = split(a:line, '[')[0]
   " [a-zA-Z:#_.,<>]
   " matching tag can't contain whitespace, but a tag does have a chance to contain whitespace?
@@ -117,9 +73,7 @@ function! s:sink(line) abort
 endfunction
 
 " Actually call fzf#run() with a highlighter given the opts
-function! s:ApplyRun(opts, Hi) abort
-  echo "\r"
-
+function! s:ApplyRun() abort
   try
     " fzf_colors may interfere custom syntax.
     " Unlet and restore it later.
@@ -128,44 +82,21 @@ function! s:ApplyRun(opts, Hi) abort
       unlet g:fzf_colors
     endif
 
-    call fzf#run(fzf#wrap(a:opts))
+    call fzf#run(fzf#wrap(s:opts))
   finally
     if exists('l:old_fzf_colors')
       let g:fzf_colors = old_fzf_colors
     endif
   endtry
-
-  " Only add highlights when using nvim, since vim has an issue with the highlight.
-  " Ref #139
-  if has('nvim')
-    call call(function(a:Hi), [])
-
-    " https://unix.stackexchange.com/questions/149209/refresh-changed-content-of-file-opened-in-vim
-    " Vim Highlight does not work at times
-    "
-    "  &modifiable is to avoid error in MacVim - E948: Job still running (add ! to end the job)
-    " if !has('nvim') && &modifiable
-      " edit
-    " endif
-  endif
 endfunction
 
 function! s:Run(...) abort
-  let source = s:AlignSource()
+  let source  = vista#finder#PrepareSource(s:data)
   let prompt = (get(s:, 'using_alternative', v:false) ? '*' : '').s:cur_executive.'> '
-  let opts = {
-          \ 'source': source,
-          \ 'sink': function('s:sink'),
-          \ 'options': ['--prompt', prompt] + get(g:, 'vista_fzf_opt', []),
-          \ }
 
-  if exists('g:vista_fzf_preview')
-    let preview_opts = call('fzf#vim#with_preview', g:vista_fzf_preview).options
-    let preview_opts[-1] = preview_opts[-1][0:-3] . t:vista.source.fpath . (g:vista#renderer#enable_icon ? ':{2}' : ':{1}')
-    call extend(opts.options, preview_opts)
-  endif
+  let s:opts = vista#finder#PrepareOpts(source, prompt)
 
-  call s:ApplyRun(opts, 's:Highlight')
+  call vista#finder#RunFZFOrSkim(function('s:ApplyRun'), 'vista#finder#fzf#Highlight')
 endfunction
 
 function! s:project_sink(line) abort
@@ -186,10 +117,10 @@ function! s:ProjectRun(...) abort
           \ 'options': ['--prompt', prompt] + get(g:, 'vista_fzf_opt', []),
           \ }
 
-  call s:ApplyRun(opts, 's:Highlight')
+  call s:ApplyRun(opts, 'vista#finder#fzf#Highlight')
 endfunction
 
-function! s:Highlight() abort
+function! vista#finder#fzf#Highlight() abort
   let groups = ['Character', 'Float', 'Identifier', 'Statement', 'Label', 'Boolean', 'Delimiter', 'Constant', 'String', 'Operator', 'PreCondit', 'Include', 'Conditional', 'PreProc', 'TypeDef',]
   let len_groups = len(groups)
 
