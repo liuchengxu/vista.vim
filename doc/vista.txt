@@ -122,17 +122,20 @@ Vista                                                                      *Vist
 
                                                                     *vista-finder*
 
-  `:Vista finder`:  same with `:Vista finder ctags` .
+  `:Vista finder`:  same with `:Vista finder fzf:ctags` .
 
   `:Vista finder!`: search tags recursively. Note: it's still experimental.
                   What's more, it may be very slow to generate all tags
                   in a whole project.
 
-  You can also specify an executive for the finder, for example:
+  `:Vistaa finder [finder:executive]`: You can specify either the finder or the
+                  executive, or the both, e.g., `:Vista finder skim:ctags` .
 
-  `:Vista finder coc`:   search symbols provided by coc.nvim.
+                  Specify the finder or executive, e.g.,:
 
-  `:Vista finder ctags`: search tags provided by ctags.
+  `:Vista finder fzf`: same with `:Vista finder fzf:ctags` .
+
+  `:Vista finder coc`: same with `:Vista finder fzf:coc` .
 
                                                                       *vista-info*
 

@@ -3,9 +3,13 @@
 " vim: ts=2 sw=2 sts=2 et
 
 let s:cur_dir = fnamemodify(resolve(expand('<sfile>:p')), ':h')
-let g:vista#executives = map(
-      \ split(globpath(s:cur_dir.'/vista/executive', '*'), '\n'),
-      \ 'fnamemodify(v:val, '':t:r'')')
+
+function! vista#FindItemsUnderDirectory(dir) abort
+  return map(split(globpath(a:dir, '*'), '\n'), 'fnamemodify(v:val, '':t:r'')')
+endfunction
+
+let g:vista#finders = vista#FindItemsUnderDirectory(s:cur_dir.'/vista/finder')
+let g:vista#executives = vista#FindItemsUnderDirectory(s:cur_dir.'/vista/executive')
 
 " Skip special buffers, filetypes.
 function! vista#ShouldSkip() abort
@@ -104,7 +108,7 @@ function! vista#(bang, ...) abort
       call vista#executive#{a:1}#Execute(v:false, v:true)
       let t:vista.lnum = line('.')
     elseif a:1 ==# 'finder'
-      call vista#finder#fzf#Run('coc')
+      call vista#finder#Dispatch('', '')
     elseif a:1 ==# 'finder!'
       call vista#finder#fzf#ProjectRun()
     elseif a:1 ==# 'toc'
@@ -133,7 +137,27 @@ function! vista#(bang, ...) abort
     if a:1 !=# 'finder'
       return vista#error#Expect('Vista finder [EXECUTIVE]')
     endif
-    call vista#finder#fzf#Run(a:2)
+    let finder_args_reg = '^\('.join(g:vista#finders, '\|').'\):\('.join(g:vista#executives, '\|').'\)$'
+    if stridx(a:2, ':') > -1
+      if a:2 =~? finder_args_reg
+        let matched = matchlist(a:2, finder_args_reg)
+        let finder = matched[1]
+        let executive = matched[2]
+      else
+        return vista#error#Expect('Vista finder [FINDER|EXECUTIVE|FINDER:EXECUTIVE]')
+      endif
+    else
+      if index(g:vista#finders, a:2) > -1
+        let finder = a:2
+        let executive = ''
+      elseif index(g:vista#executives, a:2) > -1
+        let finder = ''
+        let executive = a:2
+      else
+        return vista#error#Expect('Vista finder [FINDER|EXECUTIVE|FINDER:EXECUTIVE]')
+      endif
+    endif
+    call vista#finder#Dispatch(finder, executive)
     return
   else
     return vista#error#('Too many arguments for Vista')
