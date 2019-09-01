@@ -170,8 +170,7 @@ endfunction
 " Ctags is the default.
 function! vista#finder#fzf#Run(...) abort
   if !exists('*fzf#run')
-    call vista#error#Need('fzf')
-    return
+    return vista#error#Need('https://github.com/junegunn/fzf')
   endif
 
   let [s:data, s:cur_executive, s:using_alternative] = call('vista#finder#GetSymbols', a:000)
