@@ -198,7 +198,7 @@ g:vista_echo_cursor_strategy                        *g:vista_echo_cursor_strateg
                  window.
   `floating_win` - display in neovim's floating window or vim's popup window.
                  See if you have neovim's floating window support via
-                 `:echo exists(*nvim_open_win)` or vim's popup feature
+                 `:echo exists('*nvim_open_win')` or vim's popup feature
                  via `:echo exists('*popup_create')`
   `both`         - both `echo` and `floating_win` if it's avaliable otherwise
                  `scroll` will be used.
