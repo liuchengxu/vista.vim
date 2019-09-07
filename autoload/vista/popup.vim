@@ -70,7 +70,10 @@ function! s:OpenPopup(lnum, tag) abort
   let target_line = lines[s:popup_lnum - 1]
   let [_, s:popup_start, s:popup_end] = matchstrpos(target_line, '\C'.a:tag)
 
-  call win_execute(s:popup_winid, 'call s:HiTag()')
+  " Highlight the tag in the popup window if found.
+  if s:popup_start > -1
+    call win_execute(s:popup_winid, 'call s:HiTag()')
+  endif
 
   augroup VistaPopup
     autocmd!
