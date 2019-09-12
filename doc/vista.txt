@@ -128,7 +128,7 @@ Vista                                                                      *Vist
                   What's more, it may be very slow to generate all tags
                   in a whole project.
 
-  `:Vistaa finder [finder:executive]`: You can specify either the finder or the
+  `:Vista finder [finder:executive]`: You can specify either the finder or the
                   executive, or the both, e.g., `:Vista finder skim:ctags` .
 
                   Specify the finder or executive, e.g.,:
