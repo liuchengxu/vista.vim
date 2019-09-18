@@ -88,6 +88,7 @@ endfunction
 
 function! s:on_exit(_job, _data, _event) abort dict
   if v:dying | return | endif
+  if !exists('t:vista') | return | endif
 
   " Second last line is the real last one in neovim
   call s:ExtractLinewise(self.stdout[:-2])
