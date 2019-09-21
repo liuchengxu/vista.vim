@@ -217,7 +217,8 @@ The JSON support for ctags is avaliable if u-ctags is linked to libjansson when 
 - macOS
 
     ```bash
-    $ brew install --with-jansson universal-ctags/universal-ctags/universal-ctags
+    # NOTE: Don't use `brew install ctags`, which is not supported by the vista.vim
+    $ brew install --HEAD universal-ctags/universal-ctags/universal-ctags
     ```
 
 - Ubuntu
