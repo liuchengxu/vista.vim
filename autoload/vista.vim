@@ -54,6 +54,32 @@ function! vista#Sort() abort
   endif
 endfunction
 
+function! s:GetExplicitExecutive() abort
+  let ft = &filetype
+
+  if exists('g:vista_'.ft.'_executive')
+    execute 'return' 'g:vista_'.ft.'_executive'
+  endif
+
+  if exists('g:vista_executive_for') && has_key(g:vista_executive_for, ft)
+    return g:vista_executive_for[ft]
+  endif
+
+  return v:null
+endfunction
+
+function! vista#GetExplicitExecutiveOrDefault() abort
+  let explicit_executive = s:GetExplicitExecutive()
+
+  if explicit_executive isnot# v:null
+    let executive = explicit_executive
+  else
+    let executive = get(g:, 'vista_default_executive', 'ctags')
+  endif
+
+  return executive
+endfunction
+
 function! vista#GenericCloseOverlay() abort
   if has('*nvim_open_win')
     call vista#floating#Close()

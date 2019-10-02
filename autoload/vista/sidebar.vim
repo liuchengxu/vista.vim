@@ -104,32 +104,10 @@ function! s:ClearAugroups(...) abort
   endfor
 endfunction
 
-function! s:GetExplicitExecutive() abort
-  let ft = &filetype
-
-  if exists('g:vista_'.ft.'_executive')
-    execute 'return' 'g:vista_'.ft.'_executive'
-  endif
-
-  if exists('g:vista_executive_for') && has_key(g:vista_executive_for, ft)
-    return g:vista_executive_for[ft]
-  endif
-
-  return v:null
-endfunction
-
 function! vista#sidebar#Open() abort
   let [bufnr, winnr, fname, fpath] = [bufnr('%'), winnr(), expand('%'), expand('%:p')]
   call vista#source#Update(bufnr, winnr, fname, fpath)
-
-  let explicit_executive = s:GetExplicitExecutive()
-
-  if explicit_executive isnot# v:null
-    let executive = explicit_executive
-  else
-    let executive = get(g:, 'vista_default_executive', 'ctags')
-  endif
-
+  let executive = vista#GetExplicitExecutiveOrDefault()
   " Support the builtin markdown toc extension as an executive
   if &filetype ==# 'markdown' && executive ==# 'toc'
     call vista#extension#markdown#Execute(v:false, v:true)

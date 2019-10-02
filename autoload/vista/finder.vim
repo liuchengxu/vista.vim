@@ -158,6 +158,10 @@ endfunction
 
 function! vista#finder#Dispatch(finder, executive) abort
   let finder = empty(a:finder) ? 'fzf' : a:finder
-  let executive = empty(a:executive) ? 'ctags' : a:executive
+  if empty(a:executive)
+    let executive = vista#GetExplicitExecutiveOrDefault()
+  else
+    let executive = a:executive
+  endif
   call vista#finder#{finder}#Run(executive)
 endfunction
