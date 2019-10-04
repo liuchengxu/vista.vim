@@ -55,7 +55,9 @@ function! s:EnsureExists() abort
     endfunction
 
     function! t:vista.source.extension() abort
-      return fnamemodify(self.fpath, ':e')
+      " Try the extension first, and then the filetype, for ctags relys on the extension name.
+      let e = fnamemodify(self.fpath, ':e')
+      return empty(e) ? getbufvar(self.bufnr, '&ft') : e
     endfunction
 
     function! t:vista.source.scope_seperator() abort
