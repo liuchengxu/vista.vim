@@ -256,6 +256,8 @@ g:vista_icon_indent                                          *g:vista_icon_inden
 
   How each level is indented and what to prepend. This could make
   the display more compact or more spacious.
+
+  Note: this option only works the LSP executives, doesn't work for `:Vista ctags` .
 >
 g:vista_default_executive                              *g:vista_default_executive*
 

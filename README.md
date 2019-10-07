@@ -5,6 +5,7 @@ View and search LSP symbols, tags in Vim/NeoVim.
 
 <p align="center">
     <img width="600px" src="https://user-images.githubusercontent.com/8850248/56469894-14d40780-6472-11e9-802f-729ac53bd4d5.gif">
+    <p align="center">Vista ctags</p>
 </p>
 
 ## Table Of Contents
@@ -38,7 +39,9 @@ In addition to being a tags viewer, vista.vim can also be a symbol navigator sim
 
 <p align="center">
     <img width="600px" src="https://user-images.githubusercontent.com/8850248/56454822-18d82a80-6389-11e9-80cf-ef7709da3f75.png">
+    <p align="center">Vista ctags</p>
 </p>
+
 
 ## Features
 
@@ -162,6 +165,7 @@ See `:help vista-commands` for more information.
 " How each level is indented and what to prepend.
 " This could make the display more compact or more spacious.
 " e.g., more compact: ["▸ ", ""]
+" Note: this option only works the LSP executives, doesn't work for `:Vista ctags`.
 let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
 
 " Executive used when opening vista sidebar without specifying it.
