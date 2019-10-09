@@ -123,6 +123,10 @@ function! vista#parser#ctags#FromExtendedRaw(line, container) abort
 
   call extend(line, tagfields)
 
+  if vista#ShouldIgnore(line.kind)
+    return
+  endif
+
   call s:LoadData(a:container, line)
 
 endfunction
@@ -138,6 +142,10 @@ function! vista#parser#ctags#FromJSON(line, container) abort
     call vista#error#('Fail to decode from JSON: '.a:line.', error: '.v:exception)
     return
   endtry
+
+  if vista#ShouldIgnore(line.kind)
+    return
+  endif
 
   call s:LoadData(a:container, line)
 
@@ -164,6 +172,9 @@ function! vista#parser#ctags#RecursiveFromXformat(line, container) abort
   let tagname = items[0][8:]
   " KIND:
   let kind = items[1][5:]
+  if vista#ShouldIgnore(kind)
+    return
+  endif
   " LINE:
   let lnum = items[2][5:]
   " INPUT-FILE:
@@ -192,6 +203,10 @@ function! vista#parser#ctags#RecursiveFromJSON(line, container) abort
   let line = json_decode(a:line)
 
   let kind = line.kind
+
+  if vista#ShouldIgnore(kind)
+    return
+  endif
 
   let picked = {'lnum': line.line, 'text': line.name, 'tagfile': line.path, 'taginfo': line.pattern[2:-3]}
 

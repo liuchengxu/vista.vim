@@ -20,6 +20,10 @@ function! vista#ShouldSkip() abort
         \ || index(blacklist, &filetype) > -1
 endfunction
 
+function! vista#ShouldIgnore(kind) abort
+  return exists('g:vista_ignore_kinds') && index(g:vista_ignore_kinds, a:kind) != -1
+endfunction
+
 function! vista#SetProvider(provider) abort
   if get(t:vista, 'skip_set_provider', v:false)
     let t:vista.skip_set_provider = v:false

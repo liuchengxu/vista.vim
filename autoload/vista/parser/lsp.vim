@@ -62,6 +62,10 @@ endfunction
 function! vista#parser#lsp#ExtractSymbol(symbol, container) abort
   let symbol = a:symbol
 
+  if vista#ShouldIgnore(symbol.kind)
+    return
+  endif
+
   let picked = {'lnum': symbol.lnum, 'col': symbol.col, 'text': symbol.text}
 
   if symbol.kind ==? 'Method' || symbol.kind ==? 'Function'
