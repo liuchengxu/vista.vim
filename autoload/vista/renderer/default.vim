@@ -104,11 +104,21 @@ function! s:RealParentOf(candidate) abort
   return {}
 endfunction
 
+" Previously we use the regexp to see if the scope of candidate is matched:
+"
+" \ ' && v:val.scope =~# ''^''.l:scope'.
+"
+" but it runs into the error like NFA E869 '\@ ' in some cases, so we use this
+" now. Ref #161
+function! s:StartWith(candidate_scope, root_scope) abort
+  return a:candidate_scope[:len(a:root_scope)] == a:root_scope
+endfunction
+
 " Find all descendants of the root
 function! s:DescendantsOf(candidates, root_line, scope) abort
   let candidates = filter(copy(a:candidates),
         \ 'has_key(v:val, ''scope'')'.
-        \ ' && v:val.scope =~# ''^''.a:scope'.
+        \ ' && s:StartWith(v:val.scope, a:scope)'.
         \ ' && v:val.scopeKind ==# a:root_line.kind'.
         \ ' && v:val.line > a:root_line.line'
         \ )
@@ -121,7 +131,7 @@ endfunction
 function! s:DescendantsOfRoot(candidates, root_line) abort
   let candidates = filter(copy(a:candidates),
         \ 'has_key(v:val, ''scope'')'.
-        \ ' && v:val.scope =~# ''^''.a:root_line.name'.
+        \ ' && s:StartWith(v:val.scope, a:root_line.name)'.
         \ ' && v:val.scopeKind ==# a:root_line.kind'.
         \ ' && v:val.line > a:root_line.line'
         \ )
