@@ -344,10 +344,12 @@ function! vista#cursor#FoldOrJump() abort
 
   " Fold or unfold when meets the top level tag line
   if indent('.') == 0
-    if foldclosed('.') != -1
-      normal! zo
-    else
-      normal! zc
+    if !empty(getline('.'))
+      if foldclosed('.') != -1
+        normal! zo
+      else
+        normal! zc
+      endif
     endif
     return
   endif
