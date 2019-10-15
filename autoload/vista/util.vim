@@ -45,7 +45,7 @@ function! s:SetBufline(bufnr, lines) abort
     let cur_lines = getbufline(a:bufnr, 1, '$')
     call setbufline(a:bufnr, 1, a:lines)
     if len(cur_lines) > len(a:lines)
-      call deletebufline(a:bufnr, len(a:lines)+1, len(cur_lines)+1)
+      silent call deletebufline(a:bufnr, len(a:lines)+1, len(cur_lines)+1)
     endif
   endif
 endfunction

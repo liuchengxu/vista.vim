@@ -19,6 +19,13 @@ function! s:HiTag() abort
   call prop_add(s:popup_lnum, s:popup_start+1, { 'length': s:popup_end - s:popup_start, 'type': 'VistaMatch' })
 endfunction
 
+function! s:HiTagLine() abort
+  if exists('w:vista_hi_cur_tag_id')
+    call matchdelete(w:vista_hi_cur_tag_id)
+  endif
+  call matchaddpos('Search', [s:popup_lnum])
+endfunction
+
 function! s:OpenPopup(lnum, tag) abort
   let range = 5
 
@@ -61,19 +68,23 @@ function! s:OpenPopup(lnum, tag) abort
     let filetype = getbufvar(t:vista.source.bufnr, '&ft')
     call win_execute(s:popup_winid, 'setlocal filetype='.filetype.' nofoldenable')
   else
-    call deletebufline(s:popup_bufnr, 1, 100000000000)
+    silent call deletebufline(s:popup_bufnr, 1, 100000000000)
     call setbufline(s:popup_bufnr, 1, lines)
     call popup_show(s:popup_winid)
     call popup_move(s:popup_winid, pos_opts)
   endif
 
   let target_line = lines[s:popup_lnum - 1]
-  let [_, s:popup_start, s:popup_end] = matchstrpos(target_line, '\C'.a:tag)
+  try
+    let [_, s:popup_start, s:popup_end] = matchstrpos(target_line, '\C'.a:tag)
 
-  " Highlight the tag in the popup window if found.
-  if s:popup_start > -1
-    call win_execute(s:popup_winid, 'call s:HiTag()')
-  endif
+    " Highlight the tag in the popup window if found.
+    if s:popup_start > -1
+      call win_execute(s:popup_winid, 'call s:HiTag()')
+    endif
+  catch /^Vim\%((\a\+)\)\=:E869/
+    call win_execute(s:popup_winid, 'call s:HiTagLine()')
+  endtry
 
   augroup VistaPopup
     autocmd!

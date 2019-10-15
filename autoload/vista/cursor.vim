@@ -107,13 +107,22 @@ endfunction
 function! s:EchoInCmdline(msg, tag) abort
   let [msg, tag] = [a:msg, a:tag]
 
-  let [_, start, end] = matchstrpos(msg, '\C'.tag)
+  " Case II:\@ $R^2 \geq Q^3$ :  paragraph:175
+  try
+    let [_, start, end] = matchstrpos(msg, '\C'.tag)
 
-  " If couldn't find the tag in the msg
-  if start == -1
+    " If couldn't find the tag in the msg
+    if start == -1
+      echohl Function | echo msg | echohl NONE
+      return
+    endif
+
+  catch /^Vim\%((\a\+)\)\=:E869/
+
     echohl Function | echo msg | echohl NONE
     return
-  endif
+
+  endtry
 
   let echoed_scope = v:false
 

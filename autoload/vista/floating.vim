@@ -114,12 +114,16 @@ function! s:Display(msg) abort
   call nvim_buf_set_lines(s:floating_bufnr, 0, -1, 0, a:msg)
 
   let target_line = getbufline(s:floating_bufnr, s:floating_lnum)[0]
-  let [_, start, end] = matchstrpos(target_line, '\C'.s:cur_tag)
-
-  if start != -1
-    " {line} is zero-based.
-    call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:floating_lnum-1, start, end)
-  endif
+  try
+    let [_, start, end] = matchstrpos(target_line, '\C'.s:cur_tag)
+    if start != -1
+      " {line} is zero-based.
+      call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:floating_lnum-1, start, end)
+    endif
+  catch /^Vim\%((\a\+)\)\=:E869/
+    " If we meet the E869 error, just highlight the whole line.
+    call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:floating_lnum-1, 0, -1)
+  endtry
 
   setlocal
         \ winhl=Normal:Pmenu
