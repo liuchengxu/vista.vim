@@ -90,7 +90,6 @@ function! s:DisplayRawAt(lnum, lines) abort
 endfunction
 
 function! s:DisplayAt(lnum, tag) abort
-  echom "000000 :".a:lnum." tag: .".a:tag
   let lines = s:GetSouceLines(a:lnum)
 
   let s:max_length = max(map(copy(lines), 'strlen(v:val)')) + 2
@@ -99,12 +98,10 @@ function! s:DisplayAt(lnum, tag) abort
 
   let target_line = lines[s:popup_lnum - 1]
   try
-    echom "tag: ".a:tag
     let [_, s:popup_start, s:popup_end] = matchstrpos(target_line, '\C'.a:tag)
 
     " Highlight the tag in the popup window if found.
     if s:popup_start > -1
-      echom "s:popup_move: ".s:popup_start
       call win_execute(s:popup_winid, 'call s:HiTag()')
     endif
   catch /^Vim\%((\a\+)\)\=:E869/
