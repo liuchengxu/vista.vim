@@ -30,5 +30,8 @@ function! vista#fold#Text() abort
   let spaces = repeat(' ', &tabstop)
   let line = substitute(line, '\t', spaces, 'g')
 
+  let line = substitute(line, '▼', '▶', '')
+  let line .= repeat(' ', 100)
+
   return line
 endfunction

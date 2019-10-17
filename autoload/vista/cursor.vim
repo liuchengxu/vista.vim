@@ -235,7 +235,9 @@ function! s:Compare(s1, s2) abort
 endfunction
 
 function! s:FindNearestMethodOrFunction(_timer) abort
-  if !exists('t:vista') || !has_key(t:vista, 'functions') || !has_key(t:vista, 'source')
+  if !exists('t:vista')
+        \ || !has_key(t:vista, 'functions')
+        \ || !has_key(t:vista, 'source')
     return
   endif
   call sort(t:vista.functions, function('s:Compare'))
