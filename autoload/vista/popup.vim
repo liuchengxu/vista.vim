@@ -68,7 +68,7 @@ function! s:OpenPopup(lnum, tag) abort
     let filetype = getbufvar(t:vista.source.bufnr, '&ft')
     call win_execute(s:popup_winid, 'setlocal filetype='.filetype.' nofoldenable')
   else
-    silent call deletebufline(s:popup_bufnr, 1, 100000000000)
+    silent call deletebufline(s:popup_bufnr, 1, '$')
     call setbufline(s:popup_bufnr, 1, lines)
     call popup_show(s:popup_winid)
     call popup_move(s:popup_winid, pos_opts)
@@ -99,7 +99,7 @@ function! vista#popup#Close() abort
   call s:ClosePopup()
 endfunction
 
-function! vista#popup#Display(lnum, tag) abort
+function! vista#popup#DisplayAt(lnum, tag) abort
   if a:lnum == s:last_lnum
         \ || get(t:vista, 'popup_visible', v:false)
     return

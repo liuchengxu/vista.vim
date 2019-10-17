@@ -109,21 +109,26 @@ function! s:Display(msg) abort
         \   'anchor': anchor,
         \   'row': row + 0.4,
         \   'col': col - 5,
+        \   'focusable': v:false,
         \ })
 
   call nvim_buf_set_lines(s:floating_bufnr, 0, -1, 0, a:msg)
 
-  let target_line = getbufline(s:floating_bufnr, s:floating_lnum)[0]
-  try
-    let [_, start, end] = matchstrpos(target_line, '\C'.s:cur_tag)
-    if start != -1
-      " {line} is zero-based.
-      call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:floating_lnum-1, start, end)
-    endif
-  catch /^Vim\%((\a\+)\)\=:E869/
-    " If we meet the E869 error, just highlight the whole line.
-    call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:floating_lnum-1, 0, -1)
-  endtry
+  if exists('s:floating_lnum')
+    let target_line = getbufline(s:floating_bufnr, s:floating_lnum)[0]
+    try
+      let [_, start, end] = matchstrpos(target_line, '\C'.s:cur_tag)
+      if start != -1
+        " {line} is zero-based.
+        call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:floating_lnum-1, start, end)
+      endif
+    catch /^Vim\%((\a\+)\)\=:E869/
+      " If we meet the E869 error, just highlight the whole line.
+      call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:floating_lnum-1, 0, -1)
+    endtry
+
+    unlet s:floating_lnum
+  endif
 
   setlocal
         \ winhl=Normal:Pmenu
@@ -152,7 +157,7 @@ function! vista#floating#Close() abort
   call s:ApplyClose()
 endfunction
 
-function! vista#floating#Display(lnum, tag) abort
+function! vista#floating#DisplayAt(lnum, tag) abort
   silent! call timer_stop(s:floating_timer)
 
   let lnum = a:lnum
@@ -189,5 +194,22 @@ function! vista#floating#Display(lnum, tag) abort
   let s:floating_timer = timer_start(
         \ delay,
         \ { -> s:Display(lines)},
+        \ )
+endfunction
+
+function! vista#floating#DisplayRawAt(lnum, lines) abort
+  silent! call timer_stop(s:floating_timer)
+
+  if a:lnum == s:last_lnum
+        \ && get(t:vista, 'floating_visible', v:false)
+    return
+  endif
+
+  let s:last_lnum = a:lnum
+
+  let delay = get(g:, 'vista_floating_delay', 100)
+  let s:floating_timer = timer_start(
+        \ delay,
+        \ { -> s:Display(a:lines)},
         \ )
 endfunction

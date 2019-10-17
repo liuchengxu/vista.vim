@@ -174,9 +174,9 @@ endfunction
 
 function! s:DisplayInFloatingWin(...) abort
   if s:has_popup
-    call call('vista#popup#Display', a:000)
+    call call('vista#popup#DisplayAt', a:000)
   elseif s:has_floating_win
-    call call('vista#floating#Display', a:000)
+    call call('vista#floating#DisplayAt', a:000)
   else
     call vista#error#Need('neovim compiled with floating window support or vim compiled with popup feature')
   endif
@@ -400,6 +400,15 @@ function! vista#cursor#ShowDetail(_timer) abort
     call s:EchoScope(scope)
     echohl Keyword | echon cnt | echohl NONE
     return
+  endif
+
+  if foldclosed('.') != -1
+    if s:has_floating_win
+      let foldclosed_end = foldclosedend('.')
+      let curlnum = line('.')
+      let lines = getbufline(t:vista.bufnr, curlnum, foldclosed_end)
+      call vista#floating#DisplayRawAt(curlnum, lines)
+    endif
   endif
 
   call s:ShowDetail()
