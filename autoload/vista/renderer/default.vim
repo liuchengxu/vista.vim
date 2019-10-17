@@ -10,7 +10,7 @@ let s:visibility_icon = {
       \ 'private': '-',
       \ }
 
-let s:arrow_icon = ['▼', '▶']
+let g:vista_fold_toggle_icons = get(g:, 'vista_fold_toggle_icons', ['▼', '▶'])
 
 let g:vista#renderer#default#vlnum_offset = 3
 
@@ -206,7 +206,7 @@ function! s:RenderScopeless(scope_less, rows) abort
 
   for kind in keys(scope_less)
     let kind_line = vista#renderer#Decorate(kind)
-    call add(rows, s:arrow_icon[0].kind_line)
+    call add(rows, g:vista_fold_toggle_icons[0].' '.kind_line)
 
     let lines = scope_less[kind]
 

@@ -14,12 +14,21 @@ function! s:ClearOtherEvents(group) abort
   endfor
 endfunction
 
-function! s:GenericAutoUpdate(fpath) abort
+function! s:OnBufEnter(bufnr, fpath) abort
+  " If we just enter the buffer that is being displayed, skip the update.
+  if a:bufnr == t:vista.source.bufnr
+    return
+  endif
+
+  call s:GenericAutoUpdate(a:bufnr, a:fpath)
+endfunction
+
+function! s:GenericAutoUpdate(bufnr, fpath) abort
   if vista#ShouldSkip()
     return
   endif
 
-  let [bufnr, winnr, fname] = [bufnr('%'), winnr(), expand('%')]
+  let [bufnr, winnr, fname] = [a:bufnr, winnr(), expand('%')]
 
   call vista#source#Update(bufnr, winnr, fname, a:fpath)
 
@@ -72,8 +81,10 @@ function! vista#autocmd#Init(group_name, AUF) abort
     "
     " CursorHold and CursorHoldI event have been removed in order to
     " highlight the nearest tag automatically.
-    autocmd BufEnter,BufWritePost,BufReadPost, *
-          \ call s:GenericAutoUpdate(fnamemodify(expand('<afile>'), ':p'))
+    autocmd BufWritePost,BufReadPost, *
+          \ call s:GenericAutoUpdate(+expand('<abuf>'), fnamemodify(expand('<afile>'), ':p'))
+
+    autocmd BufEnter * call s:OnBufEnter(+expand('<abuf>'), fnamemodify(expand('<afile>'), ':p'))
 
     if get(g:, 'vista_update_on_text_changed', 0)
       autocmd TextChanged,TextChangedI * call s:AutoUpdateWithDelay(fnamemodify(expand('<afile>'), ':p'))
