@@ -26,26 +26,12 @@ function! s:HiTagLine() abort
   let w:vista_hi_cur_tag_id = matchaddpos('Search', [s:popup_lnum])
 endfunction
 
-function! s:OpenPopup(lnum, tag) abort
-  let range = 5
-
-  if a:lnum - range > 0
-    let s:popup_lnum = range + 1
-  else
-    let s:popup_lnum = a:lnum
-  endif
-
-  let begin = max([a:lnum - range, 1])
-  let end = begin + range * 2
-  let lines = getbufline(t:vista.source.bufnr, begin, end)
-
-  let max_length = max(map(copy(lines), 'strlen(v:val)')) + 2
-
+function! s:OpenPopup(lines) abort
   if get(g:, 'vista_sidebar_position', 'vertical botright') =~# 'right'
     let pos_opts = {
           \ 'pos': 'botleft',
           \ 'line': 'cursor-2',
-          \ 'col': 'cursor-'.max_length,
+          \ 'col': 'cursor-'.s:max_length,
           \ 'moved': 'WORD',
           \ }
   else
@@ -62,29 +48,37 @@ function! s:OpenPopup(lnum, tag) abort
   endif
 
   if !exists('s:popup_winid')
-    let s:popup_winid = popup_create(lines, pos_opts)
+    let s:popup_winid = popup_create(a:lines, pos_opts)
     let s:popup_bufnr = winbufnr(s:popup_winid)
 
     let filetype = getbufvar(t:vista.source.bufnr, '&ft')
     call win_execute(s:popup_winid, 'setlocal filetype='.filetype.' nofoldenable')
   else
     silent call deletebufline(s:popup_bufnr, 1, '$')
-    call setbufline(s:popup_bufnr, 1, lines)
+    call setbufline(s:popup_bufnr, 1, a:lines)
     call popup_show(s:popup_winid)
     call popup_move(s:popup_winid, pos_opts)
   endif
+endfunction
 
-  let target_line = lines[s:popup_lnum - 1]
-  try
-    let [_, s:popup_start, s:popup_end] = matchstrpos(target_line, '\C'.a:tag)
+function! s:GetSouceLines(lnum) abort
+  let range = 5
 
-    " Highlight the tag in the popup window if found.
-    if s:popup_start > -1
-      call win_execute(s:popup_winid, 'call s:HiTag()')
-    endif
-  catch /^Vim\%((\a\+)\)\=:E869/
-    call win_execute(s:popup_winid, 'call s:HiTagLine()')
-  endtry
+  if a:lnum - range > 0
+    let s:popup_lnum = range + 1
+  else
+    let s:popup_lnum = a:lnum
+  endif
+
+  let begin = max([a:lnum - range, 1])
+  let end = begin + range * 2
+
+  return getbufline(t:vista.source.bufnr, begin, end)
+endfunction
+
+function! s:DisplayRawAt(lnum, lines) abort
+  let s:max_length = max(map(copy(a:lines), 'strlen(v:val)')) + 2
+  call s:OpenPopup(a:lines)
 
   augroup VistaPopup
     autocmd!
@@ -95,21 +89,62 @@ function! s:OpenPopup(lnum, tag) abort
   let t:vista.popup_visible = v:true
 endfunction
 
+function! s:DisplayAt(lnum, tag) abort
+  echom "000000 :".a:lnum." tag: .".a:tag
+  let lines = s:GetSouceLines(a:lnum)
+
+  let s:max_length = max(map(copy(lines), 'strlen(v:val)')) + 2
+
+  call s:OpenPopup(lines)
+
+  let target_line = lines[s:popup_lnum - 1]
+  try
+    echom "tag: ".a:tag
+    let [_, s:popup_start, s:popup_end] = matchstrpos(target_line, '\C'.a:tag)
+
+    " Highlight the tag in the popup window if found.
+    if s:popup_start > -1
+      echom "s:popup_move: ".s:popup_start
+      call win_execute(s:popup_winid, 'call s:HiTag()')
+    endif
+  catch /^Vim\%((\a\+)\)\=:E869/
+    call win_execute(s:popup_winid, 'call s:HiTagLine()')
+  endtry
+
+  augroup VistaPopup
+    autocmd!
+    autocmd CursorMoved <buffer> call s:ClosePopup()
+    autocmd BufEnter,WinEnter,WinLeave * call s:ClosePopup()
+  augroup END
+
+  let t:vista.popup_visible = v:true
+endfunction
+
 function! vista#popup#Close() abort
   call s:ClosePopup()
 endfunction
 
-function! vista#popup#DisplayAt(lnum, tag) abort
+function! s:DispatchDisplayer(Displayer, lnum, tag_or_raw_lines) abort
   if a:lnum == s:last_lnum
         \ || get(t:vista, 'popup_visible', v:false)
     return
   endif
+
+  silent! call timer_stop(s:popup_timer)
 
   let s:last_lnum = a:lnum
 
   let delay = get(g:, 'vista_floating_delay', 100)
   let s:popup_timer = timer_start(
         \ delay,
-        \ { -> s:OpenPopup(a:lnum, a:tag)},
+        \ { -> call(a:Displayer, [a:lnum, a:tag_or_raw_lines]) }
         \ )
+endfunction
+
+function! vista#popup#DisplayAt(lnum, tag) abort
+  call s:DispatchDisplayer(function('s:DisplayAt'), a:lnum, a:tag)
+endfunction
+
+function! vista#popup#DisplayRawAt(lnum, lines) abort
+  call s:DispatchDisplayer(function('s:DisplayRawAt'), a:lnum, a:lines)
 endfunction

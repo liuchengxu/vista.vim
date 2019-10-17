@@ -408,6 +408,11 @@ function! vista#cursor#ShowDetail(_timer) abort
       let curlnum = line('.')
       let lines = getbufline(t:vista.bufnr, curlnum, foldclosed_end)
       call vista#floating#DisplayRawAt(curlnum, lines)
+    elseif s:has_popup
+      let foldclosed_end = foldclosedend('.')
+      let curlnum = line('.')
+      let lines = getbufline(t:vista.bufnr, curlnum, foldclosed_end)
+      call vista#popup#DisplayRawAt(curlnum, lines)
     endif
   endif
 
