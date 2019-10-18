@@ -185,17 +185,23 @@ function! s:DisplayInFloatingWin(...) abort
   endif
 endfunction
 
-function! s:RevealInSourceFile(lnum, tag) abort
-  noautocmd execute t:vista.source.winnr().'wincmd w'
-
+function! s:ApplyPeek(lnum, tag) abort
   silent execute 'normal!' a:lnum.'z.'
-
   let [_, start, end] = matchstrpos(getline('.'), a:tag)
-
   call vista#util#Blink(1, 100, [a:lnum, start+1, strlen(a:tag)])
-
-  noautocmd wincmd p
 endfunction
+
+if exists('*win_execute')
+  function! s:PeekInSourceFile(lnum, tag) abort
+    call win_execute(bufwinid(t:vista.source.bufnr), 'noautocmd call s:ApplyPeek(a:lnum, a:tag)')
+  endfunction
+else
+  function! s:PeekInSourceFile(lnum, tag) abort
+    noautocmd execute t:vista.source.winnr().'wincmd w'
+    call s:ApplyPeek(a:lnum, a:tag)
+    noautocmd wincmd p
+  endfunction
+endif
 
 " Show the detail of current tag/symbol under cursor.
 function! s:ShowDetail() abort
@@ -218,13 +224,13 @@ function! s:ShowDetail() abort
   elseif strategy == opts[1]
     call s:DisplayInFloatingWin(lnum, tag)
   elseif strategy == opts[2]
-    call s:RevealInSourceFile(lnum, tag)
+    call s:PeekInSourceFile(lnum, tag)
   elseif strategy == opts[3]
     call s:EchoInCmdline(msg, tag)
     if s:has_floating_win
       call s:DisplayInFloatingWin(lnum, tag)
     else
-      call s:RevealInSourceFile(lnum, tag)
+      call s:PeekInSourceFile(lnum, tag)
     endif
   else
     call vista#error#InvalidOption('g:vista_echo_cursor_strategy', opts)
