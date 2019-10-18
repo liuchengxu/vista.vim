@@ -11,6 +11,9 @@ let s:find_timer = -1
 let s:cursor_timer = -1
 let s:highlight_timer = -1
 
+let s:find_delay = get(g:, 'vista_find_nearest_method_or_function_delay', 300)
+let s:cursor_delay = get(g:, 'vista_cursor_delay', 400)
+
 let s:last_vlnum = v:null
 
 function! s:GenericStopTimer(timer) abort
@@ -374,15 +377,26 @@ function! vista#cursor#FindNearestMethodOrFunction() abort
     return
   endif
 
-  let delay = get(g:, 'vista_find_nearest_method_or_function_delay', 300)
   let s:find_timer = timer_start(
-        \ delay,
+        \ s:find_delay,
         \ function('s:FindNearestMethodOrFunction'),
         \ )
 endfunction
 
 function! vista#cursor#NearestSymbol() abort
   return vista#util#BinarySearch(t:vista.raw, line('.'), 'line', 'name')
+endfunction
+
+function! s:ShowFoldedDetail() abort
+  let foldclosed_end = foldclosedend('.')
+  let curlnum = line('.')
+  let lines = getbufline(t:vista.bufnr, curlnum, foldclosed_end)
+
+  if s:has_floating_win
+    call vista#floating#DisplayRawAt(curlnum, lines)
+  elseif s:has_popup
+    call vista#popup#DisplayRawAt(curlnum, lines)
+  endif
 endfunction
 
 function! vista#cursor#ShowDetail(_timer) abort
@@ -406,16 +420,8 @@ function! vista#cursor#ShowDetail(_timer) abort
     if !s:has_floating_win && !s:has_popup
       return
     endif
-
-    let foldclosed_end = foldclosedend('.')
-    let curlnum = line('.')
-    let lines = getbufline(t:vista.bufnr, curlnum, foldclosed_end)
-
-    if s:has_floating_win
-      call vista#floating#DisplayRawAt(curlnum, lines)
-    elseif s:has_popup
-      call vista#popup#DisplayRawAt(curlnum, lines)
-    endif
+    call s:ShowFoldedDetail()
+    return
   endif
 
   call s:ShowDetail()
@@ -424,9 +430,8 @@ endfunction
 function! vista#cursor#ShowDetailWithDelay() abort
   call s:StopCursorTimer()
 
-  let delay = get(g:, 'vista_cursor_delay', 400)
   let s:cursor_timer = timer_start(
-        \ delay,
+        \ s:cursor_delay,
         \ function('vista#cursor#ShowDetail'),
         \ )
 endfunction
