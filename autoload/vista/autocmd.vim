@@ -27,6 +27,10 @@ function! s:GenericAutoUpdate(fpath) abort
 endfunction
 
 function! s:AutoUpdateWithDelay(fpath) abort
+  if !exists('t:vista')
+    return
+  endif
+
   if s:update_timer != -1
     call timer_stop(s:update_timer)
     let s:update_timer = -1
