@@ -5,6 +5,8 @@
 let s:floating_timer = -1
 let s:last_lnum = -1
 
+let s:floating_delay = get(g:, 'vista_floating_delay', 100)
+
 " Vista sidebar window usually sits at the right side.
 " TODO improve me!
 function! s:CalculatePosition(lines) abort
@@ -157,6 +159,22 @@ function! vista#floating#Close() abort
   call s:ApplyClose()
 endfunction
 
+function! s:GetSouceLines(lnum) abort
+  let range = 5
+
+  if a:lnum - range > 0
+    let s:popup_lnum = range + 1
+  else
+    let s:popup_lnum = a:lnum
+  endif
+
+  let begin = max([a:lnum - range, 1])
+  let end = begin + range * 2
+
+  return getbufline(t:vista.source.bufnr, begin, end)
+endfunction
+
+
 function! vista#floating#DisplayAt(lnum, tag) abort
   silent! call timer_stop(s:floating_timer)
 
@@ -177,24 +195,9 @@ function! vista#floating#DisplayAt(lnum, tag) abort
   let s:last_lnum = lnum
   let s:cur_tag = a:tag
 
-  " Show 5 lines around the tag source line [lnum-5, lnum+5]
-  let range = 5
+  let [lines, s:floating_lnum] = vista#util#GetPreviewLines(lnum)
 
-  if lnum - range > 0
-    let s:floating_lnum = range + 1
-  else
-    let s:floating_lnum = lnum
-  endif
-
-  let begin = max([lnum - range, 1])
-  let end = begin + range * 2
-  let lines = getbufline(t:vista.source.bufnr, begin, end)
-
-  let delay = get(g:, 'vista_floating_delay', 100)
-  let s:floating_timer = timer_start(
-        \ delay,
-        \ { -> s:Display(lines)},
-        \ )
+  let s:floating_timer = timer_start(s:floating_delay, { -> s:Display(lines)})
 endfunction
 
 function! vista#floating#DisplayRawAt(lnum, lines) abort
@@ -207,9 +210,5 @@ function! vista#floating#DisplayRawAt(lnum, lines) abort
 
   let s:last_lnum = a:lnum
 
-  let delay = get(g:, 'vista_floating_delay', 100)
-  let s:floating_timer = timer_start(
-        \ delay,
-        \ { -> s:Display(a:lines)},
-        \ )
+  let s:floating_timer = timer_start(s:floating_delay, { -> s:Display(a:lines)})
 endfunction

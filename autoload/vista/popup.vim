@@ -4,6 +4,7 @@
 
 let s:last_lnum = -1
 let s:popup_timer = -1
+let s:popup_delay = get(g:, 'vista_floating_delay', 100)
 
 function! s:ClosePopup() abort
   if exists('s:popup_winid')
@@ -61,21 +62,6 @@ function! s:OpenPopup(lines) abort
   endif
 endfunction
 
-function! s:GetSouceLines(lnum) abort
-  let range = 5
-
-  if a:lnum - range > 0
-    let s:popup_lnum = range + 1
-  else
-    let s:popup_lnum = a:lnum
-  endif
-
-  let begin = max([a:lnum - range, 1])
-  let end = begin + range * 2
-
-  return getbufline(t:vista.source.bufnr, begin, end)
-endfunction
-
 function! s:DisplayRawAt(lnum, lines) abort
   let s:max_length = max(map(copy(a:lines), 'strlen(v:val)')) + 2
   call s:OpenPopup(a:lines)
@@ -90,7 +76,7 @@ function! s:DisplayRawAt(lnum, lines) abort
 endfunction
 
 function! s:DisplayAt(lnum, tag) abort
-  let lines = s:GetSouceLines(a:lnum)
+  let [lines, s:popup_lnum] = vista#util#GetPreviewLines(a:lnum)
 
   let s:max_length = max(map(copy(lines), 'strlen(v:val)')) + 2
 
@@ -131,9 +117,8 @@ function! s:DispatchDisplayer(Displayer, lnum, tag_or_raw_lines) abort
 
   let s:last_lnum = a:lnum
 
-  let delay = get(g:, 'vista_floating_delay', 100)
   let s:popup_timer = timer_start(
-        \ delay,
+        \ s:popup_delay,
         \ { -> call(a:Displayer, [a:lnum, a:tag_or_raw_lines]) }
         \ )
 endfunction
