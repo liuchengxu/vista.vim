@@ -5,6 +5,8 @@
 let s:floating_timer = -1
 let s:last_lnum = -1
 
+let s:floating_delay = get(g:, 'vista_floating_delay', 100)
+
 " Vista sidebar window usually sits at the right side.
 " TODO improve me!
 function! s:CalculatePosition(lines) abort
@@ -109,21 +111,26 @@ function! s:Display(msg) abort
         \   'anchor': anchor,
         \   'row': row + 0.4,
         \   'col': col - 5,
+        \   'focusable': v:false,
         \ })
 
   call nvim_buf_set_lines(s:floating_bufnr, 0, -1, 0, a:msg)
 
-  let target_line = getbufline(s:floating_bufnr, s:floating_lnum)[0]
-  try
-    let [_, start, end] = matchstrpos(target_line, '\C'.s:cur_tag)
-    if start != -1
-      " {line} is zero-based.
-      call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:floating_lnum-1, start, end)
-    endif
-  catch /^Vim\%((\a\+)\)\=:E869/
-    " If we meet the E869 error, just highlight the whole line.
-    call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:floating_lnum-1, 0, -1)
-  endtry
+  if exists('s:floating_lnum')
+    let target_line = getbufline(s:floating_bufnr, s:floating_lnum)[0]
+    try
+      let [_, start, end] = matchstrpos(target_line, '\C'.s:cur_tag)
+      if start != -1
+        " {line} is zero-based.
+        call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:floating_lnum-1, start, end)
+      endif
+    catch /^Vim\%((\a\+)\)\=:E869/
+      " If we meet the E869 error, just highlight the whole line.
+      call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:floating_lnum-1, 0, -1)
+    endtry
+
+    unlet s:floating_lnum
+  endif
 
   setlocal
         \ winhl=Normal:Pmenu
@@ -152,7 +159,23 @@ function! vista#floating#Close() abort
   call s:ApplyClose()
 endfunction
 
-function! vista#floating#Display(lnum, tag) abort
+function! s:GetSouceLines(lnum) abort
+  let range = 5
+
+  if a:lnum - range > 0
+    let s:popup_lnum = range + 1
+  else
+    let s:popup_lnum = a:lnum
+  endif
+
+  let begin = max([a:lnum - range, 1])
+  let end = begin + range * 2
+
+  return getbufline(t:vista.source.bufnr, begin, end)
+endfunction
+
+
+function! vista#floating#DisplayAt(lnum, tag) abort
   silent! call timer_stop(s:floating_timer)
 
   let lnum = a:lnum
@@ -172,22 +195,20 @@ function! vista#floating#Display(lnum, tag) abort
   let s:last_lnum = lnum
   let s:cur_tag = a:tag
 
-  " Show 5 lines around the tag source line [lnum-5, lnum+5]
-  let range = 5
+  let [lines, s:floating_lnum] = vista#util#GetPreviewLines(lnum)
 
-  if lnum - range > 0
-    let s:floating_lnum = range + 1
-  else
-    let s:floating_lnum = lnum
+  let s:floating_timer = timer_start(s:floating_delay, { -> s:Display(lines)})
+endfunction
+
+function! vista#floating#DisplayRawAt(lnum, lines) abort
+  silent! call timer_stop(s:floating_timer)
+
+  if a:lnum == s:last_lnum
+        \ && get(t:vista, 'floating_visible', v:false)
+    return
   endif
 
-  let begin = max([lnum - range, 1])
-  let end = begin + range * 2
-  let lines = getbufline(t:vista.source.bufnr, begin, end)
+  let s:last_lnum = a:lnum
 
-  let delay = get(g:, 'vista_floating_delay', 100)
-  let s:floating_timer = timer_start(
-        \ delay,
-        \ { -> s:Display(lines)},
-        \ )
+  let s:floating_timer = timer_start(s:floating_delay, { -> s:Display(a:lines)})
 endfunction

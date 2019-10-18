@@ -10,6 +10,8 @@ let s:visibility_icon = {
       \ 'private': '-',
       \ }
 
+let g:vista_fold_toggle_icons = get(g:, 'vista_fold_toggle_icons', ['▼', '▶'])
+
 let g:vista#renderer#default#vlnum_offset = 3
 
 " Return the rendered row to be displayed given the depth
@@ -203,7 +205,8 @@ function! s:RenderScopeless(scope_less, rows) abort
   let scope_less = a:scope_less
 
   for kind in keys(scope_less)
-    call add(rows, vista#renderer#Decorate(kind))
+    let kind_line = vista#renderer#Decorate(kind)
+    call add(rows, g:vista_fold_toggle_icons[0].' '.kind_line)
 
     let lines = scope_less[kind]
 

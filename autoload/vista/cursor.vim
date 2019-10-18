@@ -11,6 +11,9 @@ let s:find_timer = -1
 let s:cursor_timer = -1
 let s:highlight_timer = -1
 
+let s:find_delay = get(g:, 'vista_find_nearest_method_or_function_delay', 300)
+let s:cursor_delay = get(g:, 'vista_cursor_delay', 400)
+
 let s:last_vlnum = v:null
 
 function! s:GenericStopTimer(timer) abort
@@ -174,25 +177,31 @@ endfunction
 
 function! s:DisplayInFloatingWin(...) abort
   if s:has_popup
-    call call('vista#popup#Display', a:000)
+    call call('vista#popup#DisplayAt', a:000)
   elseif s:has_floating_win
-    call call('vista#floating#Display', a:000)
+    call call('vista#floating#DisplayAt', a:000)
   else
     call vista#error#Need('neovim compiled with floating window support or vim compiled with popup feature')
   endif
 endfunction
 
-function! s:RevealInSourceFile(lnum, tag) abort
-  noautocmd execute t:vista.source.winnr().'wincmd w'
-
+function! s:ApplyPeek(lnum, tag) abort
   silent execute 'normal!' a:lnum.'z.'
-
   let [_, start, end] = matchstrpos(getline('.'), a:tag)
-
   call vista#util#Blink(1, 100, [a:lnum, start+1, strlen(a:tag)])
-
-  noautocmd wincmd p
 endfunction
+
+if exists('*win_execute')
+  function! s:PeekInSourceFile(lnum, tag) abort
+    call win_execute(bufwinid(t:vista.source.bufnr), 'noautocmd call s:ApplyPeek(a:lnum, a:tag)')
+  endfunction
+else
+  function! s:PeekInSourceFile(lnum, tag) abort
+    noautocmd execute t:vista.source.winnr().'wincmd w'
+    call s:ApplyPeek(a:lnum, a:tag)
+    noautocmd wincmd p
+  endfunction
+endif
 
 " Show the detail of current tag/symbol under cursor.
 function! s:ShowDetail() abort
@@ -215,13 +224,13 @@ function! s:ShowDetail() abort
   elseif strategy == opts[1]
     call s:DisplayInFloatingWin(lnum, tag)
   elseif strategy == opts[2]
-    call s:RevealInSourceFile(lnum, tag)
+    call s:PeekInSourceFile(lnum, tag)
   elseif strategy == opts[3]
     call s:EchoInCmdline(msg, tag)
     if s:has_floating_win
       call s:DisplayInFloatingWin(lnum, tag)
     else
-      call s:RevealInSourceFile(lnum, tag)
+      call s:PeekInSourceFile(lnum, tag)
     endif
   else
     call vista#error#InvalidOption('g:vista_echo_cursor_strategy', opts)
@@ -235,7 +244,9 @@ function! s:Compare(s1, s2) abort
 endfunction
 
 function! s:FindNearestMethodOrFunction(_timer) abort
-  if !exists('t:vista') || !has_key(t:vista, 'functions') || !has_key(t:vista, 'source')
+  if !exists('t:vista')
+        \ || !has_key(t:vista, 'functions')
+        \ || !has_key(t:vista, 'source')
     return
   endif
   call sort(t:vista.functions, function('s:Compare'))
@@ -372,15 +383,26 @@ function! vista#cursor#FindNearestMethodOrFunction() abort
     return
   endif
 
-  let delay = get(g:, 'vista_find_nearest_method_or_function_delay', 300)
   let s:find_timer = timer_start(
-        \ delay,
+        \ s:find_delay,
         \ function('s:FindNearestMethodOrFunction'),
         \ )
 endfunction
 
 function! vista#cursor#NearestSymbol() abort
   return vista#util#BinarySearch(t:vista.raw, line('.'), 'line', 'name')
+endfunction
+
+function! s:ShowFoldedDetail() abort
+  let foldclosed_end = foldclosedend('.')
+  let curlnum = line('.')
+  let lines = getbufline(t:vista.bufnr, curlnum, foldclosed_end)
+
+  if s:has_floating_win
+    call vista#floating#DisplayRawAt(curlnum, lines)
+  elseif s:has_popup
+    call vista#popup#DisplayRawAt(curlnum, lines)
+  endif
 endfunction
 
 function! vista#cursor#ShowDetail(_timer) abort
@@ -400,15 +422,22 @@ function! vista#cursor#ShowDetail(_timer) abort
     return
   endif
 
+  if foldclosed('.') != -1
+    if !s:has_floating_win && !s:has_popup
+      return
+    endif
+    call s:ShowFoldedDetail()
+    return
+  endif
+
   call s:ShowDetail()
 endfunction
 
 function! vista#cursor#ShowDetailWithDelay() abort
   call s:StopCursorTimer()
 
-  let delay = get(g:, 'vista_cursor_delay', 400)
   let s:cursor_timer = timer_start(
-        \ delay,
+        \ s:cursor_delay,
         \ function('vista#cursor#ShowDetail'),
         \ )
 endfunction

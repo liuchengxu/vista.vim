@@ -27,6 +27,9 @@ setlocal
   \ foldcolumn=0
   \ nowrap
 
+" Get rid of extra fold dashes when using Vim folding
+setlocal fillchars=fold:\ 
+
 setlocal foldmethod=expr
 setlocal foldexpr=vista#fold#Expr()
 setlocal foldtext=vista#fold#Text()

@@ -29,6 +29,7 @@ function! vista#fold#Text() abort
   " so convert tabs to 'tabstop' spaces, then text lines up.
   let spaces = repeat(' ', &tabstop)
   let line = substitute(line, '\t', spaces, 'g')
+  let line = substitute(line, g:vista_fold_toggle_icons[0], g:vista_fold_toggle_icons[1], '')
 
   return line
 endfunction

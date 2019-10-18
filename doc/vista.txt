@@ -171,6 +171,13 @@ g:vista_sidebar_width                                      *g:vista_sidebar_widt
 
   Width of vista sidebar.
 
+g:vista_fold_toggle_icons                              *g:vista_fold_toggle_icons*
+
+  Type: |List|
+  Default: `['▼', '▶']`
+
+  This variable controls the icons used to indicate open or close folds.
+
 g:vista_echo_cursor                                          *g:vista_echo_cursor*
 
   Type: |Number|
