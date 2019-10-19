@@ -234,7 +234,7 @@ function! s:ShowDetail() abort
       call s:PeekInSourceFile(lnum, tag)
     endif
   else
-    call vista#error#InvalidOption('g:vista_echo_cursor_strategy', opts)
+    call vista#error#InvalidOption('g:vista_echo_cursor_strategy', s:echo_cursor_opts)
   endif
 
   call s:ApplyHighlight(line('.'), v:false, tag)
