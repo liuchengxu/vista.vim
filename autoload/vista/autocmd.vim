@@ -35,7 +35,7 @@ function! s:GenericAutoUpdate(bufnr, fpath) abort
   call s:ApplyAutoUpdate(a:fpath)
 endfunction
 
-function! s:AutoUpdateWithDelay(fpath) abort
+function! s:AutoUpdateWithDelay(bufnr, fpath) abort
   if !exists('t:vista')
     return
   endif
@@ -48,7 +48,7 @@ function! s:AutoUpdateWithDelay(fpath) abort
   let t:vista.on_text_changed = 1
   let s:update_timer = timer_start(
         \ s:update_delay,
-        \ { -> s:GenericAutoUpdate(a:fpath)}
+        \ { -> s:GenericAutoUpdate(a:bufnr, a:fpath)}
         \ )
 endfunction
 
@@ -93,7 +93,8 @@ function! vista#autocmd#Init(group_name, AUF) abort
           \ call s:OnBufEnter(+expand('<abuf>'), fnamemodify(expand('<afile>'), ':p'))
 
     if get(g:, 'vista_update_on_text_changed', 0)
-      autocmd TextChanged,TextChangedI * call s:AutoUpdateWithDelay(fnamemodify(expand('<afile>'), ':p'))
+      autocmd TextChanged,TextChangedI *
+            \ call s:AutoUpdateWithDelay(+expand('<abuf>'), fnamemodify(expand('<afile>'), ':p'))
     endif
   augroup END
 endfunction

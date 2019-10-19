@@ -14,6 +14,8 @@ let s:highlight_timer = -1
 let s:find_delay = get(g:, 'vista_find_nearest_method_or_function_delay', 300)
 let s:cursor_delay = get(g:, 'vista_cursor_delay', 400)
 
+let s:echo_cursor_opts = ['echo', 'floating_win', 'scroll', 'both']
+
 let s:last_vlnum = v:null
 
 function! s:GenericStopTimer(timer) abort
@@ -213,19 +215,18 @@ function! s:ShowDetail() abort
     return
   endif
 
-  let opts = ['echo', 'floating_win', 'scroll', 'both']
   let strategy = get(g:, 'vista_echo_cursor_strategy', 'echo')
 
   let msg = vista#util#Truncate(source_line)
   let lnum = s:GetTrailingLnum()
 
-  if strategy == opts[0]
+  if strategy ==# s:echo_cursor_opts[0]
     call s:EchoInCmdline(msg, tag)
-  elseif strategy == opts[1]
+  elseif strategy ==# s:echo_cursor_opts[1]
     call s:DisplayInFloatingWin(lnum, tag)
-  elseif strategy == opts[2]
+  elseif strategy ==# s:echo_cursor_opts[2]
     call s:PeekInSourceFile(lnum, tag)
-  elseif strategy == opts[3]
+  elseif strategy ==# s:echo_cursor_opts[3]
     call s:EchoInCmdline(msg, tag)
     if s:has_floating_win
       call s:DisplayInFloatingWin(lnum, tag)
