@@ -47,6 +47,10 @@ function! s:CalculatePosition(lines) abort
 endfunction
 
 function! s:ApplyClose() abort
+  if !exists('t:vista')
+    return
+  endif
+
   if exists('#VistaFloatingWin')
     autocmd! VistaFloatingWin
   endif

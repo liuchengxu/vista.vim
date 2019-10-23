@@ -18,7 +18,7 @@ function! vista#statusline#Render() abort
 endfunction
 
 function! vista#statusline#RenderOnWinEvent() abort
-  if vista#statusline#ShouldDisable()
+  if !exists('t:vista') || vista#statusline#ShouldDisable()
     return
   endif
 

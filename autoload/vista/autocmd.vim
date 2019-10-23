@@ -16,7 +16,7 @@ endfunction
 
 function! s:OnBufEnter(bufnr, fpath) abort
   " If we just enter the buffer that is being displayed, skip the update.
-  if a:bufnr == t:vista.source.bufnr
+  if !exists('t:vista') || a:bufnr == t:vista.source.bufnr
     return
   endif
 
