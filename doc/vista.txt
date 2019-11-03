@@ -48,6 +48,7 @@ FEATURES                                                          *vista-feature
     [x] vim-lsp (https://github.com/prabirshrestha/vim-lsp)
     [x] coc.nvim (https://github.com/neoclide/coc.nvim)
     [x] LanguageClient-neovim (https://github.com/autozimu/LanguageClient-neovim)
+    [x] vim-lsc (https://github.com/natebosch/vim-lsc)
 [x] Finder for tags and LSP symbols.
     [x] fzf (https://github.com/junegunn/fzf)
 [x] Display decent detailed symbol info in cmdline.
@@ -119,6 +120,8 @@ Vista                                                                      *Vist
   `:Vista ctags`:   open vista window based on ctags.
 
   `:Vista vim_lsp`: open vista window based on vim-lsp.
+
+  `:Vista vim_lsc`: open vista window based on vim-lsc.
 
                                                                     *vista-finder*
 
