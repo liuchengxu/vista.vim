@@ -36,6 +36,7 @@ hi default VistaPublic     guifg=Green  ctermfg=Green
 hi default VistaProtected  guifg=Yellow ctermfg=Yellow
 hi default VistaPrivate    guifg=Red    ctermfg=Red
 
-hi! link Folded Function
+" Do not touch the global highlight group.
+" hi! link Folded Function
 
 let b:current_syntax = 'vista'
