@@ -39,4 +39,8 @@ hi default VistaPrivate    guifg=Red    ctermfg=Red
 " Do not touch the global highlight group.
 " hi! link Folded Function
 
+if has('nvim')
+  call setwinvar(winnr(), '&winhl', 'Folded:Function')
+endif
+
 let b:current_syntax = 'vista'
