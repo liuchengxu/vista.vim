@@ -27,6 +27,10 @@ setlocal
   \ foldcolumn=0
   \ nowrap
 
+if !exists('s:save_fillchars')
+  let s:save_fillchars = &fillchars
+endif
+
 " Get rid of extra fold dashes when using Vim folding
 setlocal fillchars=fold:\ 
 
@@ -51,7 +55,7 @@ augroup VistaCursor
     autocmd CursorMoved <buffer> call vista#cursor#ShowDetailWithDelay()
   endif
 
-  autocmd BufLeave <buffer> call vista#floating#Close()
+  autocmd BufLeave <buffer> let &fillchars = s:save_fillchars | call vista#floating#Close()
 augroup END
 
 if !exists('#VistaMOF')
