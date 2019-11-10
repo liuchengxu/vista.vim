@@ -46,7 +46,14 @@ function! s:BuildCmd(file) abort
   let ft = &filetype
 
   " Refer to tagbar
-  let common_opt = '--format=2 --excmd=pattern --fields=nksSaf --extras= --file-scope=yes --sort=no --append=no'
+  let common_opt = '--format=2 --excmd=pattern --fields=nksSaf --file-scope=yes --sort=no --append=no'
+
+  " Do not pass --extras in order to let uctags handle the tags for anonymous
+  " entities correctly.
+  if t:vista.source.filetype() !=# 'c' && t:vista.source.filetype() !=# 'cpp'
+    let common_opt .= ' --extras= '
+  endif
+
   let language_specific_opt = s:GetLanguageSpecificOptition(ft)
 
   if s:support_json_format

@@ -255,29 +255,6 @@ function! s:Render() abort
 
   let without_scope = t:vista.without_scope
 
-  " Build psedu tags for cpp anonymous namespace tags . Ref #83
-  let ft_having_anonymous_tags = ['cpp', 'c']
-  if index(ft_having_anonymous_tags, t:vista.source.filetype()) > -1
-    let anons = []
-
-    for ws in t:vista.with_scope
-      if ws.scope =~# '^__anon' && index(anons,  ws.scope) == -1
-        call add(anons, ws.scope)
-      endif
-    endfor
-
-    let psedu_anonymous_cpp_namespace_tags = []
-
-    for anon in anons
-      let ps = filter(copy(t:vista.with_scope), 'v:val.scope ==# anon')
-      let p = ps[0]
-      let line = str2nr(p.line) - 1
-      call add(psedu_anonymous_cpp_namespace_tags, { 'name': p.scope, 'kind': p.scopeKind, 'line': line })
-    endfor
-
-    call extend(without_scope, psedu_anonymous_cpp_namespace_tags)
-  endif
-
   " The root of hierarchy structure doesn't have scope field.
   for potential_root_line in without_scope
 
