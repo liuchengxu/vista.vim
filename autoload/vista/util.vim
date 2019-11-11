@@ -227,8 +227,9 @@ endfunction
 "
 " see also #71
 function! vista#util#EnsureRunOnSourceFile(Run, ...) abort
-  if winnr() != t:vista.source.winnr()
-    execute t:vista.source.winnr().'wincmd w'
+  let source_winnr = t:vista.source.winnr()
+  if winnr() != source_winnr
+    execute source_winnr.'wincmd w'
     let l:switch_back = 1
   endif
 

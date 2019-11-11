@@ -64,7 +64,7 @@ endfunction
 function! vista#extension#markdown#Execute(_bang, should_display) abort
   call vista#OnExecute(s:provider, function('s:AutoUpdate'))
 
-  let headers =  s:Execute()
+  let headers = s:Execute()
 
   if a:should_display
     let rendered = vista#renderer#markdown#Render(headers)

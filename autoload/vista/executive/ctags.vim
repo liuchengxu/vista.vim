@@ -24,6 +24,31 @@ function! s:GetCustomCmd(ft) abort
   return v:null
 endfunction
 
+function! s:GetDefaultCmd(file) abort
+  " Refer to tagbar
+  let common_opt = '--format=2 --excmd=pattern --fields=nksSaf --file-scope=yes --sort=no --append=no'
+
+  " Do not pass --extras for C/CPP in order to let uctags handle the tags for anonymous
+  " entities correctly.
+  if t:vista.source.filetype() !=# 'c' && t:vista.source.filetype() !=# 'cpp'
+    let common_opt .= ' --extras= '
+  endif
+
+  let language_specific_opt = s:GetLanguageSpecificOptition(&filetype)
+
+  if s:support_json_format
+    let fmt = '%s %s %s --output-format=json --fields=-PF -f- %s'
+    let s:TagParser = function('vista#parser#ctags#FromJSON')
+  else
+    let fmt = '%s %s %s -f- %s'
+    let s:TagParser = function('vista#parser#ctags#FromExtendedRaw')
+  endif
+
+  let cmd = printf(fmt, s:ctags, common_opt, language_specific_opt, a:file)
+
+  return cmd
+endfunction
+
 function! s:GetLanguageSpecificOptition(filetype) abort
   let opt = ''
 
@@ -43,30 +68,7 @@ endfunction
 
 " FIXME support all languages that ctags does
 function! s:BuildCmd(file) abort
-  let ft = &filetype
-
-  " Refer to tagbar
-  let common_opt = '--format=2 --excmd=pattern --fields=nksSaf --file-scope=yes --sort=no --append=no'
-
-  " Do not pass --extras in order to let uctags handle the tags for anonymous
-  " entities correctly.
-  if t:vista.source.filetype() !=# 'c' && t:vista.source.filetype() !=# 'cpp'
-    let common_opt .= ' --extras= '
-  endif
-
-  let language_specific_opt = s:GetLanguageSpecificOptition(ft)
-
-  if s:support_json_format
-    let fmt = '%s %s %s --output-format=json --fields=-PF -f- %s'
-    let s:TagParser = function('vista#parser#ctags#FromJSON')
-  else
-    let fmt = '%s %s %s -f- %s'
-    let s:TagParser = function('vista#parser#ctags#FromExtendedRaw')
-  endif
-
-  let cmd = printf(fmt, s:ctags, common_opt, language_specific_opt, a:file)
-
-  let custom_cmd = s:GetCustomCmd(ft)
+  let custom_cmd = s:GetCustomCmd(&filetype)
 
   if custom_cmd isnot v:null
     if stridx(custom_cmd, '--output-format=json') > -1
@@ -75,6 +77,8 @@ function! s:BuildCmd(file) abort
       let s:TagParser = function('vista#parser#ctags#FromExtendedRaw')
     endif
     let cmd = printf('%s %s', custom_cmd, a:file)
+  else
+    let cmd = s:GetDefaultCmd(a:file)
   endif
 
   let t:vista.ctags_cmd = cmd
@@ -94,8 +98,9 @@ function! s:PrepareContainer() abort
 endfunction
 
 function! s:on_exit(_job, _data, _event) abort dict
-  if v:dying | return | endif
-  if !exists('t:vista') | return | endif
+  if !exists('t:vista') || v:dying
+    return
+  endif
 
   " Second last line is the real last one in neovim
   call s:ExtractLinewise(self.stdout[:-2])
@@ -148,7 +153,7 @@ endfunction
 
 function! s:AutoUpdate(fpath) abort
   if t:vista.source.filetype() ==# 'markdown'
-        \ && get(g:, 'vista_enable'.&ft.'_extension', 1)
+        \ && get(g:, 'vista_enable'.&filetype.'_extension', 1)
     call vista#extension#{&ft}#AutoUpdate(a:fpath)
   else
     call vista#OnExecute(s:provider, function('s:AutoUpdate'))
@@ -175,24 +180,26 @@ function! s:ApplyRun(cmd) abort
   call s:ExtractLinewise(split(output, "\n"))
 endfunction
 
-" Run ctags asynchronously given the cmd
-function! s:ApplyRunAsync(cmd) abort
-  if has('nvim')
-    " job is job id in neovim
-    let jobid = jobstart(a:cmd, {
-            \ 'stdout_buffered': 1,
-            \ 'stderr_buffered': 1,
-            \ 'on_exit': function('s:on_exit')
-            \ })
-  else
+if has('nvim')
+  " Run ctags asynchronously given the cmd
+  function! s:ApplyRunAsync(cmd) abort
+      " job is job id in neovim
+      let jobid = jobstart(a:cmd, {
+              \ 'stdout_buffered': 1,
+              \ 'stderr_buffered': 1,
+              \ 'on_exit': function('s:on_exit')
+              \ })
+    return jobid > 0 ? jobid : 0
+  endfunction
+else
+  function! s:ApplyRunAsync(cmd) abort
     let job = job_start(a:cmd, {
           \ 'close_cb':function('s:close_cb')
           \ })
     let jobid = matchstr(job, '\d\+') + 0
-  endif
-
-  return jobid > 0 ? jobid : 0
-endfunction
+    return jobid > 0 ? jobid : 0
+  endfunction
+endif
 
 function! s:TryAppendExtension(tempname) abort
   let ext = t:vista.source.extension()
@@ -217,10 +224,8 @@ function! s:Tempdir() abort
   let tmpdir = $TMPDIR
   if empty(tmpdir)
     let tmpdir = '/tmp/'
-  else
-    if tmpdir !~# '/$'
-      let tmpdir .= '/'
-    endif
+  elseif tmpdir !~# '/$'
+    let tmpdir .= '/'
   endif
   return tmpdir
 endfunction
@@ -292,15 +297,7 @@ function! s:ApplyExecute(bang, fpath) abort
   if a:bang
     call s:ApplyRun(cmd)
   else
-    if exists('s:id')
-      call vista#util#JobStop(s:id)
-    endif
-
-    let s:id = s:ApplyRunAsync(cmd)
-
-    if s:id == 0
-      call vista#error#RunCtags(cmd)
-    endif
+    call s:RunAsyncCommon(cmd)
   endif
 endfunction
 
@@ -318,6 +315,18 @@ function! s:Run(fpath) abort
   return s:data
 endfunction
 
+function! s:RunAsyncCommon(cmd) abort
+  if exists('s:id')
+    call vista#util#JobStop(s:id)
+  endif
+
+  let s:id = s:ApplyRunAsync(a:cmd)
+
+  if !s:id
+    call vista#error#RunCtags(a:cmd)
+  endif
+endfunction
+
 function! s:RunAsync(fpath) abort
   let file = s:IntoTemp(a:fpath)
   if empty(file)
@@ -325,16 +334,7 @@ function! s:RunAsync(fpath) abort
   endif
 
   let cmd = s:BuildCmd(file)
-
-  if exists('s:id')
-    call vista#util#JobStop(s:id)
-  endif
-
-  let s:id = s:ApplyRunAsync(cmd)
-
-  if !s:id
-    call vista#error#RunCtags(cmd)
-  endif
+  call s:RunAsyncCommon(cmd)
 endfunction
 
 function! s:Execute(bang, should_display) abort
@@ -344,8 +344,7 @@ function! s:Execute(bang, should_display) abort
 endfunction
 
 function! s:Dispatch(F, ...) abort
-  let ft = &filetype
-  let custom_cmd = s:GetCustomCmd(ft)
+  let custom_cmd = s:GetCustomCmd(&filetype)
 
   let exe = custom_cmd isnot v:null ? split(custom_cmd)[0] : 'ctags'
 

@@ -37,6 +37,14 @@ function! s:StopHighlightTimer() abort
   call s:GenericStopTimer('s:highlight_timer')
 endfunction
 
+function! s:RemoveVisibility(tag) abort
+  if index(['+', '~', '-'], a:tag[0]) > -1
+    return a:tag[1:]
+  else
+    return a:tag
+  endif
+endfunction
+
 " Get tag and corresponding source line at current cursor position.
 "
 " Return: [tag, source_line]
@@ -63,14 +71,6 @@ function! s:GetInfoUnderCursor() abort
     endif
   endif
 
-  function! s:RemoveVisibility(tag) abort
-    if index(['+', '~', '-'], a:tag[0]) > -1
-      return a:tag[1:]
-    else
-      return a:tag
-    endif
-  endfunction
-
   " For scopeless tag
   " peer_ilog(PEER,FORMAT,...):90
   let trimmed_line = vista#util#Trim(getline('.'))
@@ -88,7 +88,12 @@ function! s:GetInfoUnderCursor() abort
   endif
 
   " Since we include the space ` `, we need to trim the result later.
-  let matched = matchlist(trimmed_line, '\([a-zA-Z:#_.,<> ]\+\):\(\d\+\)$')
+  " / --> github.com/golang/dep/gps:11
+  if t:vista.provider ==# 'markdown'
+    let matched = matchlist(trimmed_line, '\([a-zA-Z:#_.,/<> ]\+\)\(H\d:\d\+\)$')
+  else
+    let matched = matchlist(trimmed_line, '\([a-zA-Z:#_.,/<> ]\+\):\(\d\+\)$')
+  endif
 
   let tag = get(matched, 1, '')
 
@@ -298,7 +303,7 @@ function! s:ApplyHighlight(lnum, ensure_visible, ...) abort
       let hi_pos = [a:lnum, start+1, strlen(a:1)]
     else
       let [matched, end, _] = matchstrpos(cur_line, ':\d\+$')
-      let hi_pos = [a:lnum, start+1, end-len(matched)]
+      let hi_pos = [a:lnum, start+1, end - start]
     endif
   endif
 
