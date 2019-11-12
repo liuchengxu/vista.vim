@@ -95,7 +95,7 @@ function! s:RealParentOf(candidate) abort
 
   let parent_candidates = []
   for pc in t:vista.without_scope
-    if pc.name ==# name && pc.kind ==# kind && pc.line < candidate.line
+    if pc.name ==# name && pc.kind ==# kind && pc.line <= candidate.line
       call add(parent_candidates, pc)
     endif
   endfor
@@ -124,7 +124,7 @@ function! s:DescendantsOf(candidates, root_line, scope) abort
         \ 'has_key(v:val, ''scope'')'.
         \ ' && s:StartWith(v:val.scope, a:scope)'.
         \ ' && v:val.scopeKind ==# a:root_line.kind'.
-        \ ' && v:val.line > a:root_line.line'
+        \ ' && v:val.line >= a:root_line.line'
         \ )
 
   return candidates
@@ -137,7 +137,7 @@ function! s:DescendantsOfRoot(candidates, root_line) abort
         \ 'has_key(v:val, ''scope'')'.
         \ ' && s:StartWith(v:val.scope, a:root_line.name)'.
         \ ' && v:val.scopeKind ==# a:root_line.kind'.
-        \ ' && v:val.line > a:root_line.line'
+        \ ' && v:val.line >= a:root_line.line'
         \ )
 
   return filter(candidates, 's:RealParentOf(v:val) ==# a:root_line')
