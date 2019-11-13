@@ -346,6 +346,14 @@ g:vista_fzf_opt                                                  *g:vista_fzf_op
 
   Append options to `fzf#run()`.
 
+g:vista_keep_fzf_colors                                   *g:vista_keep_fzf_colors*
+
+  Type: |Number|
+  Default: `0`
+
+  Set this variable to `1` to keep the original |g:fzf_colors| when using fzf
+  finder in vista.vim.
+
 g:vista_finder_alternative_executives      *g:vista_finder_alternative_executives*
 
   Type: |List|
