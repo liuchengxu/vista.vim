@@ -58,6 +58,13 @@ function! vista#Sort() abort
   endif
 endfunction
 
+" coc.nvim returns no symbols if you just send the request on the event.
+" We use a delayed update instead.
+" Maybe also useful for the other LSP clients.
+function! vista#AutoUpdateWithDelay(Fn, Args) abort
+  call timer_start(30, { -> call(a:Fn, a:Args) })
+endfunction
+
 function! s:GetExplicitExecutive() abort
   let ft = &filetype
 

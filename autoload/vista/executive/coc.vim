@@ -63,7 +63,7 @@ endfunction
 
 function! s:AutoUpdate(_fpath) abort
   let s:reload_only = v:true
-  call CocActionAsync('documentSymbols', function('s:Cb'))
+  call vista#AutoUpdateWithDelay(function('CocActionAsync'), ['documentSymbols', function('s:Cb')])
 endfunction
 
 function! s:Run() abort
