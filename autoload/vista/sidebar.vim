@@ -2,17 +2,25 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
+" Which filetype the current sidebar should be.
+function! vista#sidebar#WhichFileType() abort
+  if t:vista.provider ==# 'coc'
+        \ || (t:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default')
+    return 'vista'
+  elseif t:vista.provider ==# 'markdown'
+    return 'vista_markdown'
+  else
+    return 'vista_kind'
+  endif
+endfunction
+
 function! s:NewWindow() abort
   let position = get(g:, 'vista_sidebar_position', 'vertical botright')
   let width = get(g:, 'vista_sidebar_width', 30)
   let open = position.' '.width.'new'
   silent execute open '__vista__'
 
-  if t:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default'
-    setlocal filetype=vista
-  else
-    setlocal filetype=vista_kind
-  endif
+  execute 'setlocal filetype='.vista#sidebar#WhichFileType()
 
   " FIXME when to delete?
   if has_key(t:vista.source, 'fpath')

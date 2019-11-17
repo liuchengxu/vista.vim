@@ -5,7 +5,9 @@
 let s:default_icon = ['╰─▸ ', '├─▸ ']
 
 function! s:Render(data) abort
-  if t:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default'
+  if t:vista.provider ==# 'coc'
+    return vista#renderer#hir#Coc(a:data)
+  elseif t:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default'
     return vista#renderer#default#Render()
   else
     " The kind renderer applys to the LSP provider.
