@@ -20,6 +20,7 @@ function! vista#ShouldSkip() abort
         \ || index(blacklist, &filetype) > -1
 endfunction
 
+" Ignore some kinds of tags/symbols which is done at the parser step.
 function! vista#ShouldIgnore(kind) abort
   return exists('g:vista_ignore_kinds') && index(g:vista_ignore_kinds, a:kind) != -1
 endfunction
@@ -46,8 +47,7 @@ function! vista#Sort() abort
     let t:vista.sort = !t:vista.sort
   endif
 
-  let provider = t:vista.provider
-  let cache = vista#executive#{provider}#Cache()
+  let cache = vista#executive#{t:vista.provider}#Cache()
 
   let cur_pos = getpos('.')
 

@@ -14,9 +14,10 @@ function! s:ClosePopup() abort
   let t:vista.popup_visible = v:false
 endfunction
 
+call prop_type_delete('VistaMatch')
+call prop_type_add('VistaMatch', { 'highlight': 'Search' })
+
 function! s:HiTag() abort
-  call prop_type_delete('VistaMatch')
-  call prop_type_add('VistaMatch', { 'highlight': 'Search' })
   call prop_add(s:popup_lnum, s:popup_start+1, { 'length': s:popup_end - s:popup_start, 'type': 'VistaMatch' })
 endfunction
 
@@ -119,7 +120,7 @@ function! s:DispatchDisplayer(Displayer, lnum, tag_or_raw_lines) abort
 
   let s:popup_timer = timer_start(
         \ s:popup_delay,
-        \ { -> call(a:Displayer, [a:lnum, a:tag_or_raw_lines]) }
+        \ { -> a:Displayer(a:lnum, a:tag_or_raw_lines) }
         \ )
 endfunction
 
