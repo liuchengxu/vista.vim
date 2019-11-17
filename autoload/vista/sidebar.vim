@@ -43,7 +43,7 @@ function! vista#sidebar#Reload(data) abort
     return
   endif
 
-  let rendered = vista#viewer#Render(a:data)
+  let rendered = vista#renderer#Render(a:data)
   call vista#util#SetBufline(t:vista.bufnr, rendered)
 endfunction
 

@@ -31,7 +31,7 @@ function! s:Extract(symbols) abort
   endif
 
   if s:should_display
-    call vista#viewer#Display(s:data)
+    call vista#renderer#RenderAndDisplay(s:data)
     let s:should_display = v:false
   endif
 
@@ -70,7 +70,7 @@ function! s:Execute(bang, should_display) abort
   if a:bang
     call s:Extract(CocAction('documentSymbols'))
     if a:should_display
-      call vista#viewer#Display(s:data)
+      call vista#renderer#RenderAndDisplay(s:data)
     endif
   else
     let s:should_display = a:should_display

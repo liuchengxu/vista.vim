@@ -35,7 +35,7 @@ function! s:Handler(_server, _req_id, _type, data) abort
     endif
 
     if s:should_display
-      call vista#viewer#Display(s:data)
+      call vista#renderer#RenderAndDisplay(s:data)
       let s:should_display = v:false
     endif
   endif
