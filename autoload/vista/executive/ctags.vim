@@ -34,8 +34,6 @@ function! s:GetDefaultCmd(file) abort
     let common_opt .= ' --extras= '
   endif
 
-  let language_specific_opt = s:GetLanguageSpecificOptition(&filetype)
-
   if s:support_json_format
     let fmt = '%s %s %s --output-format=json --fields=-PF -f- %s'
     let s:TagParser = function('vista#parser#ctags#FromJSON')
@@ -44,6 +42,7 @@ function! s:GetDefaultCmd(file) abort
     let s:TagParser = function('vista#parser#ctags#FromExtendedRaw')
   endif
 
+  let language_specific_opt = s:GetLanguageSpecificOptition(&filetype)
   let cmd = printf(fmt, s:ctags, common_opt, language_specific_opt, a:file)
 
   return cmd

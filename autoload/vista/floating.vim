@@ -163,32 +163,23 @@ function! vista#floating#Close() abort
   call s:ApplyClose()
 endfunction
 
-function! s:GetSouceLines(lnum) abort
-  let range = 5
-
-  if a:lnum - range > 0
-    let s:popup_lnum = range + 1
-  else
-    let s:popup_lnum = a:lnum
-  endif
-
-  let begin = max([a:lnum - range, 1])
-  let end = begin + range * 2
-
-  return getbufline(t:vista.source.bufnr, begin, end)
-endfunction
-
-
-function! vista#floating#DisplayAt(lnum, tag) abort
+function! s:ShouldSkipDisplay(lnum) abort
   silent! call timer_stop(s:floating_timer)
-
-  let lnum = a:lnum
 
   " See if it's identical to the last lnum to avoid blink. Ref #55
   "
   " No need to display again when it's already visible.
-  if lnum == s:last_lnum
+  if a:lnum == s:last_lnum
         \ && get(t:vista, 'floating_visible', v:false)
+    return 1
+  else
+    return 0
+  endif
+endfunction
+
+" Display in floating_win given the lnum of source buffer and current tag.
+function! vista#floating#DisplayAt(lnum, tag) abort
+  if s:ShouldSkipDisplay(a:lnum)
     return
   endif
 
@@ -196,19 +187,18 @@ function! vista#floating#DisplayAt(lnum, tag) abort
   "
   " It's problematic when calculating the highlight position here, leading to
   " the displacement of current tag highlighting position.
-  let s:last_lnum = lnum
   let s:cur_tag = a:tag
 
-  let [lines, s:floating_lnum] = vista#util#GetPreviewLines(lnum)
+  let s:last_lnum = a:lnum
+
+  let [lines, s:floating_lnum] = vista#util#GetPreviewLines(a:lnum)
 
   let s:floating_timer = timer_start(s:floating_delay, { -> s:Display(lines)})
 endfunction
 
+" Display in floating_win given the lnum of source buffer and raw lines.
 function! vista#floating#DisplayRawAt(lnum, lines) abort
-  silent! call timer_stop(s:floating_timer)
-
-  if a:lnum == s:last_lnum
-        \ && get(t:vista, 'floating_visible', v:false)
+  if s:ShouldSkipDisplay(a:lnum)
     return
   endif
 
