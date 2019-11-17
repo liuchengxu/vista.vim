@@ -73,11 +73,12 @@ function! vista#util#SetBufline(bufnr, lines) abort
   call setbufvar(bufnr, '&readonly', 1)
   call setbufvar(bufnr, '&modifiable', 0)
 
-  call setbufvar(bufnr, '&filetype', vista#sidebar#WhichFileType())
+  let filetype = vista#sidebar#WhichFileType()
+  call setbufvar(bufnr, '&filetype', filetype)
 
-  " Reload vista syntax since you may switch between serveral
+  " Reload vista syntax as you may switch between serveral
   " executives/extensions.
-  execute 'runtime! syntax/'.getbufvar(bufnr, '&filetype').'vim'
+  execute 'runtime! syntax/'.filetype.'vim'
 
   if exists('l:switch_back')
     noautocmd wincmd p
