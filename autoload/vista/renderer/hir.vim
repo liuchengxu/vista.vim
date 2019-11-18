@@ -45,9 +45,7 @@ function! s:RenderHirAndThenGroupByKind(data) abort
 
   for [kind, vs] in items(level0)
     call add(rendered, vista#renderer#Decorate(kind))
-    for v in vs
-      call add(rendered, s:BuildNonHirRow(v))
-    endfor
+    call map(vs, 'add(rendered, s:BuildNonHirRow(v:val))')
     call add(rendered, '')
   endfor
 
