@@ -365,7 +365,9 @@ function! vista#cursor#FoldOrJump() abort
       if foldclosed('.') != -1
         normal! zo
       else
-        normal! zc
+        if foldlevel('.') != 0
+          normal! zc
+        endif
       endif
     endif
     return
