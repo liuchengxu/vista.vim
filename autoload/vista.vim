@@ -92,9 +92,9 @@ function! vista#GetExplicitExecutiveOrDefault() abort
 endfunction
 
 function! vista#GenericCloseOverlay() abort
-  if has('*nvim_open_win')
+  if exists('*nvim_open_win')
     call vista#floating#Close()
-  elseif has('*popup_create')
+  elseif exists('*popup_create')
     call vista#popup#Close()
   endif
 endfunction
