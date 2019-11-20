@@ -45,6 +45,9 @@ function! s:RemoveVisibility(tag) abort
   endif
 endfunction
 
+function! s:GetLSPInfo() abort
+endfunction
+
 " Get tag and corresponding source line at current cursor position.
 "
 " Return: [tag, source_line]
@@ -53,6 +56,14 @@ function! s:GetInfoUnderCursor() abort
 
   if empty(cur_line)
     return [v:null, v:null]
+  endif
+
+  " TODO use range info of LSP symbols?
+  if t:vista.provider ==# 'coc'
+    let tag = trim(cur_line[0])
+    let lnum = cur_line[-1]
+    let source_line = t:vista.source.line_trimmed(lnum)
+    return [tag, source_line]
   endif
 
   let lnum = cur_line[-1]
@@ -365,7 +376,9 @@ function! vista#cursor#FoldOrJump() abort
       if foldclosed('.') != -1
         normal! zo
       else
-        normal! zc
+        if foldlevel('.') != 0
+          normal! zc
+        endif
       endif
     endif
     return

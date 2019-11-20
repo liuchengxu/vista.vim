@@ -73,15 +73,12 @@ function! vista#util#SetBufline(bufnr, lines) abort
   call setbufvar(bufnr, '&readonly', 1)
   call setbufvar(bufnr, '&modifiable', 0)
 
-  " Reload vista syntax since you may switch between serveral
+  let filetype = vista#sidebar#WhichFileType()
+  call setbufvar(bufnr, '&filetype', filetype)
+
+  " Reload vista syntax as you may switch between serveral
   " executives/extensions.
-  if t:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default'
-    runtime! syntax/vista.vim
-  elseif t:vista.provider ==# 'markdown'
-    runtime! syntax/vista_markdown.vim
-  else
-    runtime! syntax/vista_kind.vim
-  endif
+  execute 'runtime! syntax/'.filetype.'vim'
 
   if exists('l:switch_back')
     noautocmd wincmd p

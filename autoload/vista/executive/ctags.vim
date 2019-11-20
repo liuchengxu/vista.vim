@@ -140,7 +140,7 @@ function! s:ApplyExtracted() abort
   endif
 
   if s:should_display
-    call vista#viewer#Display(s:data)
+    call vista#renderer#RenderAndDisplay(s:data)
     let s:should_display = v:false
   endif
 endfunction

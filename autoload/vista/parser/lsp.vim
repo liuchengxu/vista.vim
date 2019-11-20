@@ -77,6 +77,20 @@ function! vista#parser#lsp#KindToSymbol(line, container) abort
   endif
 endfunction
 
+function! vista#parser#lsp#CocSymbols(symbol, container) abort
+  if vista#ShouldIgnore(a:symbol.kind)
+    return
+  endif
+
+  call add(a:container, {
+        \ 'lnum': a:symbol.lnum,
+        \ 'col': a:symbol.col,
+        \ 'text': a:symbol.text,
+        \ 'kind': a:symbol.kind,
+        \ 'level': a:symbol.level
+        \ })
+endfunction
+
 " https://microsoft.github.io/language-server-protocol/specification#textDocument_documentSymbol
 function! vista#parser#lsp#ExtractSymbol(symbol, container) abort
   let symbol = a:symbol

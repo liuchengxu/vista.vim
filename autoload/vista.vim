@@ -20,6 +20,7 @@ function! vista#ShouldSkip() abort
         \ || index(blacklist, &filetype) > -1
 endfunction
 
+" Ignore some kinds of tags/symbols which is done at the parser step.
 function! vista#ShouldIgnore(kind) abort
   return exists('g:vista_ignore_kinds') && index(g:vista_ignore_kinds, a:kind) != -1
 endfunction
@@ -46,8 +47,7 @@ function! vista#Sort() abort
     let t:vista.sort = !t:vista.sort
   endif
 
-  let provider = t:vista.provider
-  let cache = vista#executive#{provider}#Cache()
+  let cache = vista#executive#{t:vista.provider}#Cache()
 
   let cur_pos = getpos('.')
 
@@ -92,9 +92,9 @@ function! vista#GetExplicitExecutiveOrDefault() abort
 endfunction
 
 function! vista#GenericCloseOverlay() abort
-  if has('*nvim_open_win')
+  if exists('*nvim_open_win')
     call vista#floating#Close()
-  elseif has('*popup_create')
+  elseif exists('*popup_create')
     call vista#popup#Close()
   endif
 endfunction

@@ -48,6 +48,8 @@ let g:vista#renderer#icons = map(extend(s:icons, get(g:, 'vista#renderer#icons',
 let g:vista#renderer#enable_icon = get(g:, 'vista#renderer#enable_icon',
       \ exists('g:vista#renderer#icons') || exists('g:airline_powerline_fonts'))
 
+let g:vista#renderer#kind_default_icon = ['╰─▸ ', '├─▸ ']
+
 function! vista#renderer#IconFor(kind) abort
   if g:vista#renderer#enable_icon
     return get(g:vista#renderer#icons, tolower(a:kind), g:vista#renderer#icons.default)
@@ -62,4 +64,24 @@ function! vista#renderer#Decorate(kind) abort
   else
     return a:kind
   endif
+endfunction
+
+function! s:Render(data) abort
+  if t:vista.provider ==# 'coc'
+    return vista#renderer#hir#Coc(a:data)
+  elseif t:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default'
+    return vista#renderer#default#Render()
+  else
+    " The kind renderer applys to the LSP provider.
+    return vista#renderer#kind#Render(a:data)
+  endif
+endfunction
+
+" Render the extracted data to rows
+function! vista#renderer#Render(data) abort
+  return s:Render(a:data)
+endfunction
+
+function! vista#renderer#RenderAndDisplay(data) abort
+  call vista#sidebar#OpenOrUpdate(s:Render(a:data))
 endfunction
