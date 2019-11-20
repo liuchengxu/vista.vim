@@ -67,7 +67,7 @@ In addition to being a tags viewer, vista.vim can also be a symbol navigator sim
 Notes:
 
 - The feature of finder in vista.vim `:Vista finder [EXECUTIVE]` is a bit like `:BTags` or `:Tags` in [fzf.vim](https://github.com/junegunn/fzf.vim), `:CocList` in [coc.nvim](https://github.com/neoclide/coc.nvim), `:LeaderfBufTag` in [leaderf.vim](https://github.com/Yggdroot/LeaderF), etc. You can choose whatever you like.
-- Due to limitations of the Language Server Protocol, a tree view of nested tags is currently only available for the ctags executive. Other executives will have symbols grouped by modules, classes, functions and variables.
+- ~~Due to limitations of the Language Server Protocol, a tree view of nested tags is currently only available for the ctags executive. Other executives will have symbols grouped by modules, classes, functions and variables~~. The tree view support for LSP executives are limited at present, and only `:Vista coc` provider is supported.
 
 ## Requirement
 
