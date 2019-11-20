@@ -15,13 +15,15 @@ function! vista#util#Truncate(msg) abort
   return len(a:msg) < maxlen ? a:msg : a:msg[:maxlen-3].'...'
 endfunction
 
-function! vista#util#Trim(str) abort
-  if exists('*trim')
+if exists('*trim')
+  function! vista#util#Trim(str) abort
     return trim(a:str)
-  else
+  endfunction
+else
+  function! vista#util#Trim(str) abort
     return substitute(a:str, '^\s*\(.\{-}\)\s*$', '\1', '')
-  endif
-endfunction
+  endfunction
+endif
 
 " Set the file path as the first line if possible.
 function! s:PrependFpath(lines) abort
@@ -38,17 +40,28 @@ function! s:PrependFpath(lines) abort
   return a:lines
 endfunction
 
-function! s:SetBufline(bufnr, lines) abort
-  if has('nvim')
+if has('nvim')
+  function! s:SetBufline(bufnr, lines) abort
     call nvim_buf_set_lines(a:bufnr, 0, -1, 0, a:lines)
-  else
+  endfunction
+
+  function! vista#util#JobStop(jobid) abort
+    silent! call jobstop(a:jobid)
+  endfunction
+
+else
+  function! s:SetBufline(bufnr, lines) abort
     let cur_lines = getbufline(a:bufnr, 1, '$')
     call setbufline(a:bufnr, 1, a:lines)
     if len(cur_lines) > len(a:lines)
       silent call deletebufline(a:bufnr, len(a:lines)+1, len(cur_lines)+1)
     endif
-  endif
-endfunction
+  endfunction
+
+  function! vista#util#JobStop(jobid) abort
+    silent! call job_stop(a:jobid)
+  endfunction
+endif
 
 function! vista#util#SetBufline(bufnr, lines) abort
   let lines = s:PrependFpath(a:lines)
@@ -82,14 +95,6 @@ function! vista#util#SetBufline(bufnr, lines) abort
 
   if exists('l:switch_back')
     noautocmd wincmd p
-  endif
-endfunction
-
-function! vista#util#JobStop(jobid) abort
-  if has('nvim')
-    silent! call jobstop(a:jobid)
-  else
-    silent! call job_stop(a:jobid)
   endif
 endfunction
 
