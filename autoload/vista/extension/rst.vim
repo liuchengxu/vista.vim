@@ -14,7 +14,7 @@ function! s:Execute() abort
     let line = lines[idx]
     let matched_line = get(lines, idx + 1, '')
     " Check the matching strictly.
-    if matched_line =~ '^\([[:punct:]]\)\1\{3,}$' && line !~ '^\s*$'
+    if matched_line =~# '^\([[:punct:]]\)\1\{3,}$' && line !~# '^\s*$'
         if idx > 1 && lines[idx - 1] == matched_line
           " Title
           let item = {'lnum': idx, 'text': l:line, 'level': 1}
