@@ -52,21 +52,22 @@ endfunction
 "
 " Return: [tag, source_line]
 function! s:GetInfoUnderCursor() abort
-  let cur_line = split(getline('.'), ':')
+  let raw_cur_line = getline('.')
 
-  if empty(cur_line)
+  if empty(raw_cur_line)
     return [v:null, v:null]
   endif
 
+  " tag like s:StopCursorTimer has `:`, so we can't simply use split(tag, ':')
+  let last_semicoln_idx = strridx(raw_cur_line, ':')
+  let lnum = raw_cur_line[last_semicoln_idx+1:]
+
   " TODO use range info of LSP symbols?
   if t:vista.provider ==# 'coc'
-    let tag = trim(cur_line[0])
-    let lnum = cur_line[-1]
+    let tag = vista#util#Trim(raw_cur_line[:stridx(raw_cur_line, ':')-1])
     let source_line = t:vista.source.line_trimmed(lnum)
     return [tag, source_line]
   endif
-
-  let lnum = cur_line[-1]
 
   let source_line = t:vista.source.line_trimmed(lnum)
   if empty(source_line)
@@ -84,7 +85,7 @@ function! s:GetInfoUnderCursor() abort
 
   " For scopeless tag
   " peer_ilog(PEER,FORMAT,...):90
-  let trimmed_line = vista#util#Trim(getline('.'))
+  let trimmed_line = vista#util#Trim(raw_cur_line)
   let left_parenthsis_idx = stridx(trimmed_line, '(')
   if left_parenthsis_idx > -1
     " Ignore the visibility symbol, e.g., +test2()
@@ -92,28 +93,21 @@ function! s:GetInfoUnderCursor() abort
     return [tag, source_line]
   endif
 
-  " logger_name:80
-  let with_tag = split(cur_line[-2])
-  if empty(with_tag)
-    return [v:null, v:null]
-  endif
-
   " Since we include the space ` `, we need to trim the result later.
   " / --> github.com/golang/dep/gps:11
   if t:vista.provider ==# 'markdown'
-    let matched = matchlist(trimmed_line, '\([a-zA-Z:#_.,/<> ]\+\)\(H\d:\d\+\)$')
+    let matched = matchlist(trimmed_line, '\([a-zA-Z:#_.,/<> ]\-\+\)\(H\d:\d\+\)$')
   else
-    let matched = matchlist(trimmed_line, '\([a-zA-Z:#_.,/<> ]\+\):\(\d\+\)$')
+    let matched = matchlist(trimmed_line, '\([a-zA-Z:#_.,/<> ]\-\+\):\(\d\+\)$')
   endif
 
   let tag = get(matched, 1, '')
 
   if empty(tag)
-    let tag = with_tag[-1]
+    let tag = raw_cur_line[:last_semicoln_idx-1]
   endif
 
-  let tag = s:RemoveVisibility(tag)
-  let tag = vista#util#Trim(tag)
+  let tag = s:RemoveVisibility(vista#util#Trim(tag))
 
   return [tag, source_line]
 endfunction
