@@ -6,7 +6,7 @@
 
 let s:provider = fnamemodify(expand('<sfile>'), ':t:r')
 
-function! s:Execute() abort
+function! s:GatherHeaderMetadata() abort
   let headers = []
 
   let s:lnum2tag = {}
@@ -51,7 +51,7 @@ endfunction
 function! s:ApplyAutoUpdate() abort
   if has_key(t:vista, 'bufnr') && t:vista.winnr() != -1
     call vista#SetProvider(s:provider)
-    let rendered = vista#renderer#markdown_like#RST(s:Execute())
+    let rendered = vista#renderer#markdown_like#RST(s:GatherHeaderMetadata())
     call vista#util#SetBufline(t:vista.bufnr, rendered)
   endif
 endfunction
@@ -74,8 +74,7 @@ function! vista#extension#rst#Execute(_bang, should_display) abort
   call vista#OnExecute(s:provider, function('s:AutoUpdate'))
 
   if a:should_display
-    let headers = s:Execute()
-    let rendered = vista#renderer#markdown_like#RST(headers)
+    let rendered = vista#renderer#markdown_like#RST(s:GatherHeaderMetadata())
     call vista#sidebar#OpenOrUpdate(rendered)
   endif
 endfunction

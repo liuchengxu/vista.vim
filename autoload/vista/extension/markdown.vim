@@ -9,7 +9,7 @@ function! s:IsHeader(cur_line, next_line) abort
         \ a:cur_line =~# '^\S' && (a:next_line =~# '^=\+\s*$' || a:next_line =~# '^-\+\s*$')
 endfunction
 
-function! s:Execute() abort
+function! s:GatherHeaderMetadata() abort
   let is_fenced_block = 0
 
   let s:lnum2tag = {}
@@ -50,7 +50,7 @@ endfunction
 function! s:ApplyAutoUpdate() abort
   if has_key(t:vista, 'bufnr') && t:vista.winnr() != -1
     call vista#SetProvider(s:provider)
-    let rendered = vista#renderer#markdown_like#MD(s:Execute())
+    let rendered = vista#renderer#markdown_like#MD(s:GatherHeaderMetadata())
     call vista#util#SetBufline(t:vista.bufnr, rendered)
   endif
 endfunction
@@ -74,8 +74,7 @@ function! vista#extension#markdown#Execute(_bang, should_display) abort
   call vista#OnExecute(s:provider, function('s:AutoUpdate'))
 
   if a:should_display
-    let headers = s:Execute()
-    let rendered = vista#renderer#markdown_like#MD(headers)
+    let rendered = vista#renderer#markdown_like#MD(s:GatherHeaderMetadata())
     call vista#sidebar#OpenOrUpdate(rendered)
   endif
 endfunction
