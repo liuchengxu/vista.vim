@@ -55,6 +55,8 @@ endfunction
 function! s:AutoUpdate(fpath) abort
   if t:vista.source.filetype() ==# 'markdown'
     call s:ApplyAutoUpdate()
+  elseif t:vista.source.filetype() ==# 'rst'
+    call vista#extension#rst#AutoUpdate(a:fpath)
   else
     call vista#executive#ctags#AutoUpdate(a:fpath)
   endif

@@ -92,7 +92,14 @@ function! vista#util#SetBufline(bufnr, lines) abort
   call vista#ftplugin#Set()
   " Reload vista syntax as you may switch between serveral
   " executives/extensions.
-  execute 'runtime! syntax/'.filetype.'vim'
+  "
+  " rst shares the same syntax with vista_markdown.
+  if t:vista.source.filetype() ==# 'rst'
+    execute 'runtime! syntax/vista_markdown.vim'
+  else
+    execute 'runtime! syntax/'.filetype.'vim'
+  endif
+
   if exists('l:switch_back')
     noautocmd wincmd p
   endif
