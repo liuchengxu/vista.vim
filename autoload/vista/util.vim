@@ -63,18 +63,11 @@ else
   endfunction
 endif
 
-function! vista#util#SetBufline(bufnr, lines) abort
+" Using s:SetBufline() runes into the internal error E315.
+" I don't know why. So we jump to the vista window
+" and then replace the lines.
+function! s:SafeSetBufline(bufnr, lines) abort
   let lines = s:PrependFpath(a:lines)
-
-  " This approach runes into the internal error E315.
-  " I don't know why.
-  " call s:SetBufline(a:bufnr, lines)
-
-  let winnr = t:vista.winnr()
-  if winnr() != winnr
-    noautocmd execute winnr.'wincmd w'
-    let l:switch_back = 1
-  endif
 
   let bufnr = bufnr('')
   call setbufvar(bufnr, '&readonly', 0)
@@ -99,10 +92,10 @@ function! vista#util#SetBufline(bufnr, lines) abort
   else
     execute 'runtime! syntax/'.filetype.'vim'
   endif
+endfunction
 
-  if exists('l:switch_back')
-    noautocmd wincmd p
-  endif
+function! vista#util#SetBufline(bufnr, lines) abort
+  call vista#WinExecute(t:vista.winnr(), function('s:SafeSetBufline'), a:bufnr, a:lines)
 endfunction
 
 function! vista#util#Join(...) abort
