@@ -92,7 +92,6 @@ function! vista#util#SetBufline(bufnr, lines) abort
   " Reload vista syntax as you may switch between serveral
   " executives/extensions.
   execute 'runtime! syntax/'.filetype.'vim'
-
   if exists('l:switch_back')
     noautocmd wincmd p
   endif

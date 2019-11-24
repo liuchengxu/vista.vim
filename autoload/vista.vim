@@ -149,10 +149,10 @@ function! vista#(bang, ...) abort
     elseif a:1 ==# 'finder!'
       call vista#finder#fzf#ProjectRun()
     elseif a:1 ==# 'toc'
-      if &filetype ==# 'markdown'
-        call vista#extension#markdown#Execute(v:false, v:true)
+      if (&filetype ==# 'markdown' || &filetype ==# 'rst')
+        call vista#extension#{&filetype}#Execute(v:false, v:true)
       else
-        return vista#error#For('Vista toc', 'markdown')
+        return vista#error#For('Vista toc', &filetype)
       endif
     elseif a:1 ==# 'focus'
       call vista#sidebar#ToggleFocus()
