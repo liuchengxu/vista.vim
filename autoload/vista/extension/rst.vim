@@ -4,6 +4,8 @@
 "
 " Heavily inspired  from https://raw.githubusercontent.com/Shougo/unite-outline/master/autoload/unite/sources/outline/defaults/rst.vim
 
+let s:default_icon = get(g:, 'vista_icon_indent', ['╰─▸ ', '├─▸ '])
+
 let s:provider = fnamemodify(expand('<sfile>'), ':t:r')
 
 function! s:Execute() abort
@@ -41,7 +43,6 @@ function! s:Execute() abort
   return headers
 endfunction
 
-let s:default_icon = get(g:, 'vista_icon_indent', ['╰─▸ ', '├─▸ '])
 
 function! s:Render(data) abort
   " {'lnum': 1, 'level': '4', 'text': 'Vista.vim'}
