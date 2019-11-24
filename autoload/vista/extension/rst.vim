@@ -29,6 +29,9 @@ function! s:Execute() abort
           let item = {'lnum': idx, 'text': l:line}
           let adchar = matched_line[0]
           if !has_key(l:adornment_levels, adchar)
+            let l:adornment_levels[adchar] = l:adornment_id
+            let l:adornment_id += 1
+          endif
           let l:adornment_levels[adchar] = l:adornment_id
           let l:adornment_id += 1
           endif
