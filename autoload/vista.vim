@@ -43,7 +43,8 @@ function! vista#OnExecute(provider, AUF) abort
   call vista#autocmd#Init('Vista'.vista#util#ToCamelCase(a:provider), a:AUF)
 endfunction
 
-" call Run in the window win
+" call Run in the window win unsilently, unlike win_execute() which uses
+" silent by default.
 "
 " CocAction only fetch symbols for current document, no way for specify the other at the moment.
 " workaround for #52
