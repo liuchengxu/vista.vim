@@ -231,24 +231,6 @@ function! vista#util#BinarySearch(array, target, cmp_key, ret_key) abort
   return get(found, a:ret_key, v:null)
 endfunction
 
-" CocAction only fetch symbols for current document, no way for specify the other at the moment.
-" workaround for #52
-"
-" see also #71
-function! vista#util#EnsureRunOnSourceFile(Run, ...) abort
-  let source_winnr = t:vista.source.winnr()
-  if winnr() != source_winnr
-    execute source_winnr.'wincmd w'
-    let l:switch_back = 1
-  endif
-
-  call call(a:Run, a:000)
-
-  if exists('l:switch_back')
-    wincmd p
-  endif
-endfunction
-
 " Return the lines to preview and the target line number in the preview buffer.
 function! vista#util#GetPreviewLines(lnum) abort
   " Show 5 lines around the tag source line [lnum-5, lnum+5]
