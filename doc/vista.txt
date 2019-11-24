@@ -262,7 +262,7 @@ g:vista_top_level_blink                                  *g:vista_top_level_blin
 g:vista_icon_indent                                          *g:vista_icon_indent*
 
   Type: |List|
-  Default: `["╰─▸ ", "├─▸ "]`
+  Default: `['└▸ ', '├▸ ']`
 
   How each level is indented and what to prepend. This could make
   the display more compact or more spacious.

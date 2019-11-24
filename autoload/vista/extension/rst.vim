@@ -9,6 +9,8 @@ let s:provider = fnamemodify(expand('<sfile>'), ':t:r')
 function! s:Execute() abort
   let headers = []
 
+  let s:lnum2tag = {}
+
   let idx = 0
   let lines = t:vista.source.lines()
   let adornment_levels = {}
@@ -32,6 +34,7 @@ function! s:Execute() abort
           endif
           let item['level'] = l:adornment_levels[adchar]
         endif
+        let s:lnum2tag[len(headers)] = l:line
         call add(headers, l:item)
         let idx += 1
     endif
@@ -39,6 +42,10 @@ function! s:Execute() abort
  endwhile
 
   return headers
+endfunction
+
+function! vista#extension#rst#GetHeader(lnum) abort
+  return s:lnum2tag[a:lnum]
 endfunction
 
 function! s:ApplyAutoUpdate() abort

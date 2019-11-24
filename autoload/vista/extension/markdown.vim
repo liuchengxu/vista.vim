@@ -12,6 +12,8 @@ endfunction
 function! s:Execute() abort
   let is_fenced_block = 0
 
+  let s:lnum2tag = {}
+
   let headers = []
 
   let idx = 0
@@ -28,16 +30,21 @@ function! s:Execute() abort
     let is_header = s:IsHeader(l:line, l:next_line)
 
     if is_header && !is_fenced_block
-        let item = {'lnum': idx+1, 'text': l:line}
-        let matched = matchlist(l:line, '\#*')
-        let item['level'] = len(matched[0])
-        call add(headers, l:item)
+        let matched = matchlist(l:line, '\(\#*\)\(.*\)')
+        let text = vista#util#Trim(matched[2])
+        let s:lnum2tag[len(headers)] = text
+        call add(headers, {'lnum': idx+1, 'text': text, 'level': strlen(matched[1])})
     endif
 
     let idx += 1
   endfor
 
   return headers
+endfunction
+
+" Use s:lnum2tag so that we don't have to extract the header from the rendered line.
+function! vista#extension#markdown#GetHeader(lnum) abort
+  return s:lnum2tag[a:lnum]
 endfunction
 
 function! s:ApplyAutoUpdate() abort
