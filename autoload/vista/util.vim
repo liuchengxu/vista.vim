@@ -89,6 +89,7 @@ function! vista#util#SetBufline(bufnr, lines) abort
   let filetype = vista#sidebar#WhichFileType()
   call setbufvar(bufnr, '&filetype', filetype)
 
+  call vista#ftplugin#Set()
   " Reload vista syntax as you may switch between serveral
   " executives/extensions.
   execute 'runtime! syntax/'.filetype.'vim'

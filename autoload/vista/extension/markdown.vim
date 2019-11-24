@@ -43,7 +43,7 @@ endfunction
 function! s:ApplyAutoUpdate() abort
   if has_key(t:vista, 'bufnr') && t:vista.winnr() != -1
     call vista#SetProvider(s:provider)
-    let rendered = vista#renderer#markdown#Render(s:Execute())
+    let rendered = vista#renderer#markdown_like#MD(s:Execute())
     call vista#util#SetBufline(t:vista.bufnr, rendered)
   endif
 endfunction
@@ -64,10 +64,9 @@ endfunction
 function! vista#extension#markdown#Execute(_bang, should_display) abort
   call vista#OnExecute(s:provider, function('s:AutoUpdate'))
 
-  let headers = s:Execute()
-
   if a:should_display
-    let rendered = vista#renderer#markdown#Render(headers)
+    let headers = s:Execute()
+    let rendered = vista#renderer#markdown_like#MD(headers)
     call vista#sidebar#OpenOrUpdate(rendered)
   endif
 endfunction

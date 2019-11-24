@@ -4,8 +4,6 @@
 "
 " Heavily inspired  from https://raw.githubusercontent.com/Shougo/unite-outline/master/autoload/unite/sources/outline/defaults/rst.vim
 
-let s:default_icon = get(g:, 'vista_icon_indent', ['╰─▸ ', '├─▸ '])
-
 let s:provider = fnamemodify(expand('<sfile>'), ':t:r')
 
 function! s:Execute() abort
@@ -43,29 +41,10 @@ function! s:Execute() abort
   return headers
 endfunction
 
-function! s:Render(data) abort
-  " {'lnum': 1, 'level': '4', 'text': 'Vista.vim'}
-  let data = a:data
-
-  let rows = []
-
-  for line in data
-    let level = line.level
-    let text = vista#util#Trim(line['text'])
-    " line.lnum is 0-based, but the lnum of vim is 1-based.
-    let lnum = line.lnum + 1
-
-    let row = repeat(' ', 2 * level).s:default_icon[0].text.' H'.level.':'.lnum
-    call add(rows, row)
-  endfor
-
-  return rows
-endfunction
-
 function! s:ApplyAutoUpdate() abort
   if has_key(t:vista, 'bufnr') && t:vista.winnr() != -1
     call vista#SetProvider(s:provider)
-    let rendered = s:Render(s:Execute())
+    let rendered = vista#renderer#markdown_like#RST(s:Execute())
     call vista#util#SetBufline(t:vista.bufnr, rendered)
   endif
 endfunction
@@ -85,10 +64,9 @@ endfunction
 function! vista#extension#rst#Execute(_bang, should_display) abort
   call vista#OnExecute(s:provider, function('s:AutoUpdate'))
 
-  let headers =  s:Execute()
-
   if a:should_display
-    let rendered = s:Render(headers)
+    let headers = s:Execute()
+    let rendered = vista#renderer#markdown_like#RST(headers)
     call vista#sidebar#OpenOrUpdate(rendered)
   endif
 endfunction

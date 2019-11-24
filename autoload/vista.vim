@@ -25,6 +25,10 @@ function! vista#ShouldIgnore(kind) abort
   return exists('g:vista_ignore_kinds') && index(g:vista_ignore_kinds, a:kind) != -1
 endfunction
 
+function! vista#SupportToc() abort
+  return &filetype ==# 'markdown' || &filetype ==# 'rst'
+endfunction
+
 function! vista#SetProvider(provider) abort
   if get(t:vista, 'skip_set_provider', v:false)
     let t:vista.skip_set_provider = v:false
@@ -149,7 +153,7 @@ function! vista#(bang, ...) abort
     elseif a:1 ==# 'finder!'
       call vista#finder#fzf#ProjectRun()
     elseif a:1 ==# 'toc'
-      if (&filetype ==# 'markdown' || &filetype ==# 'rst')
+      if vista#SupportToc()
         call vista#extension#{&filetype}#Execute(v:false, v:true)
       else
         return vista#error#For('Vista toc', &filetype)
