@@ -32,9 +32,6 @@ function! s:Execute() abort
             let l:adornment_levels[adchar] = l:adornment_id
             let l:adornment_id += 1
           endif
-          let l:adornment_levels[adchar] = l:adornment_id
-          let l:adornment_id += 1
-          endif
           let item['level'] = l:adornment_levels[adchar]
         endif
         call add(headers, l:item)
