@@ -43,7 +43,6 @@ function! s:Execute() abort
   return headers
 endfunction
 
-
 function! s:Render(data) abort
   " {'lnum': 1, 'level': '4', 'text': 'Vista.vim'}
   let data = a:data
@@ -53,7 +52,8 @@ function! s:Render(data) abort
   for line in data
     let level = line.level
     let text = vista#util#Trim(line['text'])
-    let lnum = line.lnum
+    " line.lnum is 0-based, but the lnum of vim is 1-based.
+    let lnum = line.lnum + 1
 
     let row = repeat(' ', 2 * level).s:default_icon[0].text.' H'.level.':'.lnum
     call add(rows, row)
