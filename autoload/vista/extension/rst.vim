@@ -1,3 +1,7 @@
+" Copyright (c) 2019 Mathieu Clabaut
+" MIT License
+" vim: ts=2 sw=2 sts=2 et
+"
 " Heavily inspired  from https://raw.githubusercontent.com/Shougo/unite-outline/master/autoload/unite/sources/outline/defaults/rst.vim
 
 let s:provider = fnamemodify(expand('<sfile>'), ':t:r')
