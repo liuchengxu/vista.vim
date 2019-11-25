@@ -67,6 +67,16 @@ function! s:GetInfoUnderCursor() abort
     let tag = vista#util#Trim(raw_cur_line[:stridx(raw_cur_line, ':')-1])
     let source_line = t:vista.source.line_trimmed(lnum)
     return [tag, source_line]
+  elseif t:vista.provider ==# 'markdown' || t:vista.provider ==# 'rst'
+    if line('.') < 3
+      return [v:null, v:null]
+    endif
+    " The first two lines are for displaying fpath. the lnum is 1-based, while
+    " idex is 0-based.
+    " So it's line('.') - 3 instead of line('.').
+    let tag = vista#extension#{t:vista.provider}#GetHeader(line('.')-3)
+    let source_line = t:vista.source.line_trimmed(lnum)
+    return [tag, source_line]
   endif
 
   let source_line = t:vista.source.line_trimmed(lnum)

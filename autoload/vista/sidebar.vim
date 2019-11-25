@@ -30,16 +30,18 @@ endfunction
 
 " Reload vista buffer given the unrendered data
 function! vista#sidebar#Reload(data) abort
-  " May be triggered by autocmd event sometimes
-  " e.g., unsupported filetypes for ctags or no related language servers.
-  if empty(a:data)
-    return
-  endif
-
-  " May opening a new tab if bufnr does not exist in t:vista.
+  " empty(a:data):
+  "   May be triggered by autocmd event sometimes
+  "   e.g., unsupported filetypes for ctags or no related language servers.
   "
-  " Skip reloading if vista window is not visible.
-  if !has_key(t:vista, 'bufnr') || t:vista.winnr() == -1
+  " !has_key(t:vista, 'bufnr'):
+  "   May opening a new tab if bufnr does not exist in t:vista.
+  "
+  " t:vista.winnr() == -1:
+  "   vista window is not visible.
+  if empty(a:data)
+        \ || !has_key(t:vista, 'bufnr')
+        \ || t:vista.winnr() == -1
     return
   endif
 
@@ -99,7 +101,7 @@ function! vista#sidebar#Close() abort
 
   call s:ClearAugroups('VistaCoc', 'VistaCtags')
 
-  call vista#floating#Close()
+  call vista#GenericCloseOverlay()
 endfunction
 
 function! s:ClearAugroups(...) abort
@@ -115,7 +117,7 @@ function! vista#sidebar#Open() abort
   call vista#source#Update(bufnr, winnr, fname, fpath)
   let executive = vista#GetExplicitExecutiveOrDefault()
   " Support the builtin markdown toc extension as an executive
-  if (&filetype ==# 'markdown' || &filetype ==# 'rst') && executive ==# 'toc'
+  if vista#SupportToc() && executive ==# 'toc'
     call vista#extension#{&filetype}#Execute(v:false, v:true)
   else
     call vista#executive#{executive}#Execute(v:false, v:true, v:false)

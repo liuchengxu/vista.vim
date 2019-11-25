@@ -25,6 +25,10 @@ function! vista#ShouldIgnore(kind) abort
   return exists('g:vista_ignore_kinds') && index(g:vista_ignore_kinds, a:kind) != -1
 endfunction
 
+function! vista#SupportToc() abort
+  return &filetype ==# 'markdown' || &filetype ==# 'rst'
+endfunction
+
 function! vista#SetProvider(provider) abort
   if get(t:vista, 'skip_set_provider', v:false)
     let t:vista.skip_set_provider = v:false
@@ -37,6 +41,26 @@ endfunction
 function! vista#OnExecute(provider, AUF) abort
   call vista#SetProvider(a:provider)
   call vista#autocmd#Init('Vista'.vista#util#ToCamelCase(a:provider), a:AUF)
+endfunction
+
+" call Run in the window win unsilently, unlike win_execute() which uses
+" silent by default.
+"
+" CocAction only fetch symbols for current document, no way for specify the other at the moment.
+" workaround for #52
+"
+" see also #71
+function! vista#WinExecute(winnr, Run, ...) abort
+  if winnr() != a:winnr
+    noautocmd execute a:winnr.'wincmd w'
+    let l:switch_back = 1
+  endif
+
+  call call(a:Run, a:000)
+
+  if exists('l:switch_back')
+    noautocmd wincmd p
+  endif
 endfunction
 
 " Sort the items under some kind alphabetically.
@@ -149,7 +173,7 @@ function! vista#(bang, ...) abort
     elseif a:1 ==# 'finder!'
       call vista#finder#fzf#ProjectRun()
     elseif a:1 ==# 'toc'
-      if (&filetype ==# 'markdown' || &filetype ==# 'rst')
+      if vista#SupportToc()
         call vista#extension#{&filetype}#Execute(v:false, v:true)
       else
         return vista#error#For('Vista toc', &filetype)

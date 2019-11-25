@@ -16,6 +16,7 @@ function! s:CalculatePosition(lines) abort
   let width = max(map(copy(a:lines), 'strdisplaywidth(v:val)'))
 
   let width = max([width, 40])
+  let width = min([width, float2nr(&columns * 0.6) ])
   let height = len(lines)
 
   " Calculate anchor
@@ -145,6 +146,7 @@ function! s:Display(msg) abort
         \ norelativenumber
         \ signcolumn=no
         \ nofoldenable
+        \ wrap
 
   let &l:filetype = getbufvar(t:vista.source.bufnr, '&ft')
 
