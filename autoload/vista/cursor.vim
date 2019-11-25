@@ -75,6 +75,9 @@ function! s:GetInfoUnderCursor() abort
     " idex is 0-based.
     " So it's line('.') - 3 instead of line('.').
     let tag = vista#extension#{t:vista.provider}#GetHeader(line('.')-3)
+    if tag is# v:null
+      return [v:null, v:null]
+    endif
     let source_line = t:vista.source.line_trimmed(lnum)
     return [tag, source_line]
   endif

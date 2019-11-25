@@ -6,11 +6,7 @@ scriptencoding utf-8
 
 let s:default_icon = get(g:, 'vista_icon_indent', ['└▸ ', '├▸ '])
 
-" Given the metadata of headers of markdown, return the rendered lines to display.
-"
-" The metadata of markdown headers is a List of Dict:
-" {'lnum': 1, 'level': '4', 'text': '# Vista.vim'}
-function! s:MD(line) abort
+function! s:BuildRow(line) abort
   let line = a:line
 
   let text = line.text
@@ -21,19 +17,20 @@ function! s:MD(line) abort
   return row
 endfunction
 
+" Given the metadata of headers of markdown, return the rendered lines to display.
+"
+" line.lnum is 1-based.
+"
+" The metadata of markdown headers is a List of Dict:
+" {'lnum': 1, 'level': '4', 'text': 'Vista.vim'}
+function! s:MD(line) abort
+  return s:BuildRow(a:line)
+endfunction
+
 " The metadata of rst headers is a List of Dict:
 " {'lnum': 1, 'level': '4', 'text': 'Vista.vim'}
 function! s:RST(line) abort
-  let line = a:line
-
-  let level = line.level
-  let text = vista#util#Trim(line['text'])
-  " line.lnum is 0-based, but the lnum of vim is 1-based.
-  let lnum = line.lnum + 1
-
-  let row = repeat(' ', 2 * (level - 1)).s:default_icon[0].text.' H'.level.':'.lnum
-
-  return row
+  return s:BuildRow(a:line)
 endfunction
 
 " markdown

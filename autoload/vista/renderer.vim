@@ -2,6 +2,8 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
+scriptencoding utf-8
+
 let s:icons = {
 \    'func': "\uf794",
 \    'function': "\uf794",
