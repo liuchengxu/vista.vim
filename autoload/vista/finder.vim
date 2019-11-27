@@ -42,15 +42,15 @@ function! vista#finder#GetSymbols(...) abort
     return
   endif
 
-  let cache = vista#executive#{executive}#Cache()
   let should_skip = vista#ShouldSkip()
   if should_skip
-    let t:vista.source = get(t:vista, 'source', {})
     let fpath = t:vista.source.fpath
   else
     let fpath = expand('%:p')
   endif
 
+  let cache = vista#executive#{executive}#Cache()
+  " FIXME s:IsUsable is actually useless as provider gives s:data.
   if type(cache) == v:t_dict && s:IsUsable(cache, fpath)
     let s:data = cache[fpath]
   else
