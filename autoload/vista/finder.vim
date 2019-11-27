@@ -43,18 +43,18 @@ function! vista#finder#GetSymbols(...) abort
   endif
 
   let cache = vista#executive#{executive}#Cache()
-  let skip = vista#ShouldSkip()
-  if skip
+  let should_skip = vista#ShouldSkip()
+  if should_skip
     let t:vista.source = get(t:vista, 'source', {})
     let fpath = t:vista.source.fpath
   else
     let fpath = expand('%:p')
   endif
 
-  if s:IsUsable(cache, fpath)
+  if type(cache) == v:t_dict && s:IsUsable(cache, fpath)
     let s:data = cache[fpath]
   else
-    if !skip
+    if !should_skip
       let [bufnr, winnr, fname] = [bufnr('%'), winnr(), expand('%')]
       call vista#source#Update(bufnr, winnr, fname, fpath)
     endif
@@ -92,10 +92,10 @@ endfunction
 
 " Find the maximum length of each column of items to be displayed
 function! s:FindColumnBoundary(grouped_data) abort
-  for [kind, v] in items(a:grouped_data)
+  for [kind, vals] in items(a:grouped_data)
     let s:max_len_kind = max([s:max_len_kind, strwidth(kind)])
 
-    let sub_max = max(map(copy(v), 'strwidth(printf(''%s:%s'', v:val.lnum, v:val.text))'))
+    let sub_max = max(map(copy(vals), 'strwidth(printf(''%s:%s'', v:val.lnum, v:val.text))'))
     let s:max_len_lnum_and_text = max([s:max_len_lnum_and_text, sub_max])
   endfor
 endfunction
