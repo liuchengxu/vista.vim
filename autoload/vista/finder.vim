@@ -95,7 +95,7 @@ function! s:FindColumnBoundary(grouped_data) abort
   for [kind, v] in items(a:grouped_data)
     let s:max_len_kind = max([s:max_len_kind, strwidth(kind)])
 
-    let sub_max = max(map(copy(v), 'strwidth(printf("%s:%s", v:val.lnum, v:val.text))'))
+    let sub_max = max(map(copy(v), 'strwidth(printf(''%s:%s'', v:val.lnum, v:val.text))'))
     let s:max_len_lnum_and_text = max([s:max_len_lnum_and_text, sub_max])
   endfor
 endfunction
