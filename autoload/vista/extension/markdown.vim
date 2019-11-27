@@ -44,7 +44,7 @@ endfunction
 
 " Use s:lnum2tag so that we don't have to extract the header from the rendered line.
 function! vista#extension#markdown#GetHeader(lnum) abort
-  return s:lnum2tag[a:lnum]
+  return get(s:lnum2tag, a:lnum, v:null)
 endfunction
 
 function! s:ApplyAutoUpdate() abort

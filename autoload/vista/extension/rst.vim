@@ -12,31 +12,32 @@ function! s:GatherHeaderMetadata() abort
   let s:lnum2tag = {}
 
   let idx = 0
-  let lines = t:vista.source.lines()
   let adornment_levels = {}
   let adornment_id = 2
 
+  let lines = t:vista.source.lines()
   while idx < len(lines)
     let line = lines[idx]
     let matched_line = get(lines, idx + 1, '')
     " Check the matching strictly.
     if matched_line =~# '^\([[:punct:]]\)\1\{3,}$' && line !~# '^\s*$'
-        if idx > 1 && lines[idx - 1] == matched_line
-          " Title
-          let item = {'lnum': idx, 'text': l:line, 'level': 1}
-        else
-          " Sections
-          let item = {'lnum': idx, 'text': l:line}
-          let adchar = matched_line[0]
-          if !has_key(l:adornment_levels, adchar)
-            let l:adornment_levels[adchar] = l:adornment_id
-            let l:adornment_id += 1
-          endif
-          let item['level'] = l:adornment_levels[adchar]
+      let text = vista#util#Trim(l:line)
+      if idx > 1 && lines[idx - 1] == matched_line
+        " Title
+        let item = {'lnum': idx+1, 'text': text, 'level': 1}
+      else
+        " Sections
+        let item = {'lnum': idx+1, 'text': text}
+        let adchar = matched_line[0]
+        if !has_key(l:adornment_levels, adchar)
+          let l:adornment_levels[adchar] = l:adornment_id
+          let l:adornment_id += 1
         endif
-        let s:lnum2tag[len(headers)] = l:line
-        call add(headers, l:item)
-        let idx += 1
+        let item['level'] = l:adornment_levels[adchar]
+      endif
+      let s:lnum2tag[len(headers)] = text
+      call add(headers, l:item)
+      let idx += 1
     endif
     let idx += 1
  endwhile
@@ -45,7 +46,7 @@ function! s:GatherHeaderMetadata() abort
 endfunction
 
 function! vista#extension#rst#GetHeader(lnum) abort
-  return s:lnum2tag[a:lnum]
+  return get(s:lnum2tag, a:lnum, v:null)
 endfunction
 
 function! s:ApplyAutoUpdate() abort
