@@ -100,20 +100,21 @@ function! s:FindColumnBoundary(grouped_data) abort
   endfor
 endfunction
 
+function! s:IntoRow(icon, kind, item) abort
+  let line = t:vista.source.line_trimmed(a:item.lnum)
+  let lnum_and_text = printf('%s:%s', a:item.lnum, a:item.text)
+  return printf('%s %s%s  [%s]%s  %s',
+        \ a:icon,
+        \ lnum_and_text, repeat(' ', s:max_len_lnum_and_text- strwidth(lnum_and_text)),
+        \ a:kind, repeat(' ', s:max_len_kind - strwidth(a:kind)),
+        \ line)
+endfunction
+
 function! s:RenderGroupedData(grouped_data) abort
   let source = []
-  for [kind, v] in items(a:grouped_data)
+  for [kind, vals] in items(a:grouped_data)
     let icon = vista#renderer#IconFor(kind)
-    for item in v
-      let line = t:vista.source.line_trimmed(item.lnum)
-      let lnum_and_text = printf('%s:%s', item.lnum, item.text)
-      let row = printf('%s %s%s  [%s]%s  %s',
-            \ icon,
-            \ lnum_and_text, repeat(' ', s:max_len_lnum_and_text- strwidth(lnum_and_text)),
-            \ kind, repeat(' ', s:max_len_kind - strwidth(kind)),
-            \ line)
-      call add(source, row)
-    endfor
+    call extend(source, map(vals, 's:IntoRow(icon, kind, v:val)'))
   endfor
   return source
 endfunction
