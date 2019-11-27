@@ -73,49 +73,62 @@ function! vista#finder#GetSymbols(...) abort
   return [s:data, s:cur_executive, s:using_alternative]
 endfunction
 
-" Find the maximum length of each column of items to be displayed
-function! s:FindColumnsMaxLen(raw_items) abort
-  let [max_len_kind, max_len_lnum_and_text] = [-1, -1]
+function! s:GroupByKindForLSPData(lsp_items) abort
+  let s:grouped = {}
 
-  for [kind, v] in items(a:raw_items)
-    let kind_len = strwidth(kind)
-    if kind_len > max_len_kind
-      let max_len_kind = kind_len
+  for item in a:lsp_items
+    let s:max_len_kind = max([s:max_len_kind, strwidth(item.kind)])
+
+    let lnum_and_text = printf('%s:%s', item.lnum, item.text)
+    let s:max_len_lnum_and_text = max([s:max_len_lnum_and_text, strwidth(lnum_and_text)])
+
+    if has_key(s:grouped, item.kind)
+      call add(s:grouped[item.kind], item)
+    else
+      let s:grouped[item.kind] = [item]
     endif
-
-    for item in v
-      let lnum_and_text = printf('%s:%s', item.lnum, item.text)
-      let len_lnum_and_text = strwidth(lnum_and_text)
-      if len_lnum_and_text > max_len_lnum_and_text
-        let max_len_lnum_and_text = len_lnum_and_text
-      endif
-    endfor
   endfor
-
-  return [max_len_kind, max_len_lnum_and_text]
 endfunction
 
-" Prepare source for fzf, skim finder
-function! vista#finder#PrepareSource(raw_items) abort
+" Find the maximum length of each column of items to be displayed
+function! s:FindColumnBoundary(grouped_data) abort
+  for [kind, v] in items(a:grouped_data)
+    let s:max_len_kind = max([s:max_len_kind, strwidth(kind)])
+
+    let sub_max = max(map(copy(v), 'strwidth(printf("%s:%s", v:val.lnum, v:val.text))'))
+    let s:max_len_lnum_and_text = max([s:max_len_lnum_and_text, sub_max])
+  endfor
+endfunction
+
+function! s:RenderGroupedData(grouped_data) abort
   let source = []
-
-  let [max_len_kind, max_len_lnum_and_text] = s:FindColumnsMaxLen(a:raw_items)
-
-  for [kind, v] in items(a:raw_items)
+  for [kind, v] in items(a:grouped_data)
     let icon = vista#renderer#IconFor(kind)
     for item in v
       let line = t:vista.source.line_trimmed(item.lnum)
       let lnum_and_text = printf('%s:%s', item.lnum, item.text)
       let row = printf('%s %s%s  [%s]%s  %s',
             \ icon,
-            \ lnum_and_text, repeat(' ', max_len_lnum_and_text- strwidth(lnum_and_text)),
-            \ kind, repeat(' ', max_len_kind - strwidth(kind)),
+            \ lnum_and_text, repeat(' ', s:max_len_lnum_and_text- strwidth(lnum_and_text)),
+            \ kind, repeat(' ', s:max_len_kind - strwidth(kind)),
             \ line)
       call add(source, row)
     endfor
   endfor
-
   return source
+endfunction
+
+" Prepare source for fzf, skim finder
+function! vista#finder#PrepareSource(raw_items) abort
+  let [s:max_len_kind, s:max_len_lnum_and_text] = [-1, -1]
+
+  if type(a:raw_items) == v:t_list
+    call s:GroupByKindForLSPData(a:raw_items)
+    return s:RenderGroupedData(s:grouped)
+  else
+    call s:FindColumnBoundary(a:raw_items)
+    return s:RenderGroupedData(a:raw_items)
+  endif
 endfunction
 
 " Prepare opts for fzf#run(fzf#wrap(opts))
