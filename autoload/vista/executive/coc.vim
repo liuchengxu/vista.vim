@@ -9,20 +9,17 @@ let s:should_display = v:false
 
 " Extract fruitful infomation from raw symbols
 function! s:Extract(symbols) abort
+  let s:data = []
+
   if empty(a:symbols)
     return
   endif
 
-  let s:data = []
   call map(a:symbols, 'vista#parser#lsp#CocSymbols(v:val, s:data)')
 
   if empty(s:data)
     return
   endif
-
-  let s:cache = get(s:, 'cache', {})
-  let s:cache.data = s:data
-  let s:cache.bufnr = bufnr('')
 
   if s:reload_only
     call vista#sidebar#Reload(s:data)
