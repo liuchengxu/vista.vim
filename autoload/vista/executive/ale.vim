@@ -55,6 +55,11 @@ function! s:Run() abort
 endfunction
 
 function! s:RunAsync() abort
+  let linters = map(filter(ale#linter#Get(&filetype), '!empty(v:val.lsp)'), 'v:val.name')
+  if empty(linters)
+    return
+  endif
+
   let method = 'textDocument/documentSymbol'
   let bufnr = t:vista.source.bufnr
   let params = {
@@ -64,12 +69,6 @@ function! s:RunAsync() abort
     \}
   let message = [0, method, params]
   let Callback = function('s:Handler')
-
-  let linters = map(filter(ale#linter#Get(&filetype), '!empty(v:val.lsp)'), 'v:val.name')
-
-  if empty(linters)
-    return
-  endif
 
   for linter in linters
     call ale#lsp_linter#SendRequest(bufnr, linter, message, Callback)

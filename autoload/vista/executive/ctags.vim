@@ -193,8 +193,19 @@ if has('nvim')
     return jobid > 0 ? jobid : 0
   endfunction
 else
+
+  if has('win32')
+    function! s:WrapCmd(cmd) abort
+      return &shell . ' ' . &shellcmdflag . ' ' . a:cmd
+    endfunction
+  else
+    function! s:WrapCmd(cmd) abort
+      return split(&shell) + split(&shellcmdflag) + [a:cmd]
+    endfunction
+  endif
+
   function! s:ApplyRunAsync(cmd) abort
-    let job = job_start(a:cmd, {
+    let job = job_start(s:WrapCmd(a:cmd), {
           \ 'close_cb':function('s:close_cb')
           \ })
     let jobid = matchstr(job, '\d\+') + 0

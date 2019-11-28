@@ -15,7 +15,6 @@ function! s:Handler(results) abort
     return []
   endif
 
-
   let lines = []
   call map(a:results, 'vista#parser#lsp#KindToSymbol(v:val, lines)')
 
