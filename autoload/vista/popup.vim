@@ -30,10 +30,11 @@ endfunction
 
 function! s:OpenPopup(lines) abort
   if get(g:, 'vista_sidebar_position', 'vertical botright') =~# 'right'
+    let max_length = max(map(copy(a:lines), 'strlen(v:val)')) + 2
     let pos_opts = {
           \ 'pos': 'botleft',
           \ 'line': 'cursor-2',
-          \ 'col': 'cursor-'.s:max_length,
+          \ 'col': 'cursor-'.max_length,
           \ 'moved': 'WORD',
           \ }
   else
@@ -61,6 +62,14 @@ function! s:OpenPopup(lines) abort
     call popup_show(s:popup_winid)
     call popup_move(s:popup_winid, pos_opts)
   endif
+
+  augroup VistaPopup
+    autocmd!
+    autocmd CursorMoved <buffer> call s:ClosePopup()
+    autocmd BufEnter,WinEnter,WinLeave * call s:ClosePopup()
+  augroup END
+
+  let t:vista.popup_visible = v:true
 endfunction
 
 function! s:DisplayRawAt(lnum, lines, vista_winid) abort
@@ -68,16 +77,7 @@ function! s:DisplayRawAt(lnum, lines, vista_winid) abort
     return
   endif
 
-  let s:max_length = max(map(copy(a:lines), 'strlen(v:val)')) + 2
   call s:OpenPopup(a:lines)
-
-  augroup VistaPopup
-    autocmd!
-    autocmd CursorMoved <buffer> call s:ClosePopup()
-    autocmd BufEnter,WinEnter,WinLeave  * call s:ClosePopup()
-  augroup END
-
-  let t:vista.popup_visible = v:true
 endfunction
 
 function! s:DisplayAt(lnum, tag, vista_winid) abort
@@ -86,8 +86,6 @@ function! s:DisplayAt(lnum, tag, vista_winid) abort
   endif
 
   let [lines, s:popup_lnum] = vista#util#GetPreviewLines(a:lnum)
-
-  let s:max_length = max(map(copy(lines), 'strlen(v:val)')) + 2
 
   call s:OpenPopup(lines)
 
@@ -102,14 +100,6 @@ function! s:DisplayAt(lnum, tag, vista_winid) abort
   catch /^Vim\%((\a\+)\)\=:E869/
     call win_execute(s:popup_winid, 'call s:HiTagLine()')
   endtry
-
-  augroup VistaPopup
-    autocmd!
-    autocmd CursorMoved <buffer> call s:ClosePopup()
-    autocmd BufEnter,WinEnter,WinLeave * call s:ClosePopup()
-  augroup END
-
-  let t:vista.popup_visible = v:true
 endfunction
 
 function! vista#popup#Close() abort
