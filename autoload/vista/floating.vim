@@ -97,8 +97,11 @@ function! s:CloseOnWinEnter() abort
   let t:vista.floating_visible = v:false
 endfunction
 
-function! s:Display(msg) abort
+function! s:Display(msg, win_id) abort
   let msg = a:msg
+  if a:win_id !=# win_getid()
+    return
+  endif
 
   if !exists('s:floating_bufnr') || !bufexists(s:floating_bufnr)
     let s:floating_bufnr = nvim_create_buf(v:false, v:false)
@@ -194,8 +197,9 @@ function! vista#floating#DisplayAt(lnum, tag) abort
   let s:last_lnum = a:lnum
 
   let [lines, s:floating_lnum] = vista#util#GetPreviewLines(a:lnum)
+  let win_id = win_getid()
 
-  let s:floating_timer = timer_start(s:floating_delay, { -> s:Display(lines)})
+  let s:floating_timer = timer_start(s:floating_delay, { -> s:Display(lines, win_id)})
 endfunction
 
 " Display in floating_win given the lnum of source buffer and raw lines.
@@ -205,6 +209,7 @@ function! vista#floating#DisplayRawAt(lnum, lines) abort
   endif
 
   let s:last_lnum = a:lnum
+  let win_id = win_getid()
 
-  let s:floating_timer = timer_start(s:floating_delay, { -> s:Display(a:lines)})
+  let s:floating_timer = timer_start(s:floating_delay, { -> s:Display(a:lines, win_id)})
 endfunction
