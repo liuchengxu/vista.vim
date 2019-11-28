@@ -16,13 +16,7 @@ function! s:Handler(data) abort
     return
   endif
 
-  let lines = []
-  call map(a:data.result, 'vista#parser#lsp#KindToSymbol(v:val, lines)')
-
-  let s:data = {}
-  let t:vista.functions = []
-  call map(lines, 'vista#parser#lsp#ExtractSymbol(v:val, s:data)')
-
+  let s:data = vista#renderer#LSPPreprocess(a:data.result)
   let s:fetching = v:false
 
   if !empty(s:data)

@@ -87,3 +87,16 @@ endfunction
 function! vista#renderer#RenderAndDisplay(data) abort
   call vista#sidebar#OpenOrUpdate(s:Render(a:data))
 endfunction
+
+" Convert the number kind to the text kind, and then
+" extract the neccessary info from the raw LSP response.
+function! vista#renderer#LSPPreprocess(lsp_result) abort
+  let lines = []
+  call map(a:lsp_result, 'vista#parser#lsp#KindToSymbol(v:val, lines)')
+
+  let processed_data = {}
+  let t:vista.functions = []
+  call map(lines, 'vista#parser#lsp#ExtractSymbol(v:val, processed_data)')
+
+  return processed_data
+endfunction
