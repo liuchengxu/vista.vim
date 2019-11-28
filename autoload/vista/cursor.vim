@@ -231,7 +231,6 @@ endif
 " Show the detail of current tag/symbol under cursor.
 function! s:ShowDetail() abort
   let [tag, source_line] = s:GetInfoUnderCursor()
-  let s:cur_tag = tag
 
   if empty(tag) || empty(source_line)
     echo "\r"
@@ -391,7 +390,8 @@ function! vista#cursor#FoldOrJump() abort
     return
   endif
 
-  call vista#jump#TagLine(get(s:, 'cur_tag', ''))
+  let tag_under_cursor = s:GetInfoUnderCursor()[0]
+  call vista#jump#TagLine(tag_under_cursor)
 endfunction
 
 " This happens when you are in the window of source file
