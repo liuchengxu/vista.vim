@@ -14,6 +14,8 @@ let s:support_json_format =
 let s:is_mac = has('macunix')
 let s:is_linux = has('unix') && !has('macunix') && !has('win32unix')
 
+let s:can_async = has('patch-8.0.0027')
+
 " Expose this variable for debugging
 let g:vista#executive#ctags#support_json_format = s:support_json_format
 
@@ -293,7 +295,7 @@ function! s:ApplyExecute(bang, fpath) abort
 
   let cmd = s:BuildCmd(file)
 
-  if a:bang
+  if a:bang || !s:can_async
     call s:ApplyRun(cmd)
   else
     call s:RunAsyncCommon(cmd)
@@ -327,13 +329,15 @@ function! s:RunAsyncCommon(cmd) abort
 endfunction
 
 function! s:RunAsync(fpath) abort
-  let file = s:IntoTemp(a:fpath)
-  if empty(file)
-    return
-  endif
+  if s:can_async
+    let file = s:IntoTemp(a:fpath)
+    if empty(file)
+      return
+    endif
 
-  let cmd = s:BuildCmd(file)
-  call s:RunAsyncCommon(cmd)
+    let cmd = s:BuildCmd(file)
+    call s:RunAsyncCommon(cmd)
+  endif
 endfunction
 
 function! s:Execute(bang, should_display) abort
