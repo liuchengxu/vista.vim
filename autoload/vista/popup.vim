@@ -63,7 +63,11 @@ function! s:OpenPopup(lines) abort
   endif
 endfunction
 
-function! s:DisplayRawAt(lnum, lines) abort
+function! s:DisplayRawAt(lnum, lines, vista_winid) abort
+  if win_getid() != a:vista_winid
+    return
+  endif
+
   let s:max_length = max(map(copy(a:lines), 'strlen(v:val)')) + 2
   call s:OpenPopup(a:lines)
 
@@ -76,7 +80,11 @@ function! s:DisplayRawAt(lnum, lines) abort
   let t:vista.popup_visible = v:true
 endfunction
 
-function! s:DisplayAt(lnum, tag) abort
+function! s:DisplayAt(lnum, tag, vista_winid) abort
+  if win_getid() != a:vista_winid
+    return
+  endif
+
   let [lines, s:popup_lnum] = vista#util#GetPreviewLines(a:lnum)
 
   let s:max_length = max(map(copy(lines), 'strlen(v:val)')) + 2
@@ -120,7 +128,7 @@ function! s:DispatchDisplayer(Displayer, lnum, tag_or_raw_lines) abort
 
   let s:popup_timer = timer_start(
         \ s:popup_delay,
-        \ { -> a:Displayer(a:lnum, a:tag_or_raw_lines) }
+        \ { -> a:Displayer(a:lnum, a:tag_or_raw_lines, win_getid()) }
         \ )
 endfunction
 
