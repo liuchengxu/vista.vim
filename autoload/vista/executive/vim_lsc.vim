@@ -10,26 +10,16 @@ let s:should_display = v:false
 let s:fetching = v:true
 
 function! s:Handler(results) abort
+  let s:fetching = v:false
   if empty(a:results)
-    let s:fetching = v:false
     return []
   endif
 
   let s:data = vista#renderer#LSPPreprocess(a:results)
-  let s:fetching = v:false
 
   if !empty(s:data)
     let s:ever_done = v:true
-    if s:reload_only
-      call vista#sidebar#Reload(s:data)
-      let s:reload_only = v:false
-      return
-    endif
-
-    if s:should_display
-      call vista#renderer#RenderAndDisplay(s:data)
-      let s:should_display = v:false
-    endif
+    let [s:reload_only, s:should_display] = vista#renderer#LSPProcess(s:data, s:reload_only, s:should_display)
   endif
 endfunction
 

@@ -8,29 +8,18 @@ let s:reload_only = v:false
 let s:should_display = v:false
 
 function! s:Handler(data) abort
+  let s:fetching = v:false
   if type(a:data) != v:t_dict
         \ || has_key(a:data, 'error')
         \ || !has_key(a:data, 'result')
         \ || empty(get(a:data, 'result', {}))
-    let s:fetching = v:false
     return
   endif
 
   let s:data = vista#renderer#LSPPreprocess(a:data.result)
-  let s:fetching = v:false
 
   if !empty(s:data)
-    if s:reload_only
-      call vista#sidebar#Reload(s:data)
-      let s:reload_only = v:false
-      return
-    endif
-
-    if s:should_display
-      let t:vista.tmp = s:data
-      call vista#renderer#RenderAndDisplay(s:data)
-      let s:should_display = v:false
-    endif
+    let [s:reload_only, s:should_display] = vista#renderer#LSPProcess(s:data, s:reload_only, s:should_display)
   endif
 endfunction
 

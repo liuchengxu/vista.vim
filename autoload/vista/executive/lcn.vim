@@ -10,25 +10,14 @@ let s:should_display = v:false
 let s:fetching = v:true
 
 function! s:Handler(output) abort
+  let s:fetching = v:false
   if !has_key(a:output, 'result')
     call vista#error#Notify('No result via LanguageClient#textDocument_documentSymbol()')
-    let s:fetching = v:false
     return
   endif
 
   let s:data = vista#renderer#LSPPreprocess(a:output.result)
-  let s:fetching = v:false
-
-  if s:reload_only
-    call vista#sidebar#Reload(s:data)
-    let s:reload_only = v:false
-    return
-  endif
-
-  if s:should_display
-    let s:should_display = v:false
-    call vista#renderer#RenderAndDisplay(s:data)
-  endif
+  let [s:reload_only, s:should_display] = vista#renderer#LSPProcess(s:data, s:reload_only, s:should_display)
 endfunction
 
 function! s:AutoUpdate(fpath) abort

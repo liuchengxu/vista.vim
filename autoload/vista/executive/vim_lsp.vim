@@ -10,28 +10,18 @@ let s:should_display = v:false
 let s:last_req_id = 0
 
 function! s:Handler(_server, _req_id, _type, data) abort
+  let s:fetching = v:false
   if !has_key(a:data.response, 'result')
-    let s:fetching = v:false
     return []
   endif
 
   let result = a:data.response.result
 
   let s:data = vista#renderer#LSPPreprocess(result)
-  let s:fetching = v:false
 
   if !empty(s:data)
     let s:ever_done = v:true
-    if s:reload_only
-      call vista#sidebar#Reload(s:data)
-      let s:reload_only = v:false
-      return
-    endif
-
-    if s:should_display
-      call vista#renderer#RenderAndDisplay(s:data)
-      let s:should_display = v:false
-    endif
+    let [s:reload_only, s:should_display] = vista#renderer#LSPPreprocess(s:data, s:reload_only, s:should_display)
   endif
 endfunction
 
