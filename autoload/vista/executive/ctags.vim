@@ -54,12 +54,10 @@ function! s:GetLanguageSpecificOptition(filetype) abort
   let opt = ''
 
   try
-
     let types = g:vista#types#uctags#{a:filetype}#
     let lang = types.lang
     let kinds = join(keys(types.kinds), '')
     let opt = printf('--language-force=%s --%s-kinds=%s', lang, lang, kinds)
-
   " Ignore Vim(let):E121: Undefined variable
   catch /^Vim\%((\a\+)\)\=:E121/
   endtry
@@ -107,10 +105,6 @@ function! s:on_exit(_job, _data, _event) abort dict
   call s:ExtractLinewise(self.stdout[:-2])
 
   call s:ApplyExtracted()
-
-  if exists('s:id')
-    unlet s:id
-  endif
 endfunction
 
 function! s:close_cb(channel) abort
@@ -118,16 +112,13 @@ function! s:close_cb(channel) abort
 
   while ch_status(a:channel, {'part': 'out'}) ==# 'buffered'
     let line = ch_read(a:channel)
-    call call(s:TagParser, [line, s:data])
+    call s:TagParser(line, s:data)
   endwhile
 
   call s:ApplyExtracted()
-
-  if exists('s:id')
-    unlet s:id
-  endif
 endfunction
 
+" Process the preprocessed output by ctags and remove s:id.
 function! s:ApplyExtracted() abort
   " Update cache when new data comes.
   let s:cache = get(s:, 'cache', {})
@@ -135,15 +126,10 @@ function! s:ApplyExtracted() abort
   let s:cache.ftime = getftime(s:fpath)
   let s:cache.bufnr = bufnr('')
 
-  if s:reload_only
-    call vista#sidebar#Reload(s:data)
-    let s:reload_only = v:false
-    return
-  endif
+  let [s:reload_only, s:should_display] = vista#renderer#LSPProcess(s:data, s:reload_only, s:should_display)
 
-  if s:should_display
-    call vista#renderer#RenderAndDisplay(s:data)
-    let s:should_display = v:false
+  if exists('s:id')
+    unlet s:id
   endif
 endfunction
 
