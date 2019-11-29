@@ -198,7 +198,11 @@ function! vista#util#BinarySearch(array, target, cmp_key, ret_key) abort
     let mid = (low + high) / 2
     if array[mid][a:cmp_key] == target
       let found = array[mid]
-      return get(found, a:ret_key, v:null)
+      if !empty(a:ret_key)
+        return get(found, a:ret_key, v:null)
+      else
+        return found
+      endif
     elseif array[mid][a:cmp_key] > target
       let high = mid - 1
     else
@@ -221,7 +225,11 @@ function! vista#util#BinarySearch(array, target, cmp_key, ret_key) abort
     let found = array[low - 1]
   endif
 
-  return get(found, a:ret_key, v:null)
+  if !empty(a:ret_key)
+    return get(found, a:ret_key, v:null)
+  else
+    return found
+  endif
 endfunction
 
 " Return the lines to preview and the target line number in the preview buffer.

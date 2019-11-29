@@ -340,8 +340,11 @@ function! s:HighlightNearestTag(_timer) abort
     return
   endif
 
-  let s:vlnum = vista#util#BinarySearch(t:vista.raw, line('.'), 'line', 'vlnum')
-
+  let found = vista#util#BinarySearch(t:vista.raw, line('.'), 'line', '')
+  if empty(found)
+    return
+  endif
+  let s:vlnum = get(found, 'vlnum', v:null)
   if empty(s:vlnum)
     return
   endif
@@ -361,7 +364,12 @@ function! s:HighlightNearestTag(_timer) abort
     let l:switch_back = 1
   endif
 
-  call s:ApplyHighlight(s:vlnum, v:true)
+  let tag = get(found, 'name', v:null)
+  if !empty(tag)
+    call s:ApplyHighlight(s:vlnum, v:true, tag)
+  else
+    call s:ApplyHighlight(s:vlnum, v:true)
+  endif
 
   if exists('l:switch_back')
     noautocmd wincmd p
@@ -474,12 +482,21 @@ function! vista#cursor#ShowTagFor(lnum) abort
     return
   endif
 
-  let s:vlnum = vista#util#BinarySearch(t:vista.raw, a:lnum, 'line', 'vlnum')
+  let found = vista#util#BinarySearch(t:vista.raw, a:lnum, 'line', '')
+  if empty(found)
+    return
+  endif
+  let s:vlnum = get(found, 'vlnum', v:null)
   if empty(s:vlnum)
     return
   endif
 
-  call s:ApplyHighlight(s:vlnum, v:true)
+  let tag = get(found, 'name', v:null)
+  if !empty(tag)
+    call s:ApplyHighlight(s:vlnum, v:true, tag)
+  else
+    call s:ApplyHighlight(s:vlnum, v:true)
+  endif
 endfunction
 
 function! vista#cursor#ShowTag() abort
