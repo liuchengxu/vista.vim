@@ -178,8 +178,13 @@ function! s:ShouldSkipDisplay(lnum) abort
         \ && get(t:vista, 'floating_visible', v:false)
     return 1
   else
+    let s:last_lnum = a:lnum
     return 0
   endif
+endfunction
+
+function! s:DisplayWithDelay(lines) abort
+  let s:floating_timer = timer_start(s:floating_delay, { -> s:Display(a:lines, win_getid())})
 endfunction
 
 " Display in floating_win given the lnum of source buffer and current tag.
@@ -194,12 +199,8 @@ function! vista#floating#DisplayAt(lnum, tag) abort
   " the displacement of current tag highlighting position.
   let s:cur_tag = a:tag
 
-  let s:last_lnum = a:lnum
-
   let [lines, s:floating_lnum] = vista#util#GetPreviewLines(a:lnum)
-  let win_id = win_getid()
-
-  let s:floating_timer = timer_start(s:floating_delay, { -> s:Display(lines, win_id)})
+  call s:DisplayWithDelay(lines)
 endfunction
 
 " Display in floating_win given the lnum of source buffer and raw lines.
@@ -208,8 +209,5 @@ function! vista#floating#DisplayRawAt(lnum, lines) abort
     return
   endif
 
-  let s:last_lnum = a:lnum
-  let win_id = win_getid()
-
-  let s:floating_timer = timer_start(s:floating_delay, { -> s:Display(a:lines, win_id)})
+  call s:DisplayWithDelay(a:lines)
 endfunction

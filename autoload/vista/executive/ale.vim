@@ -8,35 +8,18 @@ let s:reload_only = v:false
 let s:should_display = v:false
 
 function! s:Handler(data) abort
+  let s:fetching = v:false
   if type(a:data) != v:t_dict
         \ || has_key(a:data, 'error')
         \ || !has_key(a:data, 'result')
         \ || empty(get(a:data, 'result', {}))
-    let s:fetching = v:false
     return
   endif
 
-  let lines = []
-  call map(a:data.result, 'vista#parser#lsp#KindToSymbol(v:val, lines)')
-
-  let s:data = {}
-  let t:vista.functions = []
-  call map(lines, 'vista#parser#lsp#ExtractSymbol(v:val, s:data)')
-
-  let s:fetching = v:false
+  let s:data = vista#renderer#LSPPreprocess(a:data.result)
 
   if !empty(s:data)
-    if s:reload_only
-      call vista#sidebar#Reload(s:data)
-      let s:reload_only = v:false
-      return
-    endif
-
-    if s:should_display
-      let t:vista.tmp = s:data
-      call vista#renderer#RenderAndDisplay(s:data)
-      let s:should_display = v:false
-    endif
+    let [s:reload_only, s:should_display] = vista#renderer#LSPProcess(s:data, s:reload_only, s:should_display)
   endif
 endfunction
 
@@ -55,6 +38,11 @@ function! s:Run() abort
 endfunction
 
 function! s:RunAsync() abort
+  let linters = map(filter(ale#linter#Get(&filetype), '!empty(v:val.lsp)'), 'v:val.name')
+  if empty(linters)
+    return
+  endif
+
   let method = 'textDocument/documentSymbol'
   let bufnr = t:vista.source.bufnr
   let params = {
@@ -64,12 +52,6 @@ function! s:RunAsync() abort
     \}
   let message = [0, method, params]
   let Callback = function('s:Handler')
-
-  let linters = map(filter(ale#linter#Get(&filetype), '!empty(v:val.lsp)'), 'v:val.name')
-
-  if empty(linters)
-    return
-  endif
 
   for linter in linters
     call ale#lsp_linter#SendRequest(bufnr, linter, message, Callback)

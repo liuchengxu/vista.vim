@@ -17,19 +17,8 @@ function! s:Extract(symbols) abort
 
   call map(a:symbols, 'vista#parser#lsp#CocSymbols(v:val, s:data)')
 
-  if empty(s:data)
-    return
-  endif
-
-  if s:reload_only
-    call vista#sidebar#Reload(s:data)
-    let s:reload_only = v:false
-    return
-  endif
-
-  if s:should_display
-    call vista#renderer#RenderAndDisplay(s:data)
-    let s:should_display = v:false
+  if !empty(s:data)
+    let [s:reload_only, s:should_display] = vista#renderer#LSPProcess(s:data, s:reload_only, s:should_display)
   endif
 
   return s:data
