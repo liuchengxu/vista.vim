@@ -21,7 +21,7 @@ function! s:Handler(_server, _req_id, _type, data) abort
 
   if !empty(s:data)
     let s:ever_done = v:true
-    let [s:reload_only, s:should_display] = vista#renderer#LSPPreprocess(s:data, s:reload_only, s:should_display)
+    let [s:reload_only, s:should_display] = vista#renderer#LSPProcess(s:data, s:reload_only, s:should_display)
   endif
 endfunction
 

@@ -101,6 +101,7 @@ function! vista#renderer#LSPPreprocess(lsp_result) abort
   return processed_data
 endfunction
 
+" React on the preprocessed LSP data
 function! vista#renderer#LSPProcess(processed_data, reload_only, should_display) abort
   if a:reload_only
     call vista#sidebar#Reload(a:processed_data)
