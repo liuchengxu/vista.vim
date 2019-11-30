@@ -366,14 +366,14 @@ function! s:TryFoldIsOk() abort
     if !empty(getline('.'))
       if foldclosed('.') != -1
         normal! zo
+        return v:true
       elseif foldlevel('.') != 0
         normal! zc
+        return v:true
       endif
     endif
-    return v:true
-  else
-    return v:false
   endif
+  return v:false
 endfunction
 
 " Fold scope based on the indent.
