@@ -45,9 +45,6 @@ function! s:RemoveVisibility(tag) abort
   endif
 endfunction
 
-function! s:GetLSPInfo() abort
-endfunction
-
 " Try matching the exact tag given the trimmed line in the vista window.
 function! s:MatchTag(trimmed_line) abort
   " Since we include the space ` `, we need to trim the result later.
@@ -153,7 +150,27 @@ function! s:EchoScopeFromCacheIsOk() abort
   return v:false
 endfunction
 
+function! s:TryParseAndEchoScope() abort
+  let linenr = vista#util#LowerIndentLineNr()
+
+  " Echo the scope of current tag if found
+  if linenr != 0
+    let scope = matchstr(getline(linenr), '\a\+$')
+    if !empty(scope)
+      call s:EchoScope(scope)
+    else
+      " For the kind renderer
+      let pieces = split(getline(linenr), ' ')
+      if !empty(pieces)
+        let scope = pieces[1]
+        call s:EchoScope(scope)
+      endif
+    endif
+  endif
+endfunction
+
 " Echo the tag with detailed info in the cmdline
+" Try to echo the scope and then the tag.
 function! s:EchoInCmdline(msg, tag) abort
   let [msg, tag] = [a:msg, a:tag]
 
@@ -173,22 +190,7 @@ function! s:EchoInCmdline(msg, tag) abort
 
   " Try highlighting the scope of current tag
   if !s:EchoScopeFromCacheIsOk()
-    let linenr = vista#util#LowerIndentLineNr()
-
-    " Echo the scope of current tag if found
-    if linenr != 0
-      let scope = matchstr(getline(linenr), '\a\+$')
-      if !empty(scope)
-        call s:EchoScope(scope)
-      else
-        " For the kind renderer
-        let pieces = split(getline(linenr), ' ')
-        if len(pieces) > 1
-          let scope = pieces[1]
-          call s:EchoScope(scope)
-        endif
-      endif
-    endif
+    call s:TryParseAndEchoScope()
   endif
 
   " if start is 0, msg[0:-1] will display the redundant whole msg.
