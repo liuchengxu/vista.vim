@@ -79,8 +79,8 @@ function! s:ApplyRun() abort
   try
     " fzf_colors may interfere custom syntax.
     " Unlet and restore it later.
-    if exists('g:fzf_colors')
-      let old_fzf_colors = g:fzf_colors
+    if exists('g:fzf_colors') && !get(g:, 'vista_keep_fzf_colors', 0)
+      let l:old_fzf_colors = g:fzf_colors
       unlet g:fzf_colors
     endif
 

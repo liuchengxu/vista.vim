@@ -31,7 +31,7 @@ function! vista#jump#TagLine(tag) abort
 
   call call('vista#util#Blink', get(g:, 'vista_top_level_blink', [2, 100]))
 
-  call vista#popup#Close()
+  call vista#GenericCloseOverlay()
 
   if get(g:, 'vista_close_on_jump', 0)
     call vista#sidebar#Close()

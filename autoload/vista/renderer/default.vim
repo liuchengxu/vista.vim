@@ -2,6 +2,8 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
+scriptencoding utf-8
+
 let s:scope_icon = ['⊕', '⊖']
 
 let s:visibility_icon = {
@@ -93,7 +95,7 @@ function! s:RealParentOf(candidate) abort
 
   let parent_candidates = []
   for pc in t:vista.without_scope
-    if pc.name ==# name && pc.kind ==# kind && pc.line < candidate.line
+    if pc.name ==# name && pc.kind ==# kind && pc.line <= candidate.line
       call add(parent_candidates, pc)
     endif
   endfor
@@ -122,7 +124,7 @@ function! s:DescendantsOf(candidates, root_line, scope) abort
         \ 'has_key(v:val, ''scope'')'.
         \ ' && s:StartWith(v:val.scope, a:scope)'.
         \ ' && v:val.scopeKind ==# a:root_line.kind'.
-        \ ' && v:val.line > a:root_line.line'
+        \ ' && v:val.line >= a:root_line.line'
         \ )
 
   return candidates
@@ -135,7 +137,7 @@ function! s:DescendantsOfRoot(candidates, root_line) abort
         \ 'has_key(v:val, ''scope'')'.
         \ ' && s:StartWith(v:val.scope, a:root_line.name)'.
         \ ' && v:val.scopeKind ==# a:root_line.kind'.
-        \ ' && v:val.line > a:root_line.line'
+        \ ' && v:val.line >= a:root_line.line'
         \ )
 
   return filter(candidates, 's:RealParentOf(v:val) ==# a:root_line')
@@ -254,29 +256,6 @@ function! s:Render() abort
   let scope_less = {}
 
   let without_scope = t:vista.without_scope
-
-  " Build psedu tags for cpp anonymous namespace tags . Ref #83
-  let ft_having_anonymous_tags = ['cpp', 'c']
-  if index(ft_having_anonymous_tags, t:vista.source.filetype()) > -1
-    let anons = []
-
-    for ws in t:vista.with_scope
-      if ws.scope =~# '^__anon' && index(anons,  ws.scope) == -1
-        call add(anons, ws.scope)
-      endif
-    endfor
-
-    let psedu_anonymous_cpp_namespace_tags = []
-
-    for anon in anons
-      let ps = filter(copy(t:vista.with_scope), 'v:val.scope ==# anon')
-      let p = ps[0]
-      let line = str2nr(p.line) - 1
-      call add(psedu_anonymous_cpp_namespace_tags, { 'name': p.scope, 'kind': p.scopeKind, 'line': line })
-    endfor
-
-    call extend(without_scope, psedu_anonymous_cpp_namespace_tags)
-  endif
 
   " The root of hierarchy structure doesn't have scope field.
   for potential_root_line in without_scope

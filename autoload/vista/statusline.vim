@@ -2,9 +2,10 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
+let s:other_statusline_plugin_loaded = exists('g:loaded_airline') || exists('g:loaded_lightline')
+
 function! vista#statusline#ShouldDisable() abort
-  return get(g:, 'vista_disable_statusline',
-      \ exists('g:loaded_airline') || exists('g:loaded_lightline'))
+  return get(g:, 'vista_disable_statusline', s:other_statusline_plugin_loaded)
 endfunction
 
 function! vista#statusline#Render() abort

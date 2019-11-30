@@ -67,11 +67,11 @@ In addition to being a tags viewer, vista.vim can also be a symbol navigator sim
 Notes:
 
 - The feature of finder in vista.vim `:Vista finder [EXECUTIVE]` is a bit like `:BTags` or `:Tags` in [fzf.vim](https://github.com/junegunn/fzf.vim), `:CocList` in [coc.nvim](https://github.com/neoclide/coc.nvim), `:LeaderfBufTag` in [leaderf.vim](https://github.com/Yggdroot/LeaderF), etc. You can choose whatever you like.
-- Due to limitations of the Language Server Protocol, a tree view of nested tags is currently only available for the ctags executive. Other executives will have symbols grouped by modules, classes, functions and variables.
+- ~~Due to limitations of the Language Server Protocol, a tree view of nested tags is currently only available for the ctags executive. Other executives will have symbols grouped by modules, classes, functions and variables~~. The tree view support for LSP executives are limited at present, and only `:Vista coc` provider is supported.
 
 ## Requirement
 
-I don't know the mimimal supported version. But if you only care about the ctags related feature, vim 7.4.1154+ should be enough.
+I don't know the mimimal supported version. But if you only care about the ctags related feature, vim 7.4.1154+ should be enough. If you want to ctags to run asynchonously, Vim 8.0.27+ should be enough.
 
 Otherwise, if you want to try any LSP related features, then you certainly need some plugins to retrive the LSP symbols, e.g., [coc.nvim](https://github.com/neoclide/coc.nvim). When you have these LSP plugins set up, vista.vim should be ok to go as well.
 

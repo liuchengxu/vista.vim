@@ -15,13 +15,15 @@ function! vista#util#Truncate(msg) abort
   return len(a:msg) < maxlen ? a:msg : a:msg[:maxlen-3].'...'
 endfunction
 
-function! vista#util#Trim(str) abort
-  if exists('*trim')
+if exists('*trim')
+  function! vista#util#Trim(str) abort
     return trim(a:str)
-  else
+  endfunction
+else
+  function! vista#util#Trim(str) abort
     return substitute(a:str, '^\s*\(.\{-}\)\s*$', '\1', '')
-  endif
-endfunction
+  endfunction
+endif
 
 " Set the file path as the first line if possible.
 function! s:PrependFpath(lines) abort
@@ -38,30 +40,34 @@ function! s:PrependFpath(lines) abort
   return a:lines
 endfunction
 
-function! s:SetBufline(bufnr, lines) abort
-  if has('nvim')
+if has('nvim')
+  function! s:SetBufline(bufnr, lines) abort
     call nvim_buf_set_lines(a:bufnr, 0, -1, 0, a:lines)
-  else
+  endfunction
+
+  function! vista#util#JobStop(jobid) abort
+    silent! call jobstop(a:jobid)
+  endfunction
+
+else
+  function! s:SetBufline(bufnr, lines) abort
     let cur_lines = getbufline(a:bufnr, 1, '$')
     call setbufline(a:bufnr, 1, a:lines)
     if len(cur_lines) > len(a:lines)
       silent call deletebufline(a:bufnr, len(a:lines)+1, len(cur_lines)+1)
     endif
-  endif
-endfunction
+  endfunction
 
-function! vista#util#SetBufline(bufnr, lines) abort
+  function! vista#util#JobStop(jobid) abort
+    silent! call job_stop(a:jobid)
+  endfunction
+endif
+
+" Using s:SetBufline() runes into the internal error E315.
+" I don't know why. So we jump to the vista window
+" and then replace the lines.
+function! s:SafeSetBufline(bufnr, lines) abort
   let lines = s:PrependFpath(a:lines)
-
-  " This approach runes into the internal error E315.
-  " I don't know why.
-  " call s:SetBufline(a:bufnr, lines)
-
-  let winnr = t:vista.winnr()
-  if winnr() != winnr
-    noautocmd execute winnr.'wincmd w'
-    let l:switch_back = 1
-  endif
 
   let bufnr = bufnr('')
   call setbufvar(bufnr, '&readonly', 0)
@@ -73,27 +79,23 @@ function! vista#util#SetBufline(bufnr, lines) abort
   call setbufvar(bufnr, '&readonly', 1)
   call setbufvar(bufnr, '&modifiable', 0)
 
-  " Reload vista syntax since you may switch between serveral
-  " executives/extensions.
-  if t:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default'
-    runtime! syntax/vista.vim
-  elseif t:vista.provider ==# 'markdown'
-    runtime! syntax/vista_markdown.vim
-  else
-    runtime! syntax/vista_kind.vim
-  endif
+  let filetype = vista#sidebar#WhichFileType()
+  call setbufvar(bufnr, '&filetype', filetype)
 
-  if exists('l:switch_back')
-    noautocmd wincmd p
+  call vista#ftplugin#Set()
+  " Reload vista syntax as you may switch between serveral
+  " executives/extensions.
+  "
+  " rst shares the same syntax with vista_markdown.
+  if t:vista.source.filetype() ==# 'rst'
+    execute 'runtime! syntax/vista_markdown.vim'
+  else
+    execute 'runtime! syntax/'.filetype.'vim'
   endif
 endfunction
 
-function! vista#util#JobStop(jobid) abort
-  if has('nvim')
-    silent! call jobstop(a:jobid)
-  else
-    silent! call job_stop(a:jobid)
-  endif
+function! vista#util#SetBufline(bufnr, lines) abort
+  call vista#WinExecute(t:vista.winnr(), function('s:SafeSetBufline'), a:bufnr, a:lines)
 endfunction
 
 function! vista#util#Join(...) abort
@@ -196,7 +198,11 @@ function! vista#util#BinarySearch(array, target, cmp_key, ret_key) abort
     let mid = (low + high) / 2
     if array[mid][a:cmp_key] == target
       let found = array[mid]
-      return get(found, a:ret_key, v:null)
+      if !empty(a:ret_key)
+        return get(found, a:ret_key, v:null)
+      else
+        return found
+      endif
     elseif array[mid][a:cmp_key] > target
       let high = mid - 1
     else
@@ -219,23 +225,10 @@ function! vista#util#BinarySearch(array, target, cmp_key, ret_key) abort
     let found = array[low - 1]
   endif
 
-  return get(found, a:ret_key, v:null)
-endfunction
-
-" CocAction only fetch symbols for current document, no way for specify the other at the moment.
-" workaround for #52
-"
-" see also #71
-function! vista#util#EnsureRunOnSourceFile(Run, ...) abort
-  if winnr() != t:vista.source.winnr()
-    execute t:vista.source.winnr().'wincmd w'
-    let l:switch_back = 1
-  endif
-
-  call call(a:Run, a:000)
-
-  if exists('l:switch_back')
-    wincmd p
+  if !empty(a:ret_key)
+    return get(found, a:ret_key, v:null)
+  else
+    return found
   endif
 endfunction
 

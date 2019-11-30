@@ -2,6 +2,8 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
+scriptencoding utf-8
+
 let s:icons = {
 \    'func': "\uf794",
 \    'function': "\uf794",
@@ -48,6 +50,8 @@ let g:vista#renderer#icons = map(extend(s:icons, get(g:, 'vista#renderer#icons',
 let g:vista#renderer#enable_icon = get(g:, 'vista#renderer#enable_icon',
       \ exists('g:vista#renderer#icons') || exists('g:airline_powerline_fonts'))
 
+let g:vista#renderer#kind_default_icon = ['╰─▸ ', '├─▸ ']
+
 function! vista#renderer#IconFor(kind) abort
   if g:vista#renderer#enable_icon
     return get(g:vista#renderer#icons, tolower(a:kind), g:vista#renderer#icons.default)
@@ -61,5 +65,51 @@ function! vista#renderer#Decorate(kind) abort
     return vista#renderer#IconFor(a:kind).' '.a:kind
   else
     return a:kind
+  endif
+endfunction
+
+function! s:Render(data) abort
+  if t:vista.provider ==# 'coc'
+    return vista#renderer#hir#Coc(a:data)
+  elseif t:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default'
+    return vista#renderer#default#Render()
+  else
+    " The kind renderer applys to the LSP provider.
+    return vista#renderer#kind#Render(a:data)
+  endif
+endfunction
+
+" Render the extracted data to rows
+function! vista#renderer#Render(data) abort
+  return s:Render(a:data)
+endfunction
+
+function! vista#renderer#RenderAndDisplay(data) abort
+  call vista#sidebar#OpenOrUpdate(s:Render(a:data))
+endfunction
+
+" Convert the number kind to the text kind, and then
+" extract the neccessary info from the raw LSP response.
+function! vista#renderer#LSPPreprocess(lsp_result) abort
+  let lines = []
+  call map(a:lsp_result, 'vista#parser#lsp#KindToSymbol(v:val, lines)')
+
+  let processed_data = {}
+  let t:vista.functions = []
+  call map(lines, 'vista#parser#lsp#ExtractSymbol(v:val, processed_data)')
+
+  return processed_data
+endfunction
+
+" React on the preprocessed LSP data
+function! vista#renderer#LSPProcess(processed_data, reload_only, should_display) abort
+  if a:reload_only
+    call vista#sidebar#Reload(a:processed_data)
+    return [v:false, a:should_display]
+  elseif a:should_display
+    call vista#renderer#RenderAndDisplay(a:processed_data)
+    return [a:reload_only, v:false]
+  else
+    return [a:reload_only, a:should_display]
   endif
 endfunction

@@ -37,17 +37,50 @@ function! s:StopHighlightTimer() abort
   call s:GenericStopTimer('s:highlight_timer')
 endfunction
 
+function! s:RemoveVisibility(tag) abort
+  if index(['+', '~', '-'], a:tag[0]) > -1
+    return a:tag[1:]
+  else
+    return a:tag
+  endif
+endfunction
+
+function! s:GetLSPInfo() abort
+endfunction
+
 " Get tag and corresponding source line at current cursor position.
 "
 " Return: [tag, source_line]
 function! s:GetInfoUnderCursor() abort
-  let cur_line = split(getline('.'), ':')
+  let raw_cur_line = getline('.')
 
-  if empty(cur_line)
+  if empty(raw_cur_line)
     return [v:null, v:null]
   endif
 
-  let lnum = cur_line[-1]
+  " tag like s:StopCursorTimer has `:`, so we can't simply use split(tag, ':')
+  let last_semicoln_idx = strridx(raw_cur_line, ':')
+  let lnum = raw_cur_line[last_semicoln_idx+1:]
+
+  " TODO use range info of LSP symbols?
+  if t:vista.provider ==# 'coc'
+    let tag = vista#util#Trim(raw_cur_line[:stridx(raw_cur_line, ':')-1])
+    let source_line = t:vista.source.line_trimmed(lnum)
+    return [tag, source_line]
+  elseif t:vista.provider ==# 'markdown' || t:vista.provider ==# 'rst'
+    if line('.') < 3
+      return [v:null, v:null]
+    endif
+    " The first two lines are for displaying fpath. the lnum is 1-based, while
+    " idex is 0-based.
+    " So it's line('.') - 3 instead of line('.').
+    let tag = vista#extension#{t:vista.provider}#GetHeader(line('.')-3)
+    if tag is# v:null
+      return [v:null, v:null]
+    endif
+    let source_line = t:vista.source.line_trimmed(lnum)
+    return [tag, source_line]
+  endif
 
   let source_line = t:vista.source.line_trimmed(lnum)
   if empty(source_line)
@@ -63,17 +96,9 @@ function! s:GetInfoUnderCursor() abort
     endif
   endif
 
-  function! s:RemoveVisibility(tag) abort
-    if index(['+', '~', '-'], a:tag[0]) > -1
-      return a:tag[1:]
-    else
-      return a:tag
-    endif
-  endfunction
-
   " For scopeless tag
   " peer_ilog(PEER,FORMAT,...):90
-  let trimmed_line = vista#util#Trim(getline('.'))
+  let trimmed_line = vista#util#Trim(raw_cur_line)
   let left_parenthsis_idx = stridx(trimmed_line, '(')
   if left_parenthsis_idx > -1
     " Ignore the visibility symbol, e.g., +test2()
@@ -81,23 +106,21 @@ function! s:GetInfoUnderCursor() abort
     return [tag, source_line]
   endif
 
-  " logger_name:80
-  let with_tag = split(cur_line[-2])
-  if empty(with_tag)
-    return [v:null, v:null]
-  endif
-
   " Since we include the space ` `, we need to trim the result later.
-  let matched = matchlist(trimmed_line, '\([a-zA-Z:#_.,<> ]\+\):\(\d\+\)$')
+  " / --> github.com/golang/dep/gps:11
+  if t:vista.provider ==# 'markdown'
+    let matched = matchlist(trimmed_line, '\([a-zA-Z:#_.,/<> ]\-\+\)\(H\d:\d\+\)$')
+  else
+    let matched = matchlist(trimmed_line, '\([a-zA-Z:#_.,/<> ]\-\+\):\(\d\+\)$')
+  endif
 
   let tag = get(matched, 1, '')
 
   if empty(tag)
-    let tag = with_tag[-1]
+    let tag = raw_cur_line[:last_semicoln_idx-1]
   endif
 
-  let tag = s:RemoveVisibility(tag)
-  let tag = vista#util#Trim(tag)
+  let tag = s:RemoveVisibility(vista#util#Trim(tag))
 
   return [tag, source_line]
 endfunction
@@ -208,7 +231,6 @@ endif
 " Show the detail of current tag/symbol under cursor.
 function! s:ShowDetail() abort
   let [tag, source_line] = s:GetInfoUnderCursor()
-  let s:cur_tag = tag
 
   if empty(tag) || empty(source_line)
     echo "\r"
@@ -288,7 +310,7 @@ function! s:ApplyHighlight(lnum, ensure_visible, ...) abort
     let cur_line = getline(a:lnum)
     " Current line may contains +,-,~, use `\S` is incorrect to find the right
     " starting postion.
-    let [_, start, _] = matchstrpos(cur_line, '[a-zA-Z0-9_#:]')
+    let [_, start, _] = matchstrpos(cur_line, '[a-zA-Z0-9_,#:]')
 
     " If we know the tag, then what we have to do is to use the length of tag
     " based on the starting point.
@@ -298,7 +320,7 @@ function! s:ApplyHighlight(lnum, ensure_visible, ...) abort
       let hi_pos = [a:lnum, start+1, strlen(a:1)]
     else
       let [matched, end, _] = matchstrpos(cur_line, ':\d\+$')
-      let hi_pos = [a:lnum, start+1, end-len(matched)]
+      let hi_pos = [a:lnum, start+1, end - start]
     endif
   endif
 
@@ -318,8 +340,11 @@ function! s:HighlightNearestTag(_timer) abort
     return
   endif
 
-  let s:vlnum = vista#util#BinarySearch(t:vista.raw, line('.'), 'line', 'vlnum')
-
+  let found = vista#util#BinarySearch(t:vista.raw, line('.'), 'line', '')
+  if empty(found)
+    return
+  endif
+  let s:vlnum = get(found, 'vlnum', v:null)
   if empty(s:vlnum)
     return
   endif
@@ -339,7 +364,12 @@ function! s:HighlightNearestTag(_timer) abort
     let l:switch_back = 1
   endif
 
-  call s:ApplyHighlight(s:vlnum, v:true)
+  let tag = get(found, 'name', v:null)
+  if !empty(tag)
+    call s:ApplyHighlight(s:vlnum, v:true, tag)
+  else
+    call s:ApplyHighlight(s:vlnum, v:true)
+  endif
 
   if exists('l:switch_back')
     noautocmd wincmd p
@@ -360,13 +390,16 @@ function! vista#cursor#FoldOrJump() abort
       if foldclosed('.') != -1
         normal! zo
       else
-        normal! zc
+        if foldlevel('.') != 0
+          normal! zc
+        endif
       endif
     endif
     return
   endif
 
-  call vista#jump#TagLine(get(s:, 'cur_tag', ''))
+  let tag_under_cursor = s:GetInfoUnderCursor()[0]
+  call vista#jump#TagLine(tag_under_cursor)
 endfunction
 
 " This happens when you are in the window of source file
@@ -449,12 +482,21 @@ function! vista#cursor#ShowTagFor(lnum) abort
     return
   endif
 
-  let s:vlnum = vista#util#BinarySearch(t:vista.raw, a:lnum, 'line', 'vlnum')
+  let found = vista#util#BinarySearch(t:vista.raw, a:lnum, 'line', '')
+  if empty(found)
+    return
+  endif
+  let s:vlnum = get(found, 'vlnum', v:null)
   if empty(s:vlnum)
     return
   endif
 
-  call s:ApplyHighlight(s:vlnum, v:true)
+  let tag = get(found, 'name', v:null)
+  if !empty(tag)
+    call s:ApplyHighlight(s:vlnum, v:true, tag)
+  else
+    call s:ApplyHighlight(s:vlnum, v:true)
+  endif
 endfunction
 
 function! vista#cursor#ShowTag() abort

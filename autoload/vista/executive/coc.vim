@@ -7,42 +7,18 @@ let s:provider = fnamemodify(expand('<sfile>'), ':t:r')
 let s:reload_only = v:false
 let s:should_display = v:false
 
-function! s:PrepareContainer() abort
-  let s:data = {}
-  let t:vista.functions = []
-  let t:vista.raw = []
-  let t:vista.without_containerName = []
-  let t:vista.with_containerName = []
-  let t:vista.containerName_map = {}
-endfunction
-
 " Extract fruitful infomation from raw symbols
 function! s:Extract(symbols) abort
-  call s:PrepareContainer()
+  let s:data = []
 
   if empty(a:symbols)
     return
   endif
 
-  call map(a:symbols, 'vista#parser#lsp#ExtractSymbol(v:val, s:data)')
+  call map(a:symbols, 'vista#parser#lsp#CocSymbols(v:val, s:data)')
 
-  if empty(s:data)
-    return
-  endif
-
-  let s:cache = get(s:, 'cache', {})
-  let s:cache.data = s:data
-  let s:cache.bufnr = bufnr('')
-
-  if s:reload_only
-    call vista#sidebar#Reload(s:data)
-    let s:reload_only = v:false
-    return
-  endif
-
-  if s:should_display
-    call vista#viewer#Display(s:data)
-    let s:should_display = v:false
+  if !empty(s:data)
+    let [s:reload_only, s:should_display] = vista#renderer#LSPProcess(s:data, s:reload_only, s:should_display)
   endif
 
   return s:data
@@ -63,7 +39,7 @@ endfunction
 
 function! s:AutoUpdate(_fpath) abort
   let s:reload_only = v:true
-  call CocActionAsync('documentSymbols', function('s:Cb'))
+  call vista#AutoUpdateWithDelay(function('CocActionAsync'), ['documentSymbols', function('s:Cb')])
 endfunction
 
 function! s:Run() abort
@@ -80,7 +56,7 @@ function! s:Execute(bang, should_display) abort
   if a:bang
     call s:Extract(CocAction('documentSymbols'))
     if a:should_display
-      call vista#viewer#Display(s:data)
+      call vista#renderer#RenderAndDisplay(s:data)
     endif
   else
     let s:should_display = a:should_display
@@ -108,7 +84,7 @@ endfunction
 function! vista#executive#coc#Run(_fpath) abort
   if exists('*CocAction')
     call vista#SetProvider(s:provider)
-    call vista#util#EnsureRunOnSourceFile(function('s:Run'))
+    call vista#WinExecute(t:vista.source.winnr(), function('s:Run'))
     return s:data
   endif
 endfunction

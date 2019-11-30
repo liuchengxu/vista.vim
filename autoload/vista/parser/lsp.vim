@@ -45,17 +45,50 @@ endfunction
 " should transform the number to the symbol text first.
 function! vista#parser#lsp#KindToSymbol(line, container) abort
   let line = a:line
-  let location = line.location
-  if s:IsFileUri(location.uri)
-    let lnum = location.range.start.line + 1
-    let col = location.range.start.character + 1
+  " SymbolInformation interface
+  if has_key(line, 'location')
+    let location = line.location
+    if s:IsFileUri(location.uri)
+      let lnum = location.range.start.line + 1
+      let col = location.range.start.character + 1
+      call add(a:container, {
+         \ 'lnum': lnum,
+         \ 'col': col,
+         \ 'kind': s:Kind2Symbol(line.kind),
+         \ 'text': line.name,
+         \ })
+    endif
+  " DocumentSymbol class
+  elseif has_key(line, 'range')
+    let range = line.range
+    let lnum = range.start.line + 1
+    let col = range.start.character + 1
     call add(a:container, {
-        \ 'lnum': lnum,
-        \ 'col': col,
-        \ 'kind': s:Kind2Symbol(line.kind),
-        \ 'text': line.name,
-        \ })
+          \ 'lnum': lnum,
+          \ 'col': col,
+          \ 'kind': s:Kind2Symbol(line.kind),
+          \ 'text': line.name,
+          \ })
+    if has_key(line, 'children')
+      for child in line.children
+        call vista#parser#lsp#KindToSymbol(child, a:container)
+      endfor
+    endif
   endif
+endfunction
+
+function! vista#parser#lsp#CocSymbols(symbol, container) abort
+  if vista#ShouldIgnore(a:symbol.kind)
+    return
+  endif
+
+  call add(a:container, {
+        \ 'lnum': a:symbol.lnum,
+        \ 'col': a:symbol.col,
+        \ 'text': a:symbol.text,
+        \ 'kind': a:symbol.kind,
+        \ 'level': a:symbol.level
+        \ })
 endfunction
 
 " https://microsoft.github.io/language-server-protocol/specification#textDocument_documentSymbol

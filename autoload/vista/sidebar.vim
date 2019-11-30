@@ -2,17 +2,25 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
+" Which filetype the current sidebar should be.
+function! vista#sidebar#WhichFileType() abort
+  if t:vista.provider ==# 'coc'
+        \ || (t:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default')
+    return 'vista'
+  elseif t:vista.provider ==# 'markdown'
+    return 'vista_markdown'
+  else
+    return 'vista_kind'
+  endif
+endfunction
+
 function! s:NewWindow() abort
   let position = get(g:, 'vista_sidebar_position', 'vertical botright')
   let width = get(g:, 'vista_sidebar_width', 30)
   let open = position.' '.width.'new'
   silent execute open '__vista__'
 
-  if t:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default'
-    setlocal filetype=vista
-  else
-    setlocal filetype=vista_kind
-  endif
+  execute 'setlocal filetype='.vista#sidebar#WhichFileType()
 
   " FIXME when to delete?
   if has_key(t:vista.source, 'fpath')
@@ -22,20 +30,22 @@ endfunction
 
 " Reload vista buffer given the unrendered data
 function! vista#sidebar#Reload(data) abort
-  " May be triggered by autocmd event sometimes
-  " e.g., unsupported filetypes for ctags or no related language servers.
-  if empty(a:data)
-    return
-  endif
-
-  " May opening a new tab if bufnr does not exist in t:vista.
+  " empty(a:data):
+  "   May be triggered by autocmd event sometimes
+  "   e.g., unsupported filetypes for ctags or no related language servers.
   "
-  " Skip reloading if vista window is not visible.
-  if !has_key(t:vista, 'bufnr') || t:vista.winnr() == -1
+  " !has_key(t:vista, 'bufnr'):
+  "   May opening a new tab if bufnr does not exist in t:vista.
+  "
+  " t:vista.winnr() == -1:
+  "   vista window is not visible.
+  if empty(a:data)
+        \ || !has_key(t:vista, 'bufnr')
+        \ || t:vista.winnr() == -1
     return
   endif
 
-  let rendered = vista#viewer#Render(a:data)
+  let rendered = vista#renderer#Render(a:data)
   call vista#util#SetBufline(t:vista.bufnr, rendered)
 endfunction
 
@@ -52,10 +62,8 @@ function! vista#sidebar#OpenOrUpdate(rows) abort
     let winnr = t:vista.winnr()
     if winnr ==  -1
       call s:NewWindow()
-    else
-      if winnr() != winnr
-        noautocmd execute winnr.'wincmd w'
-      endif
+    elseif winnr() != winnr
+      noautocmd execute winnr.'wincmd w'
     endif
   endif
 
@@ -93,7 +101,7 @@ function! vista#sidebar#Close() abort
 
   call s:ClearAugroups('VistaCoc', 'VistaCtags')
 
-  call vista#floating#Close()
+  call vista#GenericCloseOverlay()
 endfunction
 
 function! s:ClearAugroups(...) abort
@@ -109,8 +117,8 @@ function! vista#sidebar#Open() abort
   call vista#source#Update(bufnr, winnr, fname, fpath)
   let executive = vista#GetExplicitExecutiveOrDefault()
   " Support the builtin markdown toc extension as an executive
-  if &filetype ==# 'markdown' && executive ==# 'toc'
-    call vista#extension#markdown#Execute(v:false, v:true)
+  if vista#SupportToc() && executive ==# 'toc'
+    call vista#extension#{&filetype}#Execute(v:false, v:true)
   else
     call vista#executive#{executive}#Execute(v:false, v:true, v:false)
   endif

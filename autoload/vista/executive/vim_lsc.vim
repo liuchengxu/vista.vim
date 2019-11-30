@@ -10,33 +10,16 @@ let s:should_display = v:false
 let s:fetching = v:true
 
 function! s:Handler(results) abort
+  let s:fetching = v:false
   if empty(a:results)
-    let s:fetching = v:false
     return []
   endif
 
-
-  let lines = []
-  call map(a:results, 'vista#parser#lsp#KindToSymbol(v:val, lines)')
-
-  let s:data = {}
-  let t:vista.functions = []
-  call map(lines, 'vista#parser#lsp#ExtractSymbol(v:val, s:data)')
-
-  let s:fetching = v:false
+  let s:data = vista#renderer#LSPPreprocess(a:results)
 
   if !empty(s:data)
     let s:ever_done = v:true
-    if s:reload_only
-      call vista#sidebar#Reload(s:data)
-      let s:reload_only = v:false
-      return
-    endif
-
-    if s:should_display
-      call vista#viewer#Display(s:data)
-      let s:should_display = v:false
-    endif
+    let [s:reload_only, s:should_display] = vista#renderer#LSPProcess(s:data, s:reload_only, s:should_display)
   endif
 endfunction
 

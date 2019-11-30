@@ -14,9 +14,10 @@ function! s:ClosePopup() abort
   let t:vista.popup_visible = v:false
 endfunction
 
+call prop_type_delete('VistaMatch')
+call prop_type_add('VistaMatch', { 'highlight': 'Search' })
+
 function! s:HiTag() abort
-  call prop_type_delete('VistaMatch')
-  call prop_type_add('VistaMatch', { 'highlight': 'Search' })
   call prop_add(s:popup_lnum, s:popup_start+1, { 'length': s:popup_end - s:popup_start, 'type': 'VistaMatch' })
 endfunction
 
@@ -29,10 +30,11 @@ endfunction
 
 function! s:OpenPopup(lines) abort
   if get(g:, 'vista_sidebar_position', 'vertical botright') =~# 'right'
+    let max_length = max(map(copy(a:lines), 'strlen(v:val)')) + 2
     let pos_opts = {
           \ 'pos': 'botleft',
           \ 'line': 'cursor-2',
-          \ 'col': 'cursor-'.s:max_length,
+          \ 'col': 'cursor-'.max_length,
           \ 'moved': 'WORD',
           \ }
   else
@@ -60,25 +62,30 @@ function! s:OpenPopup(lines) abort
     call popup_show(s:popup_winid)
     call popup_move(s:popup_winid, pos_opts)
   endif
-endfunction
-
-function! s:DisplayRawAt(lnum, lines) abort
-  let s:max_length = max(map(copy(a:lines), 'strlen(v:val)')) + 2
-  call s:OpenPopup(a:lines)
 
   augroup VistaPopup
     autocmd!
     autocmd CursorMoved <buffer> call s:ClosePopup()
-    autocmd BufEnter,WinEnter,WinLeave  * call s:ClosePopup()
+    autocmd BufEnter,WinEnter,WinLeave * call s:ClosePopup()
   augroup END
 
   let t:vista.popup_visible = v:true
 endfunction
 
-function! s:DisplayAt(lnum, tag) abort
-  let [lines, s:popup_lnum] = vista#util#GetPreviewLines(a:lnum)
+function! s:DisplayRawAt(lnum, lines, vista_winid) abort
+  if win_getid() != a:vista_winid
+    return
+  endif
 
-  let s:max_length = max(map(copy(lines), 'strlen(v:val)')) + 2
+  call s:OpenPopup(a:lines)
+endfunction
+
+function! s:DisplayAt(lnum, tag, vista_winid) abort
+  if win_getid() != a:vista_winid
+    return
+  endif
+
+  let [lines, s:popup_lnum] = vista#util#GetPreviewLines(a:lnum)
 
   call s:OpenPopup(lines)
 
@@ -93,14 +100,6 @@ function! s:DisplayAt(lnum, tag) abort
   catch /^Vim\%((\a\+)\)\=:E869/
     call win_execute(s:popup_winid, 'call s:HiTagLine()')
   endtry
-
-  augroup VistaPopup
-    autocmd!
-    autocmd CursorMoved <buffer> call s:ClosePopup()
-    autocmd BufEnter,WinEnter,WinLeave * call s:ClosePopup()
-  augroup END
-
-  let t:vista.popup_visible = v:true
 endfunction
 
 function! vista#popup#Close() abort
@@ -117,9 +116,10 @@ function! s:DispatchDisplayer(Displayer, lnum, tag_or_raw_lines) abort
 
   let s:last_lnum = a:lnum
 
+  let win_id = win_getid()
   let s:popup_timer = timer_start(
         \ s:popup_delay,
-        \ { -> call(a:Displayer, [a:lnum, a:tag_or_raw_lines]) }
+        \ { -> a:Displayer(a:lnum, a:tag_or_raw_lines, win_id) }
         \ )
 endfunction
 

@@ -78,6 +78,7 @@ function! vista#autocmd#Init(group_name, AUF) abort
   execute 'augroup' a:group_name
     autocmd!
 
+    " vint: -ProhibitAutocmdWithNoGroup
     autocmd WinEnter,WinLeave __vista__ call vista#statusline#RenderOnWinEvent()
 
     " BufReadPost is needed for reloading the current buffer if the file
@@ -88,7 +89,6 @@ function! vista#autocmd#Init(group_name, AUF) abort
     autocmd BufWritePost,BufReadPost, *
           \ call s:GenericAutoUpdate(+expand('<abuf>'), fnamemodify(expand('<afile>'), ':p'))
 
-    " vint: -ProhibitAutocmdWithNoGroup
     autocmd BufEnter *
           \ call s:OnBufEnter(+expand('<abuf>'), fnamemodify(expand('<afile>'), ':p'))
 
