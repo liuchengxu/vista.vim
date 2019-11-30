@@ -363,6 +363,7 @@ function! s:HighlightNearestTag(_timer) abort
   endif
 endfunction
 
+" Fold or unfold when meets the top level tag line
 function! s:TryFoldIsOk() abort
   if indent('.') == 0
     if !empty(getline('.'))
@@ -384,10 +385,7 @@ function! vista#cursor#FoldOrJump() abort
   if line('.') == 1
     call vista#source#GotoWin()
     return
-  endif
-
-  " Fold or unfold when meets the top level tag line
-  if s:TryFoldIsOk()
+  elseif s:TryFoldIsOk()
     return
   endif
 
