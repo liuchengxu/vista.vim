@@ -418,25 +418,8 @@ function! vista#cursor#NearestSymbol() abort
   return vista#util#BinarySearch(t:vista.raw, line('.'), 'line', 'name')
 endfunction
 
-function! s:ShowFoldedDetail() abort
-  let foldclosed_end = foldclosedend('.')
-  let curlnum = line('.')
-  let lines = getbufline(t:vista.bufnr, curlnum, foldclosed_end)
-
-  if s:has_floating_win
-    call vista#floating#DisplayRawAt(curlnum, lines)
-  elseif s:has_popup
-    call vista#popup#DisplayRawAt(curlnum, lines)
-  endif
-endfunction
-
-function! vista#cursor#ShowDetail(_timer) abort
+function! s:EchoScopeInCmdlineIsOk() abort
   let cur_line = getline('.')
-  if empty(cur_line)
-    return
-  endif
-
-  " scope line
   if cur_line[-1:] ==# ']'
     let splitted = split(cur_line)
     " Join the scope parts in case of they contains spaces, e.g., structure names
@@ -444,14 +427,35 @@ function! vista#cursor#ShowDetail(_timer) abort
     let cnt = matchstr(splitted[-1], '\d\+')
     call s:EchoScope(scope)
     echohl Keyword | echon cnt | echohl NONE
-    return
+    return v:true
   endif
+  return v:false
+endfunction
 
+" Show the folded content if in a closed fold.
+function! s:ShowFoldedDetailIsOk() abort
   if foldclosed('.') != -1
-    if !s:has_floating_win && !s:has_popup
-      return
+    if s:has_floating_win || s:has_popup
+      let foldclosed_end = foldclosedend('.')
+      let curlnum = line('.')
+      let lines = getbufline(t:vista.bufnr, curlnum, foldclosed_end)
+
+      if s:has_floating_win
+        call vista#floating#DisplayRawAt(curlnum, lines)
+      elseif s:has_popup
+        call vista#popup#DisplayRawAt(curlnum, lines)
+      endif
+
+      return v:true
     endif
-    call s:ShowFoldedDetail()
+  endif
+  return v:false
+endfunction
+
+function! vista#cursor#ShowDetail(_timer) abort
+  if empty(getline('.'))
+        \ || s:EchoScopeInCmdlineIsOk()
+        \ || s:ShowFoldedDetailIsOk()
     return
   endif
 
@@ -518,7 +522,8 @@ endfunction
 
 function! vista#cursor#TogglePreview() abort
   if get(t:vista, 'floating_visible', v:false)
-    call vista#floating#Close()
+        \ || get(t:vista, 'popup_visible', v:false)
+    call vista#GenericCloseOverlay()
     return
   endif
 
