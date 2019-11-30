@@ -116,9 +116,10 @@ function! s:DispatchDisplayer(Displayer, lnum, tag_or_raw_lines) abort
 
   let s:last_lnum = a:lnum
 
+  let win_id = win_getid()
   let s:popup_timer = timer_start(
         \ s:popup_delay,
-        \ { -> a:Displayer(a:lnum, a:tag_or_raw_lines, win_getid()) }
+        \ { -> a:Displayer(a:lnum, a:tag_or_raw_lines, win_id) }
         \ )
 endfunction
 

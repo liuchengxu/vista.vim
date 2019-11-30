@@ -184,7 +184,8 @@ function! s:ShouldSkipDisplay(lnum) abort
 endfunction
 
 function! s:DisplayWithDelay(lines) abort
-  let s:floating_timer = timer_start(s:floating_delay, { -> s:Display(a:lines, win_getid())})
+  let win_id = win_getid()
+  let s:floating_timer = timer_start(s:floating_delay, { -> s:Display(a:lines, win_id)})
 endfunction
 
 " Display in floating_win given the lnum of source buffer and current tag.
