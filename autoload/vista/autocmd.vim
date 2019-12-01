@@ -15,8 +15,7 @@ function! s:ClearOtherEvents(group) abort
 endfunction
 
 function! s:OnBufEnter(bufnr, fpath) abort
-  " If we just enter the buffer that is being displayed, skip the update.
-  if !exists('t:vista') || a:bufnr == t:vista.source.bufnr
+  if !exists('t:vista')
     return
   endif
 

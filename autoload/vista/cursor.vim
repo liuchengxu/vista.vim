@@ -344,6 +344,9 @@ endfunction
 
 " Highlight the nearest tag in the vista window.
 function! s:HighlightNearestTag(_timer) abort
+  if !exists('t:vista')
+    return
+  endif
   let winnr = t:vista.winnr()
 
   if winnr == -1
