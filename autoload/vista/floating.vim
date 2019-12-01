@@ -97,8 +97,25 @@ function! s:CloseOnWinEnter() abort
   let t:vista.floating_visible = v:false
 endfunction
 
+function! s:HighlightTagInFloatinWin() abort
+  if exists('s:floating_lnum')
+    let target_line = getbufline(s:floating_bufnr, s:floating_lnum)[0]
+    try
+      let [_, start, end] = matchstrpos(target_line, '\C'.s:cur_tag)
+      if start != -1
+        " {line} is zero-based.
+        call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:floating_lnum-1, start, end)
+      endif
+    catch /^Vim\%((\a\+)\)\=:E869/
+      " If we meet the E869 error, just highlight the whole line.
+      call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:floating_lnum-1, 0, -1)
+    endtry
+
+    unlet s:floating_lnum
+  endif
+endfunction
+
 function! s:Display(msg, win_id) abort
-  let msg = a:msg
   if a:win_id !=# win_getid()
     return
   endif
@@ -124,22 +141,9 @@ function! s:Display(msg, win_id) abort
 
   call nvim_buf_set_lines(s:floating_bufnr, 0, -1, 0, a:msg)
 
-  if exists('s:floating_lnum')
-    let target_line = getbufline(s:floating_bufnr, s:floating_lnum)[0]
-    try
-      let [_, start, end] = matchstrpos(target_line, '\C'.s:cur_tag)
-      if start != -1
-        " {line} is zero-based.
-        call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:floating_lnum-1, start, end)
-      endif
-    catch /^Vim\%((\a\+)\)\=:E869/
-      " If we meet the E869 error, just highlight the whole line.
-      call nvim_buf_add_highlight(s:floating_bufnr, -1, 'Search', s:floating_lnum-1, 0, -1)
-    endtry
+  call s:HighlightTagInFloatinWin()
 
-    unlet s:floating_lnum
-  endif
-
+  let &l:filetype = getbufvar(t:vista.source.bufnr, '&ft')
   setlocal
         \ winhl=Normal:Pmenu
         \ buftype=nofile
@@ -150,8 +154,6 @@ function! s:Display(msg, win_id) abort
         \ signcolumn=no
         \ nofoldenable
         \ wrap
-
-  let &l:filetype = getbufvar(t:vista.source.bufnr, '&ft')
 
   wincmd p
 
@@ -168,12 +170,12 @@ function! vista#floating#Close() abort
   call s:ApplyClose()
 endfunction
 
+" See if it's identical to the last lnum to avoid blink. Ref #55
+"
+" No need to display again when it's already visible.
 function! s:ShouldSkipDisplay(lnum) abort
   silent! call timer_stop(s:floating_timer)
 
-  " See if it's identical to the last lnum to avoid blink. Ref #55
-  "
-  " No need to display again when it's already visible.
   if a:lnum == s:last_lnum
         \ && get(t:vista, 'floating_visible', v:false)
     return 1

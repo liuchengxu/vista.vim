@@ -45,7 +45,41 @@ function! s:RemoveVisibility(tag) abort
   endif
 endfunction
 
-function! s:GetLSPInfo() abort
+" Try matching the exact tag given the trimmed line in the vista window.
+function! s:MatchTag(trimmed_line) abort
+  " Since we include the space ` `, we need to trim the result later.
+  " / --> github.com/golang/dep/gps:11
+  if t:vista.provider ==# 'markdown'
+    let matched = matchlist(a:trimmed_line, '\([a-zA-Z:#_.,/<> ]\-\+\)\(H\d:\d\+\)$')
+  else
+    let matched = matchlist(a:trimmed_line, '\([a-zA-Z:#_.,/<> ]\-\+\):\(\d\+\)$')
+  endif
+
+  return get(matched, 1, '')
+endfunction
+
+function! s:GetTagInfoFromLSPAndExtension() abort
+  let raw_cur_line = getline('.')
+
+  " TODO use range info of LSP symbols?
+  if t:vista.provider ==# 'coc'
+    let tag = vista#util#Trim(raw_cur_line[:stridx(raw_cur_line, ':')-1])
+    return [tag, v:true]
+  elseif t:vista.provider ==# 'markdown' || t:vista.provider ==# 'rst'
+    if line('.') < 3
+      return [v:null, v:true]
+    endif
+    " The first two lines are for displaying fpath. the lnum is 1-based, while
+    " idex is 0-based.
+    " So it's line('.') - 3 instead of line('.').
+    let tag = vista#extension#{t:vista.provider}#GetHeader(line('.')-3)
+    if tag is# v:null
+      return [v:null, v:true]
+    endif
+    return [tag, v:true]
+  endif
+
+  return [v:null, v:false]
 endfunction
 
 " Get tag and corresponding source line at current cursor position.
@@ -62,29 +96,14 @@ function! s:GetInfoUnderCursor() abort
   let last_semicoln_idx = strridx(raw_cur_line, ':')
   let lnum = raw_cur_line[last_semicoln_idx+1:]
 
-  " TODO use range info of LSP symbols?
-  if t:vista.provider ==# 'coc'
-    let tag = vista#util#Trim(raw_cur_line[:stridx(raw_cur_line, ':')-1])
-    let source_line = t:vista.source.line_trimmed(lnum)
-    return [tag, source_line]
-  elseif t:vista.provider ==# 'markdown' || t:vista.provider ==# 'rst'
-    if line('.') < 3
-      return [v:null, v:null]
-    endif
-    " The first two lines are for displaying fpath. the lnum is 1-based, while
-    " idex is 0-based.
-    " So it's line('.') - 3 instead of line('.').
-    let tag = vista#extension#{t:vista.provider}#GetHeader(line('.')-3)
-    if tag is# v:null
-      return [v:null, v:null]
-    endif
-    let source_line = t:vista.source.line_trimmed(lnum)
-    return [tag, source_line]
-  endif
-
   let source_line = t:vista.source.line_trimmed(lnum)
   if empty(source_line)
     return [v:null, v:null]
+  endif
+
+  let [tag, should_return] = s:GetTagInfoFromLSPAndExtension()
+  if should_return
+    return tag is# v:null ? [v:null, v:null] : [tag, source_line]
   endif
 
   " For scoped tag
@@ -106,16 +125,7 @@ function! s:GetInfoUnderCursor() abort
     return [tag, source_line]
   endif
 
-  " Since we include the space ` `, we need to trim the result later.
-  " / --> github.com/golang/dep/gps:11
-  if t:vista.provider ==# 'markdown'
-    let matched = matchlist(trimmed_line, '\([a-zA-Z:#_.,/<> ]\-\+\)\(H\d:\d\+\)$')
-  else
-    let matched = matchlist(trimmed_line, '\([a-zA-Z:#_.,/<> ]\-\+\):\(\d\+\)$')
-  endif
-
-  let tag = get(matched, 1, '')
-
+  let tag = s:MatchTag(trimmed_line)
   if empty(tag)
     let tag = raw_cur_line[:last_semicoln_idx-1]
   endif
@@ -133,7 +143,45 @@ function! s:EchoScope(scope) abort
   endif
 endfunction
 
+function! s:EchoScopeFromCacheIsOk() abort
+  if has_key(t:vista, 'vlnum_cache')
+    " should exclude the first two lines and keep in mind that the 1-based and
+    " 0-based.
+    " This is really error prone.
+    let tagline = get(t:vista.vlnum_cache, line('.') - 3, '')
+    if !empty(tagline)
+      if has_key(tagline, 'scope')
+        call s:EchoScope(tagline.scope)
+      else
+        call s:EchoScope(tagline.kind)
+      endif
+      return v:true
+    endif
+  endif
+  return v:false
+endfunction
+
+function! s:TryParseAndEchoScope() abort
+  let linenr = vista#util#LowerIndentLineNr()
+
+  " Echo the scope of current tag if found
+  if linenr != 0
+    let scope = matchstr(getline(linenr), '\a\+$')
+    if !empty(scope)
+      call s:EchoScope(scope)
+    else
+      " For the kind renderer
+      let pieces = split(getline(linenr), ' ')
+      if !empty(pieces)
+        let scope = pieces[1]
+        call s:EchoScope(scope)
+      endif
+    endif
+  endif
+endfunction
+
 " Echo the tag with detailed info in the cmdline
+" Try to echo the scope and then the tag.
 function! s:EchoInCmdline(msg, tag) abort
   let [msg, tag] = [a:msg, a:tag]
 
@@ -146,49 +194,14 @@ function! s:EchoInCmdline(msg, tag) abort
       echohl Function | echo msg | echohl NONE
       return
     endif
-
   catch /^Vim\%((\a\+)\)\=:E869/
-
     echohl Function | echo msg | echohl NONE
     return
-
   endtry
 
-  let echoed_scope = v:false
-
-  if has_key(t:vista, 'vlnum_cache')
-    " should exclude the first two lines and keep in mind that the 1-based and
-    " 0-based.
-    " This is really error prone.
-    let tagline = get(t:vista.vlnum_cache, line('.') - 3, '')
-    if !empty(tagline)
-      if has_key(tagline, 'scope')
-        call s:EchoScope(tagline.scope)
-      else
-        call s:EchoScope(tagline.kind)
-      endif
-      let echoed_scope = v:true
-    endif
-  endif
-
   " Try highlighting the scope of current tag
-  if !echoed_scope
-    let linenr = vista#util#LowerIndentLineNr()
-
-    " Echo the scope of current tag if found
-    if linenr != 0
-      let scope = matchstr(getline(linenr), '\a\+$')
-      if !empty(scope)
-        call s:EchoScope(scope)
-      else
-        " For the kind renderer
-        let pieces = split(getline(linenr), ' ')
-        if len(pieces) > 1
-          let scope = pieces[1]
-          call s:EchoScope(scope)
-        endif
-      endif
-    endif
+  if !s:EchoScopeFromCacheIsOk()
+    call s:TryParseAndEchoScope()
   endif
 
   " if start is 0, msg[0:-1] will display the redundant whole msg.
@@ -212,7 +225,7 @@ endfunction
 
 function! s:ApplyPeek(lnum, tag) abort
   silent execute 'normal!' a:lnum.'z.'
-  let [_, start, end] = matchstrpos(getline('.'), a:tag)
+  let [_, start, _] = matchstrpos(getline('.'), a:tag)
   call vista#util#Blink(1, 100, [a:lnum, start+1, strlen(a:tag)])
 endfunction
 
@@ -222,9 +235,7 @@ if exists('*win_execute')
   endfunction
 else
   function! s:PeekInSourceFile(lnum, tag) abort
-    noautocmd execute t:vista.source.winnr().'wincmd w'
-    call s:ApplyPeek(a:lnum, a:tag)
-    noautocmd wincmd p
+    call vista#WinExecute(t:vista.source.winnr(), function('s:ApplyPeek'), a:lnum, a:tag)
   endfunction
 endif
 
@@ -319,7 +330,7 @@ function! s:ApplyHighlight(lnum, ensure_visible, ...) abort
     if a:0 == 1
       let hi_pos = [a:lnum, start+1, strlen(a:1)]
     else
-      let [matched, end, _] = matchstrpos(cur_line, ':\d\+$')
+      let [_, end, _] = matchstrpos(cur_line, ':\d\+$')
       let hi_pos = [a:lnum, start+1, end - start]
     endif
   endif
@@ -331,8 +342,10 @@ function! s:ApplyHighlight(lnum, ensure_visible, ...) abort
   endif
 endfunction
 
+" Highlight the nearest tag in the vista window.
 function! s:HighlightNearestTag(_timer) abort
   let winnr = t:vista.winnr()
+
   if winnr == -1
         \ || vista#ShouldSkip()
         \ || !s:HasVlnum()
@@ -344,36 +357,37 @@ function! s:HighlightNearestTag(_timer) abort
   if empty(found)
     return
   endif
-  let s:vlnum = get(found, 'vlnum', v:null)
-  if empty(s:vlnum)
-    return
-  endif
 
+  let s:vlnum = get(found, 'vlnum', v:null)
   " Skip if the vlnum is same with previous one
-  if s:vlnum is v:null || s:last_vlnum == s:vlnum
+  if empty(s:vlnum) || s:last_vlnum == s:vlnum
     return
   endif
 
   let s:last_vlnum = s:vlnum
 
-  let winnr = t:vista.winnr()
-  " noautocmd is necessary, otherwise it may interfere the echoed message by
-  " other plugins, e.g., the warning/error message from ALE.
-  if winnr() != winnr
-    noautocmd execute winnr.'wincmd w'
-    let l:switch_back = 1
-  endif
-
   let tag = get(found, 'name', v:null)
   if !empty(tag)
-    call s:ApplyHighlight(s:vlnum, v:true, tag)
+    call vista#WinExecute(winnr, function('s:ApplyHighlight'), s:vlnum, v:true, tag)
   else
-    call s:ApplyHighlight(s:vlnum, v:true)
+    call vista#WinExecute(winnr, function('s:ApplyHighlight'), s:vlnum, v:true)
   endif
+endfunction
 
-  if exists('l:switch_back')
-    noautocmd wincmd p
+" Fold or unfold when meets the top level tag line
+function! s:TryFoldIsOk() abort
+  if indent('.') == 0
+    if !empty(getline('.'))
+      if foldclosed('.') != -1
+        normal! zo
+        return v:true
+      elseif foldlevel('.') != 0
+        normal! zc
+        return v:true
+      endif
+    endif
   endif
+  return v:false
 endfunction
 
 " Fold scope based on the indent.
@@ -382,19 +396,7 @@ function! vista#cursor#FoldOrJump() abort
   if line('.') == 1
     call vista#source#GotoWin()
     return
-  endif
-
-  " Fold or unfold when meets the top level tag line
-  if indent('.') == 0
-    if !empty(getline('.'))
-      if foldclosed('.') != -1
-        normal! zo
-      else
-        if foldlevel('.') != 0
-          normal! zc
-        endif
-      endif
-    endif
+  elseif s:TryFoldIsOk()
     return
   endif
 
@@ -427,25 +429,8 @@ function! vista#cursor#NearestSymbol() abort
   return vista#util#BinarySearch(t:vista.raw, line('.'), 'line', 'name')
 endfunction
 
-function! s:ShowFoldedDetail() abort
-  let foldclosed_end = foldclosedend('.')
-  let curlnum = line('.')
-  let lines = getbufline(t:vista.bufnr, curlnum, foldclosed_end)
-
-  if s:has_floating_win
-    call vista#floating#DisplayRawAt(curlnum, lines)
-  elseif s:has_popup
-    call vista#popup#DisplayRawAt(curlnum, lines)
-  endif
-endfunction
-
-function! vista#cursor#ShowDetail(_timer) abort
+function! s:EchoScopeInCmdlineIsOk() abort
   let cur_line = getline('.')
-  if empty(cur_line)
-    return
-  endif
-
-  " scope line
   if cur_line[-1:] ==# ']'
     let splitted = split(cur_line)
     " Join the scope parts in case of they contains spaces, e.g., structure names
@@ -453,14 +438,35 @@ function! vista#cursor#ShowDetail(_timer) abort
     let cnt = matchstr(splitted[-1], '\d\+')
     call s:EchoScope(scope)
     echohl Keyword | echon cnt | echohl NONE
-    return
+    return v:true
   endif
+  return v:false
+endfunction
 
+" Show the folded content if in a closed fold.
+function! s:ShowFoldedDetailIsOk() abort
   if foldclosed('.') != -1
-    if !s:has_floating_win && !s:has_popup
-      return
+    if s:has_floating_win || s:has_popup
+      let foldclosed_end = foldclosedend('.')
+      let curlnum = line('.')
+      let lines = getbufline(t:vista.bufnr, curlnum, foldclosed_end)
+
+      if s:has_floating_win
+        call vista#floating#DisplayRawAt(curlnum, lines)
+      elseif s:has_popup
+        call vista#popup#DisplayRawAt(curlnum, lines)
+      endif
+
+      return v:true
     endif
-    call s:ShowFoldedDetail()
+  endif
+  return v:false
+endfunction
+
+function! vista#cursor#ShowDetail(_timer) abort
+  if empty(getline('.'))
+        \ || s:EchoScopeInCmdlineIsOk()
+        \ || s:ShowFoldedDetailIsOk()
     return
   endif
 
@@ -527,7 +533,8 @@ endfunction
 
 function! vista#cursor#TogglePreview() abort
   if get(t:vista, 'floating_visible', v:false)
-    call vista#floating#Close()
+        \ || get(t:vista, 'popup_visible', v:false)
+    call vista#GenericCloseOverlay()
     return
   endif
 
