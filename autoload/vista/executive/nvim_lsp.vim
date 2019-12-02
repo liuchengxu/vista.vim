@@ -14,6 +14,9 @@ function! s:AutoUpdate(fpath) abort
 endfunction
 
 function! s:Run() abort
+  if !has('nvim-0.5')
+    return
+  endif
   call s:RunAsync()
   while g:vista_executive_nvim_lsp_fetching
     sleep 100m
@@ -26,8 +29,11 @@ function! vista#executive#nvim_lsp#SetData(data) abort
 endfunction
 
 function! s:RunAsync() abort
-    call vista#SetProvider(s:provider)
-    lua << EOF
+  if !has('nvim-0.5')
+    return
+  endif
+  call vista#SetProvider(s:provider)
+  lua << EOF
     local params = vim.lsp.util.make_position_params()
     local callback = function(_, _, result)
         if not result then return end
