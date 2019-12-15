@@ -60,13 +60,18 @@ function! s:aligner.project_ctags() abort
   return source
 endfunction
 
-function! vista#finder#fzf#sink(line) abort
+function! vista#finder#fzf#extract(line) abort
   let icon_lnum_tag = split(a:line, '[')[0]
   " [a-zA-Z:#_.,<>]
   " matching tag can't contain whitespace, but a tag does have a chance to contain whitespace?
   let items = matchlist(icon_lnum_tag, '\(.*\) \(\d\+\):\([a-zA-Z:#_.,<>]*\)')
   let lnum = items[2]
   let tag = items[3]
+  return [lnum, tag]
+endfunction
+
+function! vista#finder#fzf#sink(line) abort
+  let [lnum, tag] = vista#finder#fzf#extract(a:line)
   let col = stridx(t:vista.source.line(lnum), tag)
   let col = col == -1 ? 1 : col + 1
   call vista#source#GotoWin()
