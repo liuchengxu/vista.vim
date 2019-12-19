@@ -65,8 +65,22 @@ function! s:GetLanguageSpecificOptition(filetype) abort
   return opt
 endfunction
 
+function! s:RemoveTemp() abort
+  if exists('s:tmp_file')
+    call delete(s:tmp_file)
+    unlet s:tmp_file
+  endif
+endfunction
+
 " FIXME support all languages that ctags does
-function! s:BuildCmd(file) abort
+function! s:BuildCmd(origin_fpath) abort
+  let s:tmp_file = s:IntoTemp(a:origin_fpath)
+  if empty(s:tmp_file)
+    return ''
+  endif
+
+  let s:fpath = a:origin_fpath
+
   let custom_cmd = s:GetCustomCmd(&filetype)
 
   if custom_cmd isnot v:null
@@ -75,9 +89,9 @@ function! s:BuildCmd(file) abort
     else
       let s:TagParser = function('vista#parser#ctags#FromExtendedRaw')
     endif
-    let cmd = printf('%s %s', custom_cmd, a:file)
+    let cmd = printf('%s %s', custom_cmd, s:tmp_file)
   else
-    let cmd = s:GetDefaultCmd(a:file)
+    let cmd = s:GetDefaultCmd(s:tmp_file)
   endif
 
   let t:vista.ctags_cmd = cmd
@@ -94,6 +108,7 @@ function! s:PrepareContainer() abort
   let t:vista.raw_by_kind = {}
   let t:vista.with_scope = []
   let t:vista.without_scope = []
+  let t:vista.tree = {}
 endfunction
 
 function! s:on_exit(_job, _data, _event) abort dict
@@ -131,11 +146,13 @@ function! s:ApplyExtracted() abort
   if exists('s:id')
     unlet s:id
   endif
+
+  call s:RemoveTemp()
 endfunction
 
 function! s:ExtractLinewise(raw_data) abort
   call s:PrepareContainer()
-  call map(a:raw_data, 'call(s:TagParser, [v:val, s:data])')
+  call map(a:raw_data, 's:TagParser(v:val, s:data)')
 endfunction
 
 function! s:AutoUpdate(fpath) abort
@@ -283,14 +300,10 @@ function! s:IntoTemp(...) abort
 endfunction
 
 function! s:ApplyExecute(bang, fpath) abort
-  let file = s:IntoTemp(a:fpath)
-  if empty(file)
+  let cmd = s:BuildCmd(a:fpath)
+  if empty(cmd)
     return
   endif
-
-  let s:fpath = a:fpath
-
-  let cmd = s:BuildCmd(file)
 
   if a:bang || !s:can_async
     call s:ApplyRun(cmd)
@@ -300,14 +313,11 @@ function! s:ApplyExecute(bang, fpath) abort
 endfunction
 
 function! s:Run(fpath) abort
-  let file = s:IntoTemp(a:fpath)
-  if empty(file)
+  let cmd = s:BuildCmd(a:fpath)
+  if empty(cmd)
     return
   endif
 
-  let s:fpath = a:fpath
-
-  let cmd = s:BuildCmd(file)
   call s:ApplyRun(cmd)
 
   return s:data
@@ -317,6 +327,7 @@ function! s:RunAsyncCommon(cmd) abort
   if exists('s:id')
     call vista#util#JobStop(s:id)
   endif
+  call s:RemoveTemp()
 
   let s:id = s:ApplyRunAsync(a:cmd)
 
@@ -327,12 +338,11 @@ endfunction
 
 function! s:RunAsync(fpath) abort
   if s:can_async
-    let file = s:IntoTemp(a:fpath)
-    if empty(file)
+    let cmd = s:BuildCmd(a:fpath)
+    if empty(cmd)
       return
     endif
 
-    let cmd = s:BuildCmd(file)
     call s:RunAsyncCommon(cmd)
   endif
 endfunction
