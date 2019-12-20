@@ -20,6 +20,15 @@ function! s:LoadData(container, line) abort
   call add(t:vista.raw, line)
 
   if has_key(line, 'scope')
+    let treeId = join([line.scope, line.name], t:vista.source.scope_seperator())
+    let line.treeId = treeId
+    if !has_key(t:vista.tree, line.scope)
+      let t:vista.tree[line.scope] = {}
+      let t:vista.tree[line.scope].line = line.line
+      let t:vista.tree[line.scope].children = [line]
+    elseif line.line >= t:vista.tree[line.scope].line
+      call add(t:vista.tree[line.scope].children, line)
+    endif
     call add(t:vista.with_scope, line)
   else
     call add(t:vista.without_scope, line)
