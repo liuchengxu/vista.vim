@@ -11,17 +11,25 @@ let s:ctags = get(g:, 'vista_ctags_executable', 'ctags')
 let s:support_json_format =
       \ len(filter(split(system(s:ctags.' --list-features'), '\n'), 'v:val =~# ''^json''')) > 0
 
-let s:is_mac = has('macunix')
-let s:is_linux = has('unix') && !has('macunix') && !has('win32unix')
-
-let s:can_async = has('patch-8.0.0027')
-
 " Expose this variable for debugging
 let g:vista#executive#ctags#support_json_format = s:support_json_format
 
-function! s:GetCustomCmd(ft) abort
-  if exists('g:vista_ctags_cmd') && has_key(g:vista_ctags_cmd, a:ft)
-    return g:vista_ctags_cmd[a:ft]
+if s:support_json_format
+  let s:default_cmd_fmt = '%s %s %s --output-format=json --fields=-PF -f- %s'
+  let s:DefaultTagParser = function('vista#parser#ctags#FromJSON')
+else
+  let s:default_cmd_fmt = '%s %s %s -f- %s'
+  let s:DefaultTagParser = function('vista#parser#ctags#FromExtendedRaw')
+endif
+
+let s:is_mac = has('macunix')
+let s:is_linux = has('unix') && !has('macunix') && !has('win32unix')
+let s:can_async = has('patch-8.0.0027')
+
+function! s:GetCustomCmd(filetype) abort
+  if exists('g:vista_ctags_cmd')
+        \ && has_key(g:vista_ctags_cmd, a:filetype)
+    return g:vista_ctags_cmd[a:filetype]
   endif
   return v:null
 endfunction
@@ -36,16 +44,8 @@ function! s:GetDefaultCmd(file) abort
     let common_opt .= ' --extras= '
   endif
 
-  if s:support_json_format
-    let fmt = '%s %s %s --output-format=json --fields=-PF -f- %s'
-    let s:TagParser = function('vista#parser#ctags#FromJSON')
-  else
-    let fmt = '%s %s %s -f- %s'
-    let s:TagParser = function('vista#parser#ctags#FromExtendedRaw')
-  endif
-
   let language_specific_opt = s:GetLanguageSpecificOptition(&filetype)
-  let cmd = printf(fmt, s:ctags, common_opt, language_specific_opt, a:file)
+  let cmd = printf(s:default_cmd_fmt, s:ctags, common_opt, language_specific_opt, a:file)
 
   return cmd
 endfunction
@@ -65,7 +65,7 @@ function! s:GetLanguageSpecificOptition(filetype) abort
   return opt
 endfunction
 
-function! s:RemoveTemp() abort
+function! s:DeleteTemp() abort
   if exists('s:tmp_file')
     call delete(s:tmp_file)
     unlet s:tmp_file
@@ -84,14 +84,15 @@ function! s:BuildCmd(origin_fpath) abort
   let custom_cmd = s:GetCustomCmd(&filetype)
 
   if custom_cmd isnot v:null
+    let cmd = printf('%s %s', custom_cmd, s:tmp_file)
     if stridx(custom_cmd, '--output-format=json') > -1
       let s:TagParser = function('vista#parser#ctags#FromJSON')
     else
       let s:TagParser = function('vista#parser#ctags#FromExtendedRaw')
     endif
-    let cmd = printf('%s %s', custom_cmd, s:tmp_file)
   else
     let cmd = s:GetDefaultCmd(s:tmp_file)
+    let s:TagParser = s:DefaultTagParser
   endif
 
   let t:vista.ctags_cmd = cmd
@@ -111,29 +112,7 @@ function! s:PrepareContainer() abort
   let t:vista.tree = {}
 endfunction
 
-function! s:on_exit(_job, _data, _event) abort dict
-  if !exists('t:vista') || v:dying
-    return
-  endif
-
-  " Second last line is the real last one in neovim
-  call s:ExtractLinewise(self.stdout[:-2])
-
-  call s:ApplyExtracted()
-endfunction
-
-function! s:close_cb(channel) abort
-  call s:PrepareContainer()
-
-  while ch_status(a:channel, {'part': 'out'}) ==# 'buffered'
-    let line = ch_read(a:channel)
-    call s:TagParser(line, s:data)
-  endwhile
-
-  call s:ApplyExtracted()
-endfunction
-
-" Process the preprocessed output by ctags and remove s:id.
+" Process the preprocessed output by ctags and remove s:jodid.
 function! s:ApplyExtracted() abort
   " Update cache when new data comes.
   let s:cache = get(s:, 'cache', {})
@@ -143,11 +122,11 @@ function! s:ApplyExtracted() abort
 
   let [s:reload_only, s:should_display] = vista#renderer#LSPProcess(s:data, s:reload_only, s:should_display)
 
-  if exists('s:id')
-    unlet s:id
+  if exists('s:jodid')
+    unlet s:jodid
   endif
 
-  call s:RemoveTemp()
+  call s:DeleteTemp()
 endfunction
 
 function! s:ExtractLinewise(raw_data) abort
@@ -185,6 +164,17 @@ function! s:ApplyRun(cmd) abort
 endfunction
 
 if has('nvim')
+  function! s:on_exit(_job, _data, _event) abort dict
+    if !exists('t:vista') || v:dying
+      return
+    endif
+
+    " Second last line is the real last one in neovim
+    call s:ExtractLinewise(self.stdout[:-2])
+
+    call s:ApplyExtracted()
+  endfunction
+
   " Run ctags asynchronously given the cmd
   function! s:ApplyRunAsync(cmd) abort
       " job is job id in neovim
@@ -196,6 +186,17 @@ if has('nvim')
     return jobid > 0 ? jobid : 0
   endfunction
 else
+
+  function! s:close_cb(channel) abort
+    call s:PrepareContainer()
+
+    while ch_status(a:channel, {'part': 'out'}) ==# 'buffered'
+      let line = ch_read(a:channel)
+      call s:TagParser(line, s:data)
+    endwhile
+
+    call s:ApplyExtracted()
+  endfunction
 
   if has('win32')
     function! s:WrapCmd(cmd) abort
@@ -324,14 +325,14 @@ function! s:Run(fpath) abort
 endfunction
 
 function! s:RunAsyncCommon(cmd) abort
-  if exists('s:id')
-    call vista#util#JobStop(s:id)
+  if exists('s:jodid')
+    call vista#util#JobStop(s:jodid)
+    call s:DeleteTemp()
   endif
-  call s:RemoveTemp()
 
-  let s:id = s:ApplyRunAsync(a:cmd)
+  let s:jodid = s:ApplyRunAsync(a:cmd)
 
-  if !s:id
+  if !s:jodid
     call vista#error#RunCtags(a:cmd)
   endif
 endfunction
