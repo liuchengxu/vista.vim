@@ -93,22 +93,20 @@ function! vista#AutoUpdateWithDelay(Fn, Args) abort
   call timer_start(30, { -> call(a:Fn, a:Args) })
 endfunction
 
-function! s:GetExplicitExecutive() abort
-  let filetype = &filetype
-
-  if exists('g:vista_'.filetype.'_executive')
-    execute 'return' 'g:vista_'.filetype.'_executive'
+function! vista#GetExplicitExecutive(filetype) abort
+  if exists('g:vista_'.a:filetype.'_executive')
+    execute 'return' 'g:vista_'.a:filetype.'_executive'
   endif
 
-  if exists('g:vista_executive_for') && has_key(g:vista_executive_for, filetype)
-    return g:vista_executive_for[filetype]
+  if exists('g:vista_executive_for') && has_key(g:vista_executive_for, a:filetype)
+    return g:vista_executive_for[a:filetype]
   endif
 
   return v:null
 endfunction
 
 function! vista#GetExplicitExecutiveOrDefault() abort
-  let explicit_executive = s:GetExplicitExecutive()
+  let explicit_executive = vista#GetExplicitExecutive(&filetype)
 
   if explicit_executive isnot# v:null
     let executive = explicit_executive
@@ -137,6 +135,16 @@ function! vista#RunForNearestMethodOrFunction() abort
   if !exists('#VistaMOF')
     call vista#autocmd#InitMOF()
   endif
+endfunction
+
+function! vista#RunTOC() abort
+  let executive = vista#GetExplicitExecutiveOrDefault()
+  if executive ==# 'toc'
+    let extension = &filetype
+  else
+    let extension = executive
+  endif
+  call vista#extension#{extension}#Execute(v:false, v:true)
 endfunction
 
 " Main entrance to interact with vista.vim
@@ -178,7 +186,7 @@ function! vista#(bang, ...) abort
       call vista#finder#fzf#ProjectRun()
     elseif a:1 ==# 'toc'
       if vista#HasTOCSupport()
-        call vista#extension#{&filetype}#Execute(v:false, v:true)
+        call vista#RunTOC()
       else
         return vista#error#For('Vista toc', &filetype)
       endif

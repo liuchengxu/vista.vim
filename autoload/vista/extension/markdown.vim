@@ -59,10 +59,23 @@ function! vista#extension#markdown#AutoUpdate(fpath) abort
   call s:AutoUpdate(a:fpath)
 endfunction
 
+function! s:ShouldUseMarkdownExtension(source_filetype) abort
+  if a:source_filetype ==# 'markdown'
+    return v:true
+  " vimwiki can reuse the markdown extension.
+  elseif a:source_filetype ==# 'vimwiki'
+        \ && vista#GetExplicitExecutive(a:source_filetype) ==# 'markdown'
+    return v:true
+  else
+    return v:false
+  endif
+endfunction
+
 function! s:AutoUpdate(fpath) abort
-  if t:vista.source.filetype() ==# 'markdown'
+  let source_filetype = t:vista.source.filetype()
+  if s:ShouldUseMarkdownExtension(source_filetype)
     call s:ApplyAutoUpdate()
-  elseif t:vista.source.filetype() ==# 'rst'
+  elseif source_filetype ==# 'rst'
     call vista#extension#rst#AutoUpdate(a:fpath)
   else
     call vista#executive#ctags#AutoUpdate(a:fpath)
