@@ -283,24 +283,31 @@ g:vista_default_executive                              *g:vista_default_executiv
   See all the avaliable executives via `:echo g:vista#executives` .
 
 g:vista_executive_for                                      *g:vista_executive_for*
-
+                                                   *g:vista_{&filetype}_executive*
   Type: |Dict|
   Default: `{}`
 
   Set the executive for some filetypes explicitly, which is useful for setting
   `ctags` as the default executive, whereas you prefer to use LSP for some
-  filetypes you ensured the LSP functionality is good. The rationality is the
-  LSP server needs to be installed explicitly and people normally only install
-  a few frequently used ones, but ctags supports much more languages by default.
+  filetypes when you ensure that the related LSP server has been installed.
 
-  You can also set `toc` for markdown to use the builtin markdown extension in
-  vista.vim.
+  The rationale is the LSP server has to be installed first explicitly and
+  people normally only install a few frequently used ones, but ctags supports
+  much more languages by default.
   >
   let g:vista_default_executive = 'ctags'
 
   let g:vista_executive_for = {
       \ 'cpp': 'vim_lsp',
       \ 'php': 'vim_lsp',
+      \ }
+<
+  You can also set `toc` or some extension name for markdown like document to
+  use the builtin toc extension in vista.vim. For `toc`, it actuallys derives
+  the extension using the `&filetype`.
+  >
+  let g:vista_executive_for = {
+      \ 'vimwiki': 'markdown',
       \ 'markdown': 'toc',
       \ }
 
@@ -315,6 +322,10 @@ g:vista_{&filetype}_executive                      *g:vista_{&filetype}_executiv
   `g:vista_executive_for`. >
 
   let g:vista_cpp_executive = 'vim_lsp'
+
+  " Use the markdown extension for vimwiki as if you are using the
+  " standard markdown syntax in vimwiki.
+  let g:vista_vimwiki_executive = 'markdown'
 
 g:vista_ctags_cmd                                              *g:vista_ctags_cmd*
 
