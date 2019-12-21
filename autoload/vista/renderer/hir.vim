@@ -2,20 +2,20 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
-function! s:BuildHirRow(row) abort
+function! s:IntoLSPHirRow(row) abort
   let indented = repeat(' ', a:row.level * 4).a:row.text
   let kind = ' : '.vista#renderer#Decorate(a:row.kind)
   let lnum = ':'.a:row.lnum
   return indented.kind.lnum
 endfunction
 
-function! s:BuildNonHirRow(row) abort
+function! s:IntoLSPNonHirRow(row) abort
   let indented = repeat(' ', 4).a:row.text
   let lnum = ':'.a:row.lnum
   return indented.lnum
 endfunction
 
-function! s:RenderHirAndThenGroupByKind(data) abort
+function! s:RenderLSPHirAndThenGroupByKind(data) abort
   let rendered = []
   let level0 = {}
 
@@ -25,7 +25,7 @@ function! s:RenderHirAndThenGroupByKind(data) abort
   for row in a:data
     if (row.level == 0 && idx+1 < len && a:data[idx+1].level > 0)
           \ || row.level > 0
-      call add(rendered, s:BuildHirRow(row))
+      call add(rendered, s:IntoLSPHirRow(row))
     endif
     if row.level > 0
       if idx+1 < len && a:data[idx+1].level == 0
@@ -45,7 +45,7 @@ function! s:RenderHirAndThenGroupByKind(data) abort
 
   for [kind, vs] in items(level0)
     call add(rendered, vista#renderer#Decorate(kind))
-    call map(vs, 'add(rendered, s:BuildNonHirRow(v:val))')
+    call map(vs, 'add(rendered, s:IntoLSPNonHirRow(v:val))')
     call add(rendered, '')
   endfor
 
@@ -67,7 +67,7 @@ endfunction
 " data is a list of items with the level info for the hierarchy purpose.
 function! vista#renderer#hir#Coc(data) abort
   " return map(a:data, 's:Transform(v:val)')
-  return s:RenderHirAndThenGroupByKind(a:data)
+  return s:RenderLSPHirAndThenGroupByKind(a:data)
 endfunction
 
 function! s:Render(rows, tag_info, children, depth) abort
@@ -90,16 +90,28 @@ endfunction
 
 function! vista#renderer#hir#Ctags() abort
   let rows = []
+  let kind_group = {}
+
   for root in t:vista.without_scope
     let root_name = root.name
     if has_key(t:vista.tree, root_name)
       let children = t:vista.tree[root_name].children
       call s:Render(rows, root, children, 0)
     else
-      let row = root['name'].' :'.root['kind'].':'.root['line']
-      call add(rows, row)
+      if has_key(kind_group, root.kind)
+        call add(kind_group[root.kind], root)
+      else
+        let kind_group[root.kind] = [root]
+      endif
     endif
   endfor
-  echom "rows: ".string(rows)
+
+  for [key, vals] in items(kind_group)
+    call add(rows, key.':')
+    for val in vals
+      call add(rows, repeat(' ', 4).val['name'].' :'.val['line'])
+    endfor
+  endfor
+
   return rows
 endfunction
