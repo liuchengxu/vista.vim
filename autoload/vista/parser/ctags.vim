@@ -13,10 +13,6 @@ endfunction
 function! s:LoadData(container, line) abort
   let line = a:line
 
-  let kind = line.kind
-
-  call s:Insert(t:vista.raw_by_kind, kind, line)
-
   call add(t:vista.raw, line)
 
   if has_key(line, 'scope')
@@ -32,22 +28,15 @@ function! s:LoadData(container, line) abort
       let t:vista.tree[parent_id] = [line]
     endif
 
-    " if !has_key(t:vista.tree, line.scope)
-      " let t:vista.tree[line.scope] = {}
-      " let t:vista.tree[line.scope].line = line.line
-      " let t:vista.tree[line.scope].children = [line]
-    " elseif line.line >= t:vista.tree[line.scope].line
-      " call add(t:vista.tree[line.scope].children, line)
-    " endif
-
-    call add(t:vista.with_scope, line)
   else
     " The kind is needed for differentiating the tags having same name but different kinds.
     let parent_id = join([line.name, line.kind], '|')
     let t:vista.parents[parent_id] = line
-
-    call add(t:vista.without_scope, line)
   endif
+
+  let kind = line.kind
+
+  call s:Insert(t:vista.raw_by_kind, kind, line)
 
   let picked = {'lnum': line.line, 'text': line.name }
 
@@ -152,7 +141,6 @@ function! vista#parser#ctags#FromExtendedRaw(line, container) abort
   endif
 
   call s:LoadData(a:container, line)
-
 endfunction
 
 function! vista#parser#ctags#FromJSON(line, container) abort
@@ -172,7 +160,6 @@ function! vista#parser#ctags#FromJSON(line, container) abort
   endif
 
   call s:LoadData(a:container, line)
-
 endfunction
 
 " ctags -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"

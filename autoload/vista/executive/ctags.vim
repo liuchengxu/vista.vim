@@ -103,12 +103,10 @@ endfunction
 function! s:PrepareContainer() abort
   let s:data = {}
   let t:vista = get(t:, 'vista', {})
-  let t:vista.functions = []
   let t:vista.raw = []
   let t:vista.kinds = []
+  let t:vista.functions = []
   let t:vista.raw_by_kind = {}
-  let t:vista.with_scope = []
-  let t:vista.without_scope = []
   let t:vista.tree = {}
   let t:vista.parents = {}
 endfunction
