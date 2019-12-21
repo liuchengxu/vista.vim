@@ -40,11 +40,19 @@ function! s:CompareByLine(i1, i2) abort
   return a:i1.line > a:i2.line
 endfunction
 
-function! s:RenderCtags(rows, tag_info, children, depth) abort
+function! s:AppendRowAtDepth(rows, tag_info, depth) abort
   let rows = a:rows
+
   call add(rows, s:IntoCtagsRow(a:tag_info, a:depth))
+
   let line = a:tag_info
   let line.vlnum = len(rows) + 2
+endfunction
+
+function! s:RenderCtags(rows, tag_info, children, depth) abort
+  let rows = a:rows
+
+  call s:AppendRowAtDepth(rows, a:tag_info, a:depth)
 
   if !empty(a:children)
     for child in sort(copy(a:children), function('s:CompareByLine'))
@@ -53,7 +61,7 @@ function! s:RenderCtags(rows, tag_info, children, depth) abort
         let children = t:vista.tree[parent_id]
         call s:RenderCtags(rows, child, children, a:depth+1)
       else
-        call s:RenderCtags(rows, child, [], a:depth +1)
+        call s:AppendRowAtDepth(rows, child, a:depth + 1)
       endif
     endfor
   endif
