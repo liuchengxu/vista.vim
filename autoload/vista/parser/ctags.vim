@@ -32,13 +32,13 @@ function! s:LoadData(container, line) abort
       let t:vista.tree[parent_id] = [line]
     endif
 
-    if !has_key(t:vista.tree, line.scope)
-      let t:vista.tree[line.scope] = {}
-      let t:vista.tree[line.scope].line = line.line
-      let t:vista.tree[line.scope].children = [line]
-    elseif line.line >= t:vista.tree[line.scope].line
-      call add(t:vista.tree[line.scope].children, line)
-    endif
+    " if !has_key(t:vista.tree, line.scope)
+      " let t:vista.tree[line.scope] = {}
+      " let t:vista.tree[line.scope].line = line.line
+      " let t:vista.tree[line.scope].children = [line]
+    " elseif line.line >= t:vista.tree[line.scope].line
+      " call add(t:vista.tree[line.scope].children, line)
+    " endif
 
     call add(t:vista.with_scope, line)
   else
