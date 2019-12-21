@@ -115,10 +115,17 @@ endfunction
 function! vista#sidebar#Open() abort
   let [bufnr, winnr, fname, fpath] = [bufnr('%'), winnr(), expand('%'), expand('%:p')]
   call vista#source#Update(bufnr, winnr, fname, fpath)
+
   let executive = vista#GetExplicitExecutiveOrDefault()
+
   " Support the builtin markdown toc extension as an executive
-  if vista#SupportToc() && executive ==# 'toc'
-    call vista#extension#{&filetype}#Execute(v:false, v:true)
+  if vista#HasTOCSupport()
+    if executive ==# 'toc'
+      let extension = &filetype
+    else
+      let extension = executive
+    endif
+    call vista#extension#{extension}#Execute(v:false, v:true)
   else
     call vista#executive#{executive}#Execute(v:false, v:true, v:false)
   endif

@@ -10,14 +10,18 @@ endfunction
 
 let g:vista#finders = vista#FindItemsUnderDirectory(s:cur_dir.'/vista/finder')
 let g:vista#executives = vista#FindItemsUnderDirectory(s:cur_dir.'/vista/executive')
+let g:vista#extensions = vista#FindItemsUnderDirectory(s:cur_dir.'/vista/extension')
+
+let s:ignore_list = ['vista', 'vista_kind', 'nerdtree', 'startify', 'tagbar', 'fzf', 'gitcommit']
+
+" vimwiki supports the standard markdown syntax
+let s:toc_supported = ['markdown', 'rst', 'vimwiki']
 
 " Skip special buffers, filetypes.
 function! vista#ShouldSkip() abort
-  let blacklist = ['vista', 'vista_kind', 'nerdtree', 'startify', 'tagbar', 'fzf', 'gitcommit']
-
   return !empty(&buftype)
         \ || empty(&filetype)
-        \ || index(blacklist, &filetype) > -1
+        \ || index(s:ignore_list, &filetype) > -1
 endfunction
 
 " Ignore some kinds of tags/symbols which is done at the parser step.
@@ -25,8 +29,8 @@ function! vista#ShouldIgnore(kind) abort
   return exists('g:vista_ignore_kinds') && index(g:vista_ignore_kinds, a:kind) != -1
 endfunction
 
-function! vista#SupportToc() abort
-  return &filetype ==# 'markdown' || &filetype ==# 'rst'
+function! vista#HasTOCSupport() abort
+  return index(s:toc_supported, &filetype) > -1
 endfunction
 
 function! vista#SetProvider(provider) abort
@@ -90,14 +94,14 @@ function! vista#AutoUpdateWithDelay(Fn, Args) abort
 endfunction
 
 function! s:GetExplicitExecutive() abort
-  let ft = &filetype
+  let filetype = &filetype
 
-  if exists('g:vista_'.ft.'_executive')
-    execute 'return' 'g:vista_'.ft.'_executive'
+  if exists('g:vista_'.filetype.'_executive')
+    execute 'return' 'g:vista_'.filetype.'_executive'
   endif
 
-  if exists('g:vista_executive_for') && has_key(g:vista_executive_for, ft)
-    return g:vista_executive_for[ft]
+  if exists('g:vista_executive_for') && has_key(g:vista_executive_for, filetype)
+    return g:vista_executive_for[filetype]
   endif
 
   return v:null
@@ -173,7 +177,7 @@ function! vista#(bang, ...) abort
     elseif a:1 ==# 'finder!'
       call vista#finder#fzf#ProjectRun()
     elseif a:1 ==# 'toc'
-      if vista#SupportToc()
+      if vista#HasTOCSupport()
         call vista#extension#{&filetype}#Execute(v:false, v:true)
       else
         return vista#error#For('Vista toc', &filetype)
