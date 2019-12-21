@@ -105,6 +105,7 @@ function! vista#renderer#hir#ctags#Render() abort
     if has_key(t:vista.tree, parent_id)
       let children = t:vista.tree[parent_id]
       call s:RenderCtags(rows, parent, children, 0)
+      call add(rows, '')
     else
       if has_key(kind_group, parent.kind)
         call add(kind_group[parent.kind], parent)
