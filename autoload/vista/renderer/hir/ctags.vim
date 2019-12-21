@@ -2,11 +2,15 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
+scriptencoding utf-8
+
 let s:visibility_icon = {
       \ 'public': '+',
       \ 'protected': '~',
       \ 'private': '-',
       \ }
+
+let g:vista_fold_toggle_icons = get(g:, 'vista_fold_toggle_icons', ['▼', '▶'])
 
 function! s:GetVisibility(line) abort
   return has_key(a:line, 'access') ? get(s:visibility_icon, a:line.access, '?') : ''
@@ -32,11 +36,18 @@ function! s:IntoCtagsRow(line, depth) abort
   return row
 endfunction
 
+function! s:CompareByLine(i1, i2) abort
+  return a:i1.line > a:i2.line
+endfunction
+
 function! s:RenderCtags(rows, tag_info, children, depth) abort
   let rows = a:rows
   call add(rows, s:IntoCtagsRow(a:tag_info, a:depth))
+  let line = a:tag_info
+  let line.vlnum = len(rows) + 2
+
   if !empty(a:children)
-    for child in a:children
+    for child in sort(copy(a:children), function('s:CompareByLine'))
       let parent_id = child.tree_id
       if has_key(t:vista.tree, parent_id)
         let children = t:vista.tree[parent_id]
@@ -45,6 +56,44 @@ function! s:RenderCtags(rows, tag_info, children, depth) abort
         call s:RenderCtags(rows, child, [], a:depth +1)
       endif
     endfor
+  endif
+endfunction
+
+function! s:SortCompare(i1, i2) abort
+  return a:i1.name > a:i2.name
+endfunction
+
+function! s:RenderByKind(scope_less, rows) abort
+  let rows = a:rows
+  let scope_less = a:scope_less
+
+  for [kind, lines] in items(scope_less)
+    let kind_line = vista#renderer#Decorate(kind)
+    call add(rows, g:vista_fold_toggle_icons[0].' '.kind_line)
+
+    if get(t:vista, 'sort', v:false)
+      let lines = sort(copy(lines), function('s:SortCompare'))
+    endif
+
+    for line in lines
+      let row = vista#util#Join(
+            \ '  '.s:GetVisibility(line),
+            \ get(line, 'name'),
+            \ get(line, 'signature', ''),
+            \ ':'.line.line
+            \ )
+
+      call add(rows, row)
+
+      let line.vlnum = len(rows) + 2
+    endfor
+
+    call add(rows, '')
+  endfor
+
+  " Remove the last line if it's empty, i.e., ''
+  if !empty(rows) && empty(rows[-1])
+    unlet rows[-1]
   endif
 endfunction
 
@@ -65,12 +114,7 @@ function! vista#renderer#hir#ctags#Render() abort
     endif
   endfor
 
-  for [key, vals] in items(kind_group)
-    call add(rows, key.':')
-    for val in vals
-      call add(rows, repeat(' ', 4).val['name'].' :'.val['line'])
-    endfor
-  endfor
+  call s:RenderByKind(kind_group, rows)
 
   return rows
 endfunction
