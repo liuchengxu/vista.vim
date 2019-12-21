@@ -110,6 +110,7 @@ function! s:PrepareContainer() abort
   let t:vista.with_scope = []
   let t:vista.without_scope = []
   let t:vista.tree = {}
+  let t:vista.parents = {}
 endfunction
 
 " Process the preprocessed output by ctags and remove s:jodid.

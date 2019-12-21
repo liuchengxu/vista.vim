@@ -20,8 +20,18 @@ function! s:LoadData(container, line) abort
   call add(t:vista.raw, line)
 
   if has_key(line, 'scope')
-    let treeId = join([line.scope, line.name], t:vista.source.scope_seperator())
-    let line.treeId = treeId
+    let parent_id = join([line.scope, line.scopeKind], '|')
+    let line.parent_id = parent_id
+
+    let tree_id = line.scope.t:vista.source.scope_seperator().line.name.'|'.line.kind
+    let line.tree_id = tree_id
+
+    if has_key(t:vista.tree, parent_id)
+      call add(t:vista.tree[parent_id], line)
+    else
+      let t:vista.tree[parent_id] = [line]
+    endif
+
     if !has_key(t:vista.tree, line.scope)
       let t:vista.tree[line.scope] = {}
       let t:vista.tree[line.scope].line = line.line
@@ -29,8 +39,13 @@ function! s:LoadData(container, line) abort
     elseif line.line >= t:vista.tree[line.scope].line
       call add(t:vista.tree[line.scope].children, line)
     endif
+
     call add(t:vista.with_scope, line)
   else
+    " The kind is needed for differentiating the tags having same name but different kinds.
+    let parent_id = join([line.name, line.kind], '|')
+    let t:vista.parents[parent_id] = line
+
     call add(t:vista.without_scope, line)
   endif
 

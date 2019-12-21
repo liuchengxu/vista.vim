@@ -76,13 +76,26 @@ function! s:Render(rows, tag_info, children, depth) abort
   call add(rows, row)
   if !empty(a:children)
     for child in a:children
-      let treeId = join([child.scope, child.name], t:vista.source.scope_seperator())
-      if has_key(t:vista.tree, treeId)
-        let children = t:vista.tree[treeId].children
-        let children = filter(children, 'v:val["line"] >= a:tag_info["line"]')
-        call s:Render(rows, child, children, a:depth + 1)
+
+      " let treeId = join([child.scope, child.name], t:vista.source.scope_seperator())
+      " if has_key(t:vista.tree, treeId)
+        " let children = t:vista.tree[treeId].children
+        " let children = filter(children, 'v:val["line"] >= a:tag_info["line"]')
+        " call s:Render(rows, child, children, a:depth + 1)
+      " else
+        " call s:Render(rows, child, [], a:depth + 1)
+      " endif
+
+      let parent_id = join([child.name, child.kind], '|')
+      let parent_id = child.tree_id
+      echom "child:".string(child)
+      echom "parent_id:".parent_id
+      echom "t:vista.tree.parent_id:".get(t:vista.tree, 'parent_id', 'NO')
+      if has_key(t:vista.tree, parent_id)
+        let children = t:vista.tree[parent_id]
+        call s:Render(rows, child, children, a:depth+1)
       else
-        call s:Render(rows, child, [], a:depth + 1)
+        call s:Render(rows, child, [], a:depth +1)
       endif
     endfor
   endif
@@ -92,19 +105,32 @@ function! vista#renderer#hir#Ctags() abort
   let rows = []
   let kind_group = {}
 
-  for root in t:vista.without_scope
-    let root_name = root.name
-    if has_key(t:vista.tree, root_name)
-      let children = t:vista.tree[root_name].children
-      call s:Render(rows, root, children, 0)
+  for [parent_id, parent] in items(t:vista.parents)
+    if has_key(t:vista.tree, parent_id)
+      let children = t:vista.tree[parent_id]
+      call s:Render(rows, parent, children, 0)
     else
-      if has_key(kind_group, root.kind)
-        call add(kind_group[root.kind], root)
+      if has_key(kind_group, parent.kind)
+        call add(kind_group[parent.kind], parent)
       else
-        let kind_group[root.kind] = [root]
+        let kind_group[parent.kind] = [parent]
       endif
     endif
   endfor
+
+  " for root in t:vista.without_scope
+    " let root_name = root.name
+    " if has_key(t:vista.tree, root_name)
+      " let children = t:vista.tree[root_name].children
+      " call s:Render(rows, root, children, 0)
+    " else
+      " if has_key(kind_group, root.kind)
+        " call add(kind_group[root.kind], root)
+      " else
+        " let kind_group[root.kind] = [root]
+      " endif
+    " endif
+  " endfor
 
   for [key, vals] in items(kind_group)
     call add(rows, key.':')
