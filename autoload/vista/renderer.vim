@@ -54,7 +54,12 @@ let g:vista#renderer#kind_default_icon = ['╰─▸ ', '├─▸ ']
 
 function! vista#renderer#IconFor(kind) abort
   if g:vista#renderer#enable_icon
-    return get(g:vista#renderer#icons, tolower(a:kind), g:vista#renderer#icons.default)
+    let key = tolower(a:kind)
+    if has_key(g:vista#renderer#icons, key)
+      return g:vista#renderer#icons[key]
+    else
+      return get(g:vista#renderer#icons, 'default', '?')
+    endif
   else
     return ''
   endif
