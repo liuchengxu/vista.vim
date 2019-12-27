@@ -283,7 +283,7 @@ g:vista_default_executive                              *g:vista_default_executiv
   See all the avaliable executives via `:echo g:vista#executives` .
 
 g:vista_executive_for                                      *g:vista_executive_for*
-                                                   *g:vista_{&filetype}_executive*
+
   Type: |Dict|
   Default: `{}`
 
@@ -311,7 +311,7 @@ g:vista_executive_for                                      *g:vista_executive_fo
       \ 'markdown': 'toc',
       \ }
 
-g:vista_{&filetype}_executive                      *g:vista_{&filetype}_executive*
+g:vista_{&filetype}_executive                   *g:vista_{&filetype}_executive*
 
   Type: |String|
   Default: `''`

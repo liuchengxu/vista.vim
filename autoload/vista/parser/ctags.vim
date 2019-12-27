@@ -38,7 +38,7 @@ function! s:LoadData(container, line) abort
 
   call s:Insert(t:vista.raw_by_kind, kind, line)
 
-  let picked = {'lnum': line.line, 'text': line.name }
+  let picked = {'lnum': line.line, 'text': get(line, 'name', '') }
 
   if kind =~# '^f' || kind =~# '^m'
     if has_key(line, 'signature')
