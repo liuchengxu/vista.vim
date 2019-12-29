@@ -75,7 +75,7 @@ endfunction
 
 function! s:Render(data) abort
   if t:vista.provider ==# 'coc'
-    return vista#renderer#hir#Coc(a:data)
+    return vista#renderer#hir#lsp#Coc(a:data)
   elseif t:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default'
     return vista#renderer#default#Render()
   else

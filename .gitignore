@@ -1,1 +1,10 @@
 doc/tags
+tmp.*
+*.log
+
+test/data/184.cpp
+test/data/190.cpp
+
+.*
+
+!.github
