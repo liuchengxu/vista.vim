@@ -137,14 +137,18 @@ function! vista#RunForNearestMethodOrFunction() abort
   endif
 endfunction
 
-function! vista#RunTOC() abort
+function! vista#TryRunTOC() abort
   let executive = vista#GetExplicitExecutiveOrDefault()
   if executive ==# 'toc'
     let extension = &filetype
   else
     let extension = executive
   endif
-  call vista#extension#{extension}#Execute(v:false, v:true)
+  if index(g:vista#extensions, extension) > -1
+    call vista#extension#{extension}#Execute(v:false, v:true)
+  else
+    call vista#executive#{executive}#Execute(v:false, v:true, v:false)
+  endif
 endfunction
 
 " Main entrance to interact with vista.vim
