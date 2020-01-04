@@ -190,7 +190,7 @@ function! vista#(bang, ...) abort
       call vista#finder#fzf#ProjectRun()
     elseif a:1 ==# 'toc'
       if vista#HasTOCSupport()
-        call vista#RunTOC()
+        call vista#TryRunTOC()
       else
         return vista#error#For('Vista toc', &filetype)
       endif
