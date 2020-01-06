@@ -14,6 +14,7 @@ A clear and concise description of what the bug is.
 - OS: <!-- e.g. macOS, Ubuntu 18.04, Windows 10 -->
 - Vim/Neovim version: <!-- first two lines of `:version` command output -->
 - This plugin version: <!-- output of `git rev-parse origin/master` command -->
+- Ctags version: <!-- output of `ctags --version` command -->
 
 <!-- If this issue is related to ctags, please also provide the source file you run Vista on. -->
 
