@@ -14,8 +14,9 @@ let g:vista#extensions = vista#FindItemsUnderDirectory(s:cur_dir.'/vista/extensi
 
 let s:ignore_list = ['vista', 'vista_kind', 'nerdtree', 'startify', 'tagbar', 'fzf', 'gitcommit']
 
-" vimwiki supports the standard markdown syntax
-let s:toc_supported = ['markdown', 'rst', 'vimwiki']
+" vimwiki supports the standard markdown syntax.
+" pandoc supports the basic markdown format.
+let s:toc_supported = ['markdown', 'rst', 'vimwiki', 'pandoc']
 
 " Skip special buffers, filetypes.
 function! vista#ShouldSkip() abort

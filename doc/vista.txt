@@ -306,8 +306,10 @@ g:vista_executive_for                                      *g:vista_executive_fo
   use the builtin toc extension in vista.vim. For `toc`, it actuallys derives
   the extension using the `&filetype`.
   >
+  " Use the markdown extension for vimwiki and pandoc filetype.
   let g:vista_executive_for = {
       \ 'vimwiki': 'markdown',
+      \ 'pandoc': 'markdown',
       \ 'markdown': 'toc',
       \ }
 
