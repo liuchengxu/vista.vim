@@ -63,6 +63,9 @@ function! s:GetTagInfoFromLSPAndExtension() abort
 
   " TODO use range info of LSP symbols?
   if t:vista.provider ==# 'coc'
+    if has_key(t:vista, 'lnum2tag')
+      return [t:vista.lnum2tag[line('.')], v:true]
+    endif
     let tag = vista#util#Trim(raw_cur_line[:stridx(raw_cur_line, ':')-1])
     return [tag, v:true]
   elseif t:vista.provider ==# 'markdown' || t:vista.provider ==# 'rst'

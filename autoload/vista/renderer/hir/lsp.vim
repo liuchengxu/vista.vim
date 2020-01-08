@@ -3,20 +3,24 @@
 " vim: ts=2 sw=2 sts=2 et
 
 function! s:IntoLSPHirRow(row) abort
-  let indented = repeat(' ', a:row.level * 4).a:row.text
-  let kind = ' : '.vista#renderer#Decorate(a:row.kind)
+  let indent = repeat(' ', a:row.level * 2)
+  let text = a:row.text
+  let kind = a:row.kind
+  let icon = vista#renderer#IconFor(a:row.kind)
   let lnum = ':'.a:row.lnum
-  return indented.kind.lnum
+  return indent.icon.' '.text.' '.kind.lnum
 endfunction
 
 function! s:IntoLSPNonHirRow(row) abort
-  let indented = repeat(' ', 4).a:row.text
+  let indented = repeat(' ', 2).a:row.text
   let lnum = ':'.a:row.lnum
+  let t:vista.lnum2tag[len(s:rendered)+3] = a:row.text
   return indented.lnum
 endfunction
 
 function! s:RenderLSPHirAndThenGroupByKind(data) abort
-  let rendered = []
+  let t:vista.lnum2tag = {}
+  let s:rendered = []
   let level0 = {}
 
   let idx = 0
@@ -25,11 +29,13 @@ function! s:RenderLSPHirAndThenGroupByKind(data) abort
   for row in a:data
     if (row.level == 0 && idx+1 < len && a:data[idx+1].level > 0)
           \ || row.level > 0
-      call add(rendered, s:IntoLSPHirRow(row))
+      call add(s:rendered, s:IntoLSPHirRow(row))
+      let t:vista.lnum2tag[len(s:rendered)+2] = row.text
     endif
     if row.level > 0
       if idx+1 < len && a:data[idx+1].level == 0
-        call add(rendered, '')
+        call add(s:rendered, '')
+        let t:vista.lnum2tag[len(s:rendered)+2] = v:null
       endif
     else
       if idx+1 < len && a:data[idx+1].level == 0
@@ -44,16 +50,17 @@ function! s:RenderLSPHirAndThenGroupByKind(data) abort
   endfor
 
   for [kind, vs] in items(level0)
-    call add(rendered, vista#renderer#Decorate(kind))
-    call map(vs, 'add(rendered, s:IntoLSPNonHirRow(v:val))')
-    call add(rendered, '')
+    call add(s:rendered, vista#renderer#Decorate(kind))
+    call map(vs, 'add(s:rendered, s:IntoLSPNonHirRow(v:val))')
+    call add(s:rendered, '')
+    let t:vista.lnum2tag[len(s:rendered)+2] = v:null
   endfor
 
-  if empty(rendered[-1])
-    unlet rendered[-1]
+  if empty(s:rendered[-1])
+    unlet s:rendered[-1]
   endif
 
-  return rendered
+  return s:rendered
 endfunction
 
 " Render the content linewise.

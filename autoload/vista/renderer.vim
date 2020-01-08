@@ -99,6 +99,8 @@ function! vista#renderer#LSPPreprocess(lsp_result) abort
   let lines = []
   call map(a:lsp_result, 'vista#parser#lsp#KindToSymbol(v:val, lines)')
 
+  let t:vista.raw_data = copy(lines)
+
   let processed_data = {}
   let t:vista.functions = []
   call map(lines, 'vista#parser#lsp#ExtractSymbol(v:val, processed_data)')
