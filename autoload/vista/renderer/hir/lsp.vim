@@ -15,11 +15,14 @@ function! s:IntoLSPNonHirRow(row) abort
   let indented = repeat(' ', 2).a:row.text
   let lnum = ':'.a:row.lnum
   let t:vista.lnum2tag[len(s:rendered)+3] = a:row.text
+  let t:vista.slnum2tlnum[a:row.lnum] = len(s:rendered)+3
   return indented.lnum
 endfunction
 
 function! s:RenderLSPHirAndThenGroupByKind(data) abort
   let t:vista.lnum2tag = {}
+  let t:vista.slnum2tlnum = {}
+
   let s:rendered = []
   let level0 = {}
 
@@ -31,6 +34,7 @@ function! s:RenderLSPHirAndThenGroupByKind(data) abort
           \ || row.level > 0
       call add(s:rendered, s:IntoLSPHirRow(row))
       let t:vista.lnum2tag[len(s:rendered)+2] = row.text
+      let t:vista.slnum2tlnum[row.lnum] = len(s:rendered)+2
     endif
     if row.level > 0
       if idx+1 < len && a:data[idx+1].level == 0

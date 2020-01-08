@@ -307,6 +307,10 @@ function! s:HasVlnum() abort
         \ && has_key(t:vista.raw[0], 'vlnum')
 endfunction
 
+function! vista#cursor#Hi(lnum, ensure_visible, ...) abort
+  call s:ApplyHighlight(a:lnum, a:ensure_visible, a:000)
+endfunction
+
 " Highlight the line given the line number and ensure it's visible if required.
 "
 " lnum - current line number in vista window
@@ -412,6 +416,11 @@ endfunction
 
 " This happens when you are in the window of source file
 function! vista#cursor#FindNearestMethodOrFunction() abort
+  if t:vista.provider ==# 'coc'
+    call vista#cursor#lsp#HiNearestSymbol()
+    return
+  endif
+
   if !exists('t:vista')
         \ || !has_key(t:vista, 'functions')
         \ || bufnr('') != t:vista.source.bufnr
