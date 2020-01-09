@@ -441,6 +441,13 @@ g:vista#renderer#ctags                                    *g:vista#renderer#ctag
   `kind`    - render tags kindwise.
   `line`    - render tags linewise.
 
+g:vista_no_mappings                                          *g:vista_no_mappings*
+
+  Type: |Number|
+  Default: `0`
+
+  Disable the default mappings.
+
 --------------------------------------------------------------------------------
 Key Mappings                                                  *vista-key-mappings*
 
