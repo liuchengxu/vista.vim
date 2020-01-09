@@ -307,8 +307,8 @@ function! s:HasVlnum() abort
         \ && has_key(t:vista.raw[0], 'vlnum')
 endfunction
 
-function! vista#cursor#Hi(lnum, ensure_visible, ...) abort
-  call s:ApplyHighlight(a:lnum, a:ensure_visible, a:000)
+function! vista#cursor#Hi(lnum, ensure_visible) abort
+  call s:ApplyHighlight(a:lnum, a:ensure_visible)
 endfunction
 
 " Highlight the line given the line number and ensure it's visible if required.

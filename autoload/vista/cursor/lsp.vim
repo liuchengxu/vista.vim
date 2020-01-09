@@ -17,10 +17,15 @@ function! s:HiNearestSymbol(_timer) abort
   if !exists('t:vista')
     return
   endif
+
   let winnr = t:vista.winnr()
 
-  if has_key(t:vista.slnum2tlnum, line('.'))
-    let tlnum = t:vista.slnum2tlnum[line('.')]
+  let cur_lnum = line('.')
+
+  " TODO: find nearest symbol
+
+  if has_key(t:vista.slnum2tlnum, cur_lnum)
+    let tlnum = t:vista.slnum2tlnum[cur_lnum]
     call vista#WinExecute(winnr, function('vista#cursor#Hi'), tlnum, v:true)
   endif
 endfunction
