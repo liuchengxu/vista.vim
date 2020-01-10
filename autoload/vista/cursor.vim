@@ -416,7 +416,7 @@ endfunction
 
 " This happens when you are in the window of source file
 function! vista#cursor#FindNearestMethodOrFunction() abort
-  if t:vista.provider ==# 'coc'
+  if t:vista.provider ==# 'coc' && bufnr('') == t:vista.source.bufnr
     call vista#cursor#lsp#HiNearestSymbol()
     return
   endif
