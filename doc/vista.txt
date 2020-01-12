@@ -329,6 +329,13 @@ g:vista_{&filetype}_executive                   *g:vista_{&filetype}_executive*
   " standard markdown syntax in vimwiki.
   let g:vista_vimwiki_executive = 'markdown'
 
+g:vista_ctags_executable                                *g:vista_ctags_executable*
+
+  Type: |String|
+  Default: `ctags`
+
+  The executable to run ctags.
+
 g:vista_ctags_cmd                                              *g:vista_ctags_cmd*
 
   Type: |Dictionary|
