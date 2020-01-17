@@ -101,7 +101,7 @@ function! vista#sidebar#Close() abort
 
   call s:ClearAugroups('VistaCoc', 'VistaCtags')
 
-  call vista#GenericCloseOverlay()
+  call vista#win#CloseFloating()
 endfunction
 
 function! s:ClearAugroups(...) abort

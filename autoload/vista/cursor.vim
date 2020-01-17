@@ -4,9 +4,6 @@
 
 scriptencoding utf8
 
-let s:has_floating_win = exists('*nvim_open_win')
-let s:has_popup = exists('*popup_create')
-
 let s:find_timer = -1
 let s:cursor_timer = -1
 let s:highlight_timer = -1
@@ -46,50 +43,6 @@ function! s:GetInfoUnderCursor() abort
   else
     return vista#cursor#lsp#GetInfo()
   endif
-endfunction
-
-function! s:DisplayInFloatingWin(...) abort
-  if s:has_popup
-    call call('vista#popup#DisplayAt', a:000)
-  elseif s:has_floating_win
-    call call('vista#floating#DisplayAt', a:000)
-  else
-    call vista#error#Need('neovim compiled with floating window support or vim compiled with popup feature')
-  endif
-endfunction
-
-" Show the detail of current tag/symbol under cursor.
-function! s:ShowDetail() abort
-  let [tag, source_line] = s:GetInfoUnderCursor()
-
-  if empty(tag) || empty(source_line)
-    echo "\r"
-    return
-  endif
-
-  let strategy = get(g:, 'vista_echo_cursor_strategy', 'echo')
-
-  let msg = vista#util#Truncate(source_line)
-  let lnum = s:GetTrailingLnum()
-
-  if strategy ==# s:echo_cursor_opts[0]
-    call vista#echo#EchoInCmdline(msg, tag)
-  elseif strategy ==# s:echo_cursor_opts[1]
-    call s:DisplayInFloatingWin(lnum, tag)
-  elseif strategy ==# s:echo_cursor_opts[2]
-    call vista#source#PeekSymbol(lnum, tag)
-  elseif strategy ==# s:echo_cursor_opts[3]
-    call vista#echo#EchoInCmdline(msg, tag)
-    if s:has_floating_win
-      call s:DisplayInFloatingWin(lnum, tag)
-    else
-      call vista#source#PeekSymbol(lnum, tag)
-    endif
-  else
-    call vista#error#InvalidOption('g:vista_echo_cursor_strategy', s:echo_cursor_opts)
-  endif
-
-  call vista#highlight#Add(line('.'), v:false, tag)
 endfunction
 
 function! s:Compare(s1, s2) abort
@@ -213,34 +166,40 @@ function! vista#cursor#NearestSymbol() abort
   return vista#util#BinarySearch(t:vista.raw, line('.'), 'line', 'name')
 endfunction
 
-" Show the folded content if in a closed fold.
-function! s:ShowFoldedDetailIsOk() abort
-  if foldclosed('.') != -1
-    if s:has_floating_win || s:has_popup
-      let foldclosed_end = foldclosedend('.')
-      let curlnum = line('.')
-      let lines = getbufline(t:vista.bufnr, curlnum, foldclosed_end)
-
-      if s:has_floating_win
-        call vista#floating#DisplayRawAt(curlnum, lines)
-      elseif s:has_popup
-        call vista#popup#DisplayRawAt(curlnum, lines)
-      endif
-
-      return v:true
-    endif
-  endif
-  return v:false
-endfunction
-
+" Show the detail of current tag/symbol under cursor.
 function! vista#cursor#ShowDetail(_timer) abort
   if empty(getline('.'))
         \ || vista#echo#EchoScopeInCmdlineIsOk()
-        \ || s:ShowFoldedDetailIsOk()
+        \ || vista#win#ShowFoldedDetailInFloatingIsOk()
     return
   endif
 
-  call s:ShowDetail()
+  let [tag, source_line] = s:GetInfoUnderCursor()
+
+  if empty(tag) || empty(source_line)
+    echo "\r"
+    return
+  endif
+
+  let strategy = get(g:, 'vista_echo_cursor_strategy', 'echo')
+
+  let msg = vista#util#Truncate(source_line)
+  let lnum = s:GetTrailingLnum()
+
+  if strategy ==# s:echo_cursor_opts[0]
+    call vista#echo#EchoInCmdline(msg, tag)
+  elseif strategy ==# s:echo_cursor_opts[1]
+    call vista#win#FloatingDisplay(lnum, tag)
+  elseif strategy ==# s:echo_cursor_opts[2]
+    call vista#source#PeekSymbol(lnum, tag)
+  elseif strategy ==# s:echo_cursor_opts[3]
+    call vista#echo#EchoInCmdline(msg, tag)
+    call vista#win#FloatingDisplayOrPeek(msg, tag)
+  else
+    call vista#error#InvalidOption('g:vista_echo_cursor_strategy', s:echo_cursor_opts)
+  endif
+
+  call vista#highlight#Add(line('.'), v:false, tag)
 endfunction
 
 function! vista#cursor#ShowDetailWithDelay() abort
@@ -304,7 +263,7 @@ endfunction
 function! vista#cursor#TogglePreview() abort
   if get(t:vista, 'floating_visible', v:false)
         \ || get(t:vista, 'popup_visible', v:false)
-    call vista#GenericCloseOverlay()
+    call vista#win#CloseFloating()
     return
   endif
 
@@ -317,5 +276,5 @@ function! vista#cursor#TogglePreview() abort
 
   let lnum = s:GetTrailingLnum()
 
-  call s:DisplayInFloatingWin(lnum, tag)
+  call vista#win#FloatingDisplay(lnum, tag)
 endfunction
