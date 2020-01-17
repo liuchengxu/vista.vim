@@ -7,7 +7,7 @@
 " lnum - current line number in vista window
 " ensure_visible - kepp this line visible
 " optional: tag - accurate tag
-function! vista#highlight#Add(lnum, ensure_visible, ...) abort
+function! vista#highlight#Add(lnum, ensure_visible, tag) abort
   if exists('w:vista_highlight_id')
     call matchdelete(w:vista_highlight_id)
     unlet w:vista_highlight_id
@@ -25,8 +25,8 @@ function! vista#highlight#Add(lnum, ensure_visible, ...) abort
     " based on the starting point.
     "
     " start is 0-based, while the column used in matchstrpos is 1-based.
-    if a:0 == 1
-      let hi_pos = [a:lnum, start+1, strlen(a:1)]
+    if !empty(a:tag)
+      let hi_pos = [a:lnum, start+1, strlen(a:tag)]
     else
       let [_, end, _] = matchstrpos(cur_line, ':\d\+$')
       let hi_pos = [a:lnum, start+1, end - start]

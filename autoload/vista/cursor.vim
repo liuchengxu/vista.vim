@@ -104,11 +104,7 @@ function! s:HighlightNearestTag(_timer) abort
   let s:last_vlnum = s:vlnum
 
   let tag = get(found, 'name', v:null)
-  if !empty(tag)
-    call vista#WinExecute(winnr, function('vista#highlight#Add'), s:vlnum, v:true, tag)
-  else
-    call vista#WinExecute(winnr, function('vista#highlight#Add'), s:vlnum, v:true)
-  endif
+  call vista#WinExecute(winnr, function('vista#highlight#Add'), s:vlnum, v:true, tag)
 endfunction
 
 " Fold or unfold when meets the top level tag line
@@ -227,11 +223,7 @@ function! vista#cursor#ShowTagFor(lnum) abort
   endif
 
   let tag = get(found, 'name', v:null)
-  if !empty(tag)
-    call vista#highlight#Add(s:vlnum, v:true, tag)
-  else
-    call vista#highlight#Add(s:vlnum, v:true)
-  endif
+  call vista#highlight#Add(s:vlnum, v:true, tag)
 endfunction
 
 function! vista#cursor#ShowTag() abort
