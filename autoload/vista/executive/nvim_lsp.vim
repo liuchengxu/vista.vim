@@ -51,6 +51,7 @@ EOF
 endfunction
 
 function! vista#executive#nvim_lsp#Run(_fpath) abort
+  " TODO: check if the LSP service is registered for fpath.
   return s:Run()
 endfunction
 

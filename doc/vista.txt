@@ -329,6 +329,13 @@ g:vista_{&filetype}_executive                   *g:vista_{&filetype}_executive*
   " standard markdown syntax in vimwiki.
   let g:vista_vimwiki_executive = 'markdown'
 
+g:vista_ctags_executable                                *g:vista_ctags_executable*
+
+  Type: |String|
+  Default: `ctags`
+
+  The executable to run ctags.
+
 g:vista_ctags_cmd                                              *g:vista_ctags_cmd*
 
   Type: |Dictionary|
@@ -440,6 +447,13 @@ g:vista#renderer#ctags                                    *g:vista#renderer#ctag
   `default` - render tags in nestest structure.
   `kind`    - render tags kindwise.
   `line`    - render tags linewise.
+
+g:vista_no_mappings                                          *g:vista_no_mappings*
+
+  Type: |Number|
+  Default: `0`
+
+  Disable the default mappings.
 
 --------------------------------------------------------------------------------
 Key Mappings                                                  *vista-key-mappings*

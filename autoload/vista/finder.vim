@@ -2,6 +2,8 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
+let s:is_nvim = has('nvim')
+
 " Could use the cached data?
 function! s:IsUsable(cache, fpath) abort
   return !empty(a:cache)
@@ -23,6 +25,11 @@ function! s:TryAlternatives(tried, fpath) abort
   let alternatives = filter(copy(executives), 'v:val != a:tried')
 
   for alternative in alternatives
+    " Do not try nvim_lsp until the related LSP service is registed for nvim_lsp
+    " otherwise it may cause the neovim hangs.
+    if s:is_nvim && alternative ==# 'nvim_lsp'
+      continue
+    endif
     let s:data = vista#executive#{alternative}#Run(a:fpath)
     if !empty(s:data)
       let s:cur_executive = alternative
