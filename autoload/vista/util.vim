@@ -95,7 +95,7 @@ function! s:SafeSetBufline(bufnr, lines) abort
 endfunction
 
 function! vista#util#SetBufline(bufnr, lines) abort
-  call vista#WinExecute(t:vista.winnr(), function('s:SafeSetBufline'), a:bufnr, a:lines)
+  call vista#win#Execute(t:vista.winnr(), function('s:SafeSetBufline'), a:bufnr, a:lines)
 endfunction
 
 function! vista#util#Join(...) abort

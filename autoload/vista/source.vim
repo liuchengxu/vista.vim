@@ -114,3 +114,19 @@ function! vista#source#Update(bufnr, winnr, ...) abort
     let t:vista.source.fpath = a:2
   endif
 endfunction
+
+function! s:ApplyPeek(lnum, tag) abort
+  silent execute 'normal!' a:lnum.'z.'
+  let [_, start, _] = matchstrpos(getline('.'), a:tag)
+  call vista#util#Blink(1, 100, [a:lnum, start+1, strlen(a:tag)])
+endfunction
+
+if exists('*win_execute')
+  function! vista#source#PeekSymbol(lnum, tag) abort
+    call win_execute(bufwinid(t:vista.source.bufnr), 'noautocmd call s:ApplyPeek(a:lnum, a:tag)')
+  endfunction
+else
+  function! vista#source#PeekSymbol(lnum, tag) abort
+    call vista#win#Execute(t:vista.source.winnr(), function('s:ApplyPeek'), a:lnum, a:tag)
+  endfunction
+endif

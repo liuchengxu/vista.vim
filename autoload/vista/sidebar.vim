@@ -101,7 +101,7 @@ function! vista#sidebar#Close() abort
 
   call s:ClearAugroups('VistaCoc', 'VistaCtags')
 
-  call vista#GenericCloseOverlay()
+  call vista#win#CloseFloating()
 endfunction
 
 function! s:ClearAugroups(...) abort
@@ -125,7 +125,7 @@ function! vista#sidebar#Open() abort
   endif
 endfunction
 
-function! vista#sidebar#IsVisible() abort
+function! vista#sidebar#IsOpen() abort
   return bufwinnr('__vista__') != -1
 endfunction
 
@@ -143,7 +143,7 @@ function! vista#sidebar#ToggleFocus() abort
 endfunction
 
 function! vista#sidebar#Toggle() abort
-  if vista#sidebar#IsVisible()
+  if vista#sidebar#IsOpen()
     call vista#sidebar#Close()
   else
     call vista#sidebar#Open()

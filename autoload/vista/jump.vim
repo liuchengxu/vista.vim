@@ -31,7 +31,7 @@ function! vista#jump#TagLine(tag) abort
 
   call call('vista#util#Blink', get(g:, 'vista_top_level_blink', [2, 100]))
 
-  call vista#GenericCloseOverlay()
+  call vista#win#CloseFloating()
 
   if get(g:, 'vista_close_on_jump', 0)
     call vista#sidebar#Close()
@@ -79,11 +79,11 @@ function! s:ApplyJump(lnum) abort
 endfunction
 
 function! vista#jump#NextTopLevel() abort
-  call vista#GenericCloseOverlay()
+  call vista#win#CloseFloating()
   call s:ApplyJump(s:NextTopLevelLnum())
 endfunction
 
 function! vista#jump#PrevTopLevel() abort
-  call vista#GenericCloseOverlay()
+  call vista#win#CloseFloating()
   call s:ApplyJump(s:PrevTopLevelLnum())
 endfunction
