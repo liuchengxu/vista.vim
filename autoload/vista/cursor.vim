@@ -37,102 +37,15 @@ function! s:StopHighlightTimer() abort
   call s:GenericStopTimer('s:highlight_timer')
 endfunction
 
-function! s:RemoveVisibility(tag) abort
-  if index(['+', '~', '-'], a:tag[0]) > -1
-    return a:tag[1:]
-  else
-    return a:tag
-  endif
-endfunction
-
-" Try matching the exact tag given the trimmed line in the vista window.
-function! s:MatchTag(trimmed_line) abort
-  " Since we include the space ` `, we need to trim the result later.
-  " / --> github.com/golang/dep/gps:11
-  if t:vista.provider ==# 'markdown'
-    let matched = matchlist(a:trimmed_line, '\([a-zA-Z:#_.,/<> ]\-\+\)\(H\d:\d\+\)$')
-  else
-    let matched = matchlist(a:trimmed_line, '\([a-zA-Z:#_.,/<> ]\-\+\):\(\d\+\)$')
-  endif
-
-  return get(matched, 1, '')
-endfunction
-
-function! s:GetTagInfoFromLSPAndExtension() abort
-  let raw_cur_line = getline('.')
-
-  " TODO use range info of LSP symbols?
-  if t:vista.provider ==# 'coc'
-    let tag = vista#util#Trim(raw_cur_line[:stridx(raw_cur_line, ':')-1])
-    return [tag, v:true]
-  elseif t:vista.provider ==# 'markdown' || t:vista.provider ==# 'rst'
-    if line('.') < 3
-      return [v:null, v:true]
-    endif
-    " The first two lines are for displaying fpath. the lnum is 1-based, while
-    " idex is 0-based.
-    " So it's line('.') - 3 instead of line('.').
-    let tag = vista#extension#{t:vista.provider}#GetHeader(line('.')-3)
-    if tag is# v:null
-      return [v:null, v:true]
-    endif
-    return [tag, v:true]
-  endif
-
-  return [v:null, v:false]
-endfunction
-
 " Get tag and corresponding source line at current cursor position.
 "
 " Return: [tag, source_line]
 function! s:GetInfoUnderCursor() abort
-  let raw_cur_line = getline('.')
-
-  if empty(raw_cur_line)
-    return [v:null, v:null]
+  if t:vista.provider ==# 'ctags'
+    return vista#cursor#ctags#GetInfo()
+  else
+    return vista#cursor#lsp#GetInfo()
   endif
-
-  " tag like s:StopCursorTimer has `:`, so we can't simply use split(tag, ':')
-  let last_semicoln_idx = strridx(raw_cur_line, ':')
-  let lnum = raw_cur_line[last_semicoln_idx+1:]
-
-  let source_line = t:vista.source.line_trimmed(lnum)
-  if empty(source_line)
-    return [v:null, v:null]
-  endif
-
-  let [tag, should_return] = s:GetTagInfoFromLSPAndExtension()
-  if should_return
-    return tag is# v:null ? [v:null, v:null] : [tag, source_line]
-  endif
-
-  " For scoped tag
-  " Currently vlnum_cache is ctags provider only.
-  if has_key(t:vista, 'vlnum_cache') && t:vista.provider ==# 'ctags'
-    let tagline = t:vista.get_tagline_under_cursor()
-    if !empty(tagline)
-      return [tagline.name, source_line]
-    endif
-  endif
-
-  " For scopeless tag
-  " peer_ilog(PEER,FORMAT,...):90
-  let trimmed_line = vista#util#Trim(raw_cur_line)
-  let left_parenthsis_idx = stridx(trimmed_line, '(')
-  if left_parenthsis_idx > -1
-    " Ignore the visibility symbol, e.g., +test2()
-    let tag = s:RemoveVisibility(trimmed_line[0 : left_parenthsis_idx-1])
-    return [tag, source_line]
-  endif
-
-  let tag = s:MatchTag(trimmed_line)
-  if empty(tag)
-    let tag = raw_cur_line[:last_semicoln_idx-1]
-  endif
-
-  let tag = s:RemoveVisibility(vista#util#Trim(tag))
-
-  return [tag, source_line]
 endfunction
 
 function! s:EchoScope(scope) abort
