@@ -89,7 +89,7 @@ function! s:ShowDetail() abort
     call vista#error#InvalidOption('g:vista_echo_cursor_strategy', s:echo_cursor_opts)
   endif
 
-  call s:ApplyHighlight(line('.'), v:false, tag)
+  call vista#highlight#Add(line('.'), v:false, tag)
 endfunction
 
 function! s:Compare(s1, s2) abort
@@ -123,44 +123,6 @@ function! s:HasVlnum() abort
         \ && has_key(t:vista.raw[0], 'vlnum')
 endfunction
 
-" Highlight the line given the line number and ensure it's visible if required.
-"
-" lnum - current line number in vista window
-" ensure_visible - kepp this line visible
-" optional: tag - accurate tag
-function! s:ApplyHighlight(lnum, ensure_visible, ...) abort
-  if exists('w:vista_highlight_id')
-    call matchdelete(w:vista_highlight_id)
-    unlet w:vista_highlight_id
-  endif
-
-  if get(g:, 'vista_highlight_whole_line', 0)
-    let hi_pos = a:lnum
-  else
-    let cur_line = getline(a:lnum)
-    " Current line may contains +,-,~, use `\S` is incorrect to find the right
-    " starting postion.
-    let [_, start, _] = matchstrpos(cur_line, '[a-zA-Z0-9_,#:]')
-
-    " If we know the tag, then what we have to do is to use the length of tag
-    " based on the starting point.
-    "
-    " start is 0-based, while the column used in matchstrpos is 1-based.
-    if a:0 == 1
-      let hi_pos = [a:lnum, start+1, strlen(a:1)]
-    else
-      let [_, end, _] = matchstrpos(cur_line, ':\d\+$')
-      let hi_pos = [a:lnum, start+1, end - start]
-    endif
-  endif
-
-  let w:vista_highlight_id = matchaddpos('IncSearch', [hi_pos])
-
-  if a:ensure_visible
-    execute 'normal!' a:lnum.'z.'
-  endif
-endfunction
-
 " Highlight the nearest tag in the vista window.
 function! s:HighlightNearestTag(_timer) abort
   if !exists('t:vista')
@@ -190,9 +152,9 @@ function! s:HighlightNearestTag(_timer) abort
 
   let tag = get(found, 'name', v:null)
   if !empty(tag)
-    call vista#WinExecute(winnr, function('s:ApplyHighlight'), s:vlnum, v:true, tag)
+    call vista#WinExecute(winnr, function('vista#highlight#Add'), s:vlnum, v:true, tag)
   else
-    call vista#WinExecute(winnr, function('s:ApplyHighlight'), s:vlnum, v:true)
+    call vista#WinExecute(winnr, function('vista#highlight#Add'), s:vlnum, v:true)
   endif
 endfunction
 
@@ -307,9 +269,9 @@ function! vista#cursor#ShowTagFor(lnum) abort
 
   let tag = get(found, 'name', v:null)
   if !empty(tag)
-    call s:ApplyHighlight(s:vlnum, v:true, tag)
+    call vista#highlight#Add(s:vlnum, v:true, tag)
   else
-    call s:ApplyHighlight(s:vlnum, v:true)
+    call vista#highlight#Add(s:vlnum, v:true)
   endif
 endfunction
 
