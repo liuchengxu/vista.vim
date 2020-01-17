@@ -2,28 +2,28 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
-function! s:GetTagInfoFromLSPAndExtension() abort
+function! s:GetInfoFromLSPAndExtension() abort
   let raw_cur_line = getline('.')
 
   " TODO use range info of LSP symbols?
   if t:vista.provider ==# 'coc'
     let tag = vista#util#Trim(raw_cur_line[:stridx(raw_cur_line, ':')-1])
-    return [tag, v:true]
+    return tag
   elseif t:vista.provider ==# 'markdown' || t:vista.provider ==# 'rst'
     if line('.') < 3
-      return [v:null, v:true]
+      return v:null
     endif
     " The first two lines are for displaying fpath. the lnum is 1-based, while
     " idex is 0-based.
     " So it's line('.') - 3 instead of line('.').
     let tag = vista#extension#{t:vista.provider}#GetHeader(line('.')-3)
     if tag is# v:null
-      return [v:null, v:true]
+      return v:null
     endif
-    return [tag, v:true]
+    return tag
   endif
 
-  return [v:null, v:false]
+  return v:null
 endfunction
 
 function! vista#cursor#lsp#GetInfo() abort
@@ -42,10 +42,7 @@ function! vista#cursor#lsp#GetInfo() abort
     return [v:null, v:null]
   endif
 
-  let [tag, should_return] = s:GetTagInfoFromLSPAndExtension()
-  if should_return
-    return tag is# v:null ? [v:null, v:null] : [tag, source_line]
-  endif
+  let tag = s:GetInfoFromLSPAndExtension()
 
-  return [v:null, v:null]
+  return [tag, source_line]
 endfunction
