@@ -83,7 +83,7 @@ endfunction
 function! vista#executive#coc#Run(_fpath) abort
   if exists('*CocAction')
     call vista#SetProvider(s:provider)
-    call vista#WinExecute(t:vista.source.winnr(), function('s:Run'))
+    call vista#win#Execute(t:vista.source.winnr(), function('s:Run'))
     return s:data
   endif
 endfunction

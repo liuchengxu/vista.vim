@@ -50,3 +50,23 @@ function! vista#win#FloatingDisplayOrPeek(lnum, tag) abort
     call vista#source#PeekSymbol(a:lnum, a:tag)
   endif
 endfunction
+
+" call Run in the window win unsilently, unlike win_execute() which uses
+" silent by default.
+"
+" CocAction only fetch symbols for current document, no way for specify the other at the moment.
+" workaround for #52
+"
+" see also #71
+function! vista#win#Execute(winnr, Run, ...) abort
+  if winnr() != a:winnr
+    noautocmd execute a:winnr.'wincmd w'
+    let l:switch_back = 1
+  endif
+
+  call call(a:Run, a:000)
+
+  if exists('l:switch_back')
+    noautocmd wincmd p
+  endif
+endfunction

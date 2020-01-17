@@ -48,26 +48,6 @@ function! vista#OnExecute(provider, AUF) abort
   call vista#autocmd#Init('Vista'.vista#util#ToCamelCase(a:provider), a:AUF)
 endfunction
 
-" call Run in the window win unsilently, unlike win_execute() which uses
-" silent by default.
-"
-" CocAction only fetch symbols for current document, no way for specify the other at the moment.
-" workaround for #52
-"
-" see also #71
-function! vista#WinExecute(winnr, Run, ...) abort
-  if winnr() != a:winnr
-    noautocmd execute a:winnr.'wincmd w'
-    let l:switch_back = 1
-  endif
-
-  call call(a:Run, a:000)
-
-  if exists('l:switch_back')
-    noautocmd wincmd p
-  endif
-endfunction
-
 " Sort the items under some kind alphabetically.
 function! vista#Sort() abort
   if !has_key(t:vista, 'sort')
@@ -190,7 +170,7 @@ function! vista#(bang, ...) abort
     elseif a:1 ==# 'focus'
       call vista#sidebar#ToggleFocus()
     elseif a:1 ==# 'show'
-      if vista#sidebar#IsVisible()
+      if vista#sidebar#IsOpen()
         call vista#cursor#ShowTag()
       else
         call vista#sidebar#Open()

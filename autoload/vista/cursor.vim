@@ -64,7 +64,7 @@ function! s:FindNearestMethodOrFunction(_timer) abort
 
   call s:StopHighlightTimer()
 
-  if vista#sidebar#IsVisible()
+  if vista#sidebar#IsOpen()
     let s:highlight_timer = timer_start(200, function('s:HighlightNearestTag'))
   endif
 endfunction
@@ -104,7 +104,7 @@ function! s:HighlightNearestTag(_timer) abort
   let s:last_vlnum = s:vlnum
 
   let tag = get(found, 'name', v:null)
-  call vista#WinExecute(winnr, function('vista#highlight#Add'), s:vlnum, v:true, tag)
+  call vista#win#Execute(winnr, function('vista#highlight#Add'), s:vlnum, v:true, tag)
 endfunction
 
 " Fold or unfold when meets the top level tag line

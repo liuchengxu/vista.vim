@@ -127,6 +127,6 @@ if exists('*win_execute')
   endfunction
 else
   function! vista#source#PeekSymbol(lnum, tag) abort
-    call vista#WinExecute(t:vista.source.winnr(), function('s:ApplyPeek'), a:lnum, a:tag)
+    call vista#win#Execute(t:vista.source.winnr(), function('s:ApplyPeek'), a:lnum, a:tag)
   endfunction
 endif
