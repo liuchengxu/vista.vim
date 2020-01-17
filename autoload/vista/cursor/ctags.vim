@@ -1,3 +1,7 @@
+" Copyright (c) 2019 Liu-Cheng Xu
+" MIT License
+" vim: ts=2 sw=2 sts=2 et
+
 " Try matching the exact tag given the trimmed line in the vista window.
 function! s:MatchTag(trimmed_line) abort
   " Since we include the space ` `, we need to trim the result later.
