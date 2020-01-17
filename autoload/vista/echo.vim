@@ -31,6 +31,20 @@ function! s:TryParseAndEchoScope() abort
   endif
 endfunction
 
+function! vista#echo#EchoScopeInCmdlineIsOk() abort
+  let cur_line = getline('.')
+  if cur_line[-1:] ==# ']'
+    let splitted = split(cur_line)
+    " Join the scope parts in case of they contains spaces, e.g., structure names
+    let scope = join(splitted[1:-2], ' ')
+    let cnt = matchstr(splitted[-1], '\d\+')
+    call s:EchoScope(scope)
+    echohl Keyword | echon cnt | echohl NONE
+    return v:true
+  endif
+  return v:false
+endfunction
+
 function! vista#echo#EchoScopeFromCacheIsOk() abort
   if has_key(t:vista, 'vlnum_cache')
     " should exclude the first two lines and keep in mind that the 1-based and
