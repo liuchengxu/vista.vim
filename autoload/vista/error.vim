@@ -44,7 +44,7 @@ endfunction
 function! vista#error#For(cmd, filetype) abort
   call s:Echo('ErrorMsg', '[vista.vim]')
   call s:Echon('Underlined', ' '.a:cmd)
-  call s:Echon('Normal', ' only exists in '.a:filetype.' filetype.')
+  call s:Echon('Normal', ' does not support '.a:filetype.' filetype.')
 endfunction
 
 function! vista#error#InvalidOption(opt, ...) abort

@@ -14,8 +14,9 @@ let g:vista#extensions = vista#FindItemsUnderDirectory(s:cur_dir.'/vista/extensi
 
 let s:ignore_list = ['vista', 'vista_kind', 'nerdtree', 'startify', 'tagbar', 'fzf', 'gitcommit']
 
-" vimwiki supports the standard markdown syntax
-let s:toc_supported = ['markdown', 'rst', 'vimwiki']
+" vimwiki supports the standard markdown syntax.
+" pandoc supports the basic markdown format.
+let s:toc_supported = ['markdown', 'rst', 'vimwiki', 'pandoc']
 
 " Skip special buffers, filetypes.
 function! vista#ShouldSkip() abort
@@ -45,26 +46,6 @@ endfunction
 function! vista#OnExecute(provider, AUF) abort
   call vista#SetProvider(a:provider)
   call vista#autocmd#Init('Vista'.vista#util#ToCamelCase(a:provider), a:AUF)
-endfunction
-
-" call Run in the window win unsilently, unlike win_execute() which uses
-" silent by default.
-"
-" CocAction only fetch symbols for current document, no way for specify the other at the moment.
-" workaround for #52
-"
-" see also #71
-function! vista#WinExecute(winnr, Run, ...) abort
-  if winnr() != a:winnr
-    noautocmd execute a:winnr.'wincmd w'
-    let l:switch_back = 1
-  endif
-
-  call call(a:Run, a:000)
-
-  if exists('l:switch_back')
-    noautocmd wincmd p
-  endif
 endfunction
 
 " Sort the items under some kind alphabetically.
@@ -115,14 +96,6 @@ function! vista#GetExplicitExecutiveOrDefault() abort
   endif
 
   return executive
-endfunction
-
-function! vista#GenericCloseOverlay() abort
-  if exists('*nvim_open_win')
-    call vista#floating#Close()
-  elseif exists('*popup_create')
-    call vista#popup#Close()
-  endif
 endfunction
 
 " Used for running vista.vim on startup
@@ -190,14 +163,14 @@ function! vista#(bang, ...) abort
       call vista#finder#fzf#ProjectRun()
     elseif a:1 ==# 'toc'
       if vista#HasTOCSupport()
-        call vista#RunTOC()
+        call vista#TryRunTOC()
       else
         return vista#error#For('Vista toc', &filetype)
       endif
     elseif a:1 ==# 'focus'
       call vista#sidebar#ToggleFocus()
     elseif a:1 ==# 'show'
-      if vista#sidebar#IsVisible()
+      if vista#sidebar#IsOpen()
         call vista#cursor#ShowTag()
       else
         call vista#sidebar#Open()

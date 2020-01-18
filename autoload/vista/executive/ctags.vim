@@ -356,7 +356,7 @@ endfunction
 function! s:Dispatch(F, ...) abort
   let custom_cmd = s:GetCustomCmd(&filetype)
 
-  let exe = custom_cmd isnot v:null ? split(custom_cmd)[0] : 'ctags'
+  let exe = custom_cmd isnot v:null ? split(custom_cmd)[0] : s:ctags
 
   if !executable(exe)
     call vista#error#Need(exe)

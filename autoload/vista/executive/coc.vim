@@ -28,10 +28,9 @@ function! s:Cb(error, response) abort
   if empty(a:error)
     " Refer to coc.nvim 79cb11e
     " No document symbol provider exists when response is null.
-    if a:response is# v:null
-      return
+    if a:response isnot v:null
+      call s:Extract(a:response)
     endif
-    call s:Extract(a:response)
   else
     call vista#error#Notify("Error when calling CocActionAsync('documentSymbols'): ".string(a:error))
   endif
@@ -84,7 +83,7 @@ endfunction
 function! vista#executive#coc#Run(_fpath) abort
   if exists('*CocAction')
     call vista#SetProvider(s:provider)
-    call vista#WinExecute(t:vista.source.winnr(), function('s:Run'))
+    call vista#win#Execute(t:vista.source.winnr(), function('s:Run'))
     return s:data
   endif
 endfunction

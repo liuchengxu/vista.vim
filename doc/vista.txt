@@ -306,8 +306,10 @@ g:vista_executive_for                                      *g:vista_executive_fo
   use the builtin toc extension in vista.vim. For `toc`, it actuallys derives
   the extension using the `&filetype`.
   >
+  " Use the markdown extension for vimwiki and pandoc filetype.
   let g:vista_executive_for = {
       \ 'vimwiki': 'markdown',
+      \ 'pandoc': 'markdown',
       \ 'markdown': 'toc',
       \ }
 
@@ -326,6 +328,13 @@ g:vista_{&filetype}_executive                   *g:vista_{&filetype}_executive*
   " Use the markdown extension for vimwiki as if you are using the
   " standard markdown syntax in vimwiki.
   let g:vista_vimwiki_executive = 'markdown'
+
+g:vista_ctags_executable                                *g:vista_ctags_executable*
+
+  Type: |String|
+  Default: `ctags`
+
+  The executable to run ctags.
 
 g:vista_ctags_cmd                                              *g:vista_ctags_cmd*
 
@@ -438,6 +447,13 @@ g:vista#renderer#ctags                                    *g:vista#renderer#ctag
   `default` - render tags in nestest structure.
   `kind`    - render tags kindwise.
   `line`    - render tags linewise.
+
+g:vista_no_mappings                                          *g:vista_no_mappings*
+
+  Type: |Number|
+  Default: `0`
+
+  Disable the default mappings.
 
 --------------------------------------------------------------------------------
 Key Mappings                                                  *vista-key-mappings*
