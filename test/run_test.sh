@@ -35,8 +35,6 @@ for t in ${TESTS}; do
 
   TESTLOGDIR=$(pwd)/logs/$t
 
-  echo "t:" "$"t
-  echo "T:" "$T"
   if ${RUN_TEST} --cmd "$AVOID_E325" "$t" "$T" && [ -f "$t.res" ]; then
     echo "%PASS: $t PASSED"
   else
