@@ -110,11 +110,16 @@ endfunction
 function! s:IntoRow(icon, kind, item) abort
   let line = t:vista.source.line_trimmed(a:item.lnum)
   let lnum_and_text = printf('%s:%s', a:item.lnum, a:item.text)
-  return printf('%s %s%s  [%s]%s  %s',
-        \ a:icon,
+  let row = printf('%s%s  [%s]%s  %s',
         \ lnum_and_text, repeat(' ', s:max_len_lnum_and_text- strwidth(lnum_and_text)),
         \ a:kind, repeat(' ', s:max_len_kind - strwidth(a:kind)),
         \ line)
+
+  if a:icon !=# ''
+    let row = printf('%s %s', a:icon, row)
+  endif
+
+  return row
 endfunction
 
 function! s:RenderGroupedData(grouped_data) abort
