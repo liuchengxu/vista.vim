@@ -64,9 +64,17 @@ function! vista#finder#fzf#extract(line) abort
   let icon_lnum_tag = split(a:line, '[')[0]
   " [a-zA-Z:#_.,<>]
   " matching tag can't contain whitespace, but a tag does have a chance to contain whitespace?
-  let items = matchlist(icon_lnum_tag, '\(.*\) \(\d\+\):\([a-zA-Z:#_.,<>]*\)')
-  let lnum = items[2]
-  let tag = items[3]
+
+  if g:vista#renderer#enable_icon
+    let items = matchlist(icon_lnum_tag, '\(.*\) \(\d\+\):\([a-zA-Z:#_.,<>]*\)')
+    let lnum = items[2]
+    let tag = items[3]
+  else
+    let items = matchlist(icon_lnum_tag, '\(\d\+\):\([a-zA-Z:#_.,<>]*\)')
+    let lnum = items[1]
+    let tag = items[2]
+  end
+
   return [lnum, tag]
 endfunction
 
