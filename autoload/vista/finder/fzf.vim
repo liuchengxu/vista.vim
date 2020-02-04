@@ -66,13 +66,13 @@ function! vista#finder#fzf#extract(line) abort
   " matching tag can't contain whitespace, but a tag does have a chance to contain whitespace?
 
   if g:vista#renderer#enable_icon
-    let items = matchlist(icon_lnum_tag, '\(.*\) \(\d\+\):\([a-zA-Z:#_.,<>]*\)')
-    let lnum = items[2]
-    let tag = items[3]
-  else
-    let items = matchlist(icon_lnum_tag, '\(\d\+\):\([a-zA-Z:#_.,<>]*\)')
-    let lnum = items[1]
+    let items = matchlist(icon_lnum_tag, '\(.*\) \([a-zA-Z:#_.,<>]*\):\(\d\+\)')
     let tag = items[2]
+    let lnum = items[3]
+  else
+    let items = matchlist(icon_lnum_tag, '\([a-zA-Z:#_.,<>]*\):\(\d\+\)')
+    let tag = items[1]
+    let lnum = items[2]
   end
 
   return [lnum, tag]
@@ -156,10 +156,10 @@ function! vista#finder#fzf#Highlight() abort
     let idx += 1
   endfor
 
-  execute 'syntax match FZFVistaNumber /\s*\zs\d*\ze:\w/' 'contains=FZFVistaIcon,'.join(icon_groups, ',')
-  execute 'syntax match FZFVistaTag    /^[^\[]*\(\[\)\@=/' 'contains=FZFVistaNumber,FZFVistaIcon,'.join(icon_groups, ',')
-  syntax match FZFVistaScope  /^[^]]*]/ contains=FZFVistaTag,FZFVistaBracket
-  syntax match FZFVista /^[^│┌└]*/ contains=FZFVistaBracket,FZFVistaNumber,FZFVistaTag,FZFVistaScope
+  execute 'syntax match FZFVistaTag    /\s*.*\(:\d\)\@=/' 'contains=FZFVistaIcon,'.join(icon_groups, ',')
+  execute 'syntax match FZFVistaNumber /^[^\[]*\(\[\)\@=/' 'contains=FZFVistaTag,FZFVistaIcon,'.join(icon_groups, ',')
+  syntax match FZFVistaScope  /^[^]]*]/ contains=FZFVistaNumber,FZFVistaBracket
+  syntax match FZFVista /^[^│┌└]*/ contains=FZFVistaBracket,FZFVistaTag,FZFVistaNumber,FZFVistaScope
   syntax match FZFVistaBracket /\[\|\]/ contained
 
   hi default link FZFVistaBracket  SpecialKey

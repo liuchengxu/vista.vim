@@ -86,7 +86,7 @@ function! s:GroupByKindForLSPData(lsp_items) abort
   for item in a:lsp_items
     let s:max_len_kind = max([s:max_len_kind, strwidth(item.kind)])
 
-    let lnum_and_text = printf('%s:%s', item.lnum, item.text)
+    let lnum_and_text = printf('%s:%s', item.text, item.lnum)
     let s:max_len_lnum_and_text = max([s:max_len_lnum_and_text, strwidth(lnum_and_text)])
 
     if has_key(s:grouped, item.kind)
@@ -102,14 +102,14 @@ function! s:FindColumnBoundary(grouped_data) abort
   for [kind, vals] in items(a:grouped_data)
     let s:max_len_kind = max([s:max_len_kind, strwidth(kind)])
 
-    let sub_max = max(map(copy(vals), 'strwidth(printf(''%s:%s'', v:val.lnum, v:val.text))'))
+    let sub_max = max(map(copy(vals), 'strwidth(printf(''%s:%s'', v:val.text, v:val.lnum))'))
     let s:max_len_lnum_and_text = max([s:max_len_lnum_and_text, sub_max])
   endfor
 endfunction
 
 function! s:IntoRow(icon, kind, item) abort
   let line = t:vista.source.line_trimmed(a:item.lnum)
-  let lnum_and_text = printf('%s:%s', a:item.lnum, a:item.text)
+  let lnum_and_text = printf('%s:%s', a:item.text, a:item.lnum)
   let row = printf('%s%s  [%s]%s  %s',
         \ lnum_and_text, repeat(' ', s:max_len_lnum_and_text- strwidth(lnum_and_text)),
         \ a:kind, repeat(' ', s:max_len_kind - strwidth(a:kind)),
