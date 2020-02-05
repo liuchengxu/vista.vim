@@ -157,10 +157,10 @@ function! vista#finder#fzf#Highlight() abort
   endfor
 
   execute 'syntax match FZFVistaTag    /\s*.*\(:\d\)\@=/' 'contains=FZFVistaIcon,'.join(icon_groups, ',')
-  execute 'syntax match FZFVistaNumber /^[^\[]*\(\[\)\@=/' 'contains=FZFVistaTag,FZFVistaIcon,'.join(icon_groups, ',')
+  execute 'syntax match FZFVistaNumber /^[^\[]*\(\s\s\[\)\@=/' 'contains=FZFVistaTag,FZFVistaIcon,'.join(icon_groups, ',')
   syntax match FZFVistaScope  /^[^]]*]/ contains=FZFVistaNumber,FZFVistaBracket
   syntax match FZFVista /^[^│┌└]*/ contains=FZFVistaBracket,FZFVistaTag,FZFVistaNumber,FZFVistaScope
-  syntax match FZFVistaBracket /\[\|\]/ contained
+  syntax match FZFVistaBracket /\s\s\[\|\]\s\s/ contained
 
   hi default link FZFVistaBracket  SpecialKey
   hi default link FZFVistaNumber   Number
