@@ -19,6 +19,12 @@ function! s:Extract(symbols) abort
 
   if !empty(s:data)
     let [s:reload_only, s:should_display] = vista#renderer#LSPProcess(s:data, s:reload_only, s:should_display)
+
+    " Update cache when new data comes.
+    let s:cache = get(s:, 'cache', {})
+    let s:cache[s:fpath] = s:data
+    let s:cache.ftime = getftime(s:fpath)
+    let s:cache.bufnr = bufnr('')
   endif
 
   return s:data
@@ -51,6 +57,7 @@ endfunction
 
 function! s:Execute(bang, should_display) abort
   call vista#source#Update(bufnr('%'), winnr(), expand('%'), expand('%:p'))
+  let s:fpath = expand('%:p')
 
   if a:bang
     call s:Extract(CocAction('documentSymbols'))
@@ -74,15 +81,16 @@ function! s:Dispatch(F, ...) abort
 endfunction
 
 function! vista#executive#coc#Cache() abort
-  return get(s:, 'data', {})
+  return get(s:, 'cache', {})
 endfunction
 
 " Internal public APIs
 "
 " Run and RunAsync is for internal use.
-function! vista#executive#coc#Run(_fpath) abort
+function! vista#executive#coc#Run(fpath) abort
   if exists('*CocAction')
     call vista#SetProvider(s:provider)
+    let s:fpath = a:fpath
     call vista#win#Execute(t:vista.source.winnr(), function('s:Run'))
     return s:data
   endif
