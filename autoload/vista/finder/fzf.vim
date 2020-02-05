@@ -61,19 +61,20 @@ function! s:aligner.project_ctags() abort
 endfunction
 
 function! vista#finder#fzf#extract(line) abort
-  let icon_lnum_tag = split(a:line, '[')[0]
+  let icon_tag_lnum = split(a:line, '[')[0]
   " [a-zA-Z:#_.,<>]
   " matching tag can't contain whitespace, but a tag does have a chance to contain whitespace?
 
   if g:vista#renderer#enable_icon
-    let items = matchlist(icon_lnum_tag, '\(.*\) \([a-zA-Z:#_.,<>]*\):\(\d\+\)')
-    let tag = items[2]
-    let lnum = items[3]
+    " icon tag:lnum
+    let icon_stripped = join(split(icon_tag_lnum)[1:], ' ')
   else
-    let items = matchlist(icon_lnum_tag, '\([a-zA-Z:#_.,<>]*\):\(\d\+\)')
-    let tag = items[1]
-    let lnum = items[2]
+    let icon_stripped = icon_tag_lnum
   end
+
+  let items = matchlist(icon_stripped, '\([a-zA-Z:#_.,<>]*\):\(\d\+\)')
+  let tag = items[1]
+  let lnum = items[2]
 
   return [lnum, tag]
 endfunction
