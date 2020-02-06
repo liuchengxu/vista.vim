@@ -86,6 +86,7 @@ function! vista#finder#fzf#sink(line) abort
   call vista#source#GotoWin()
   call cursor(lnum, col)
   normal! zz
+  call call('vista#util#Blink', get(g:, 'vista_blink', [2, 100]))
 endfunction
 
 " Actually call fzf#run() with a highlighter given the opts
