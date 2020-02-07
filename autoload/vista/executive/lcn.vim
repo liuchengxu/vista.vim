@@ -9,7 +9,7 @@ let s:should_display = v:false
 
 let s:fetching = v:true
 
-function! s:Handler(output) abort
+function! s:HandleLSPResponse(output) abort
   let s:fetching = v:false
   if !has_key(a:output, 'result')
     call vista#error#Notify('No result via LanguageClient#textDocument_documentSymbol()')
@@ -18,10 +18,17 @@ function! s:Handler(output) abort
 
   let s:data = vista#renderer#LSPPreprocess(a:output.result)
   let [s:reload_only, s:should_display] = vista#renderer#LSPProcess(s:data, s:reload_only, s:should_display)
+
+  " Update cache when new data comes.
+  let s:cache = get(s:, 'cache', {})
+  let s:cache[s:fpath] = s:data
+  let s:cache.ftime = getftime(s:fpath)
+  let s:cache.bufnr = bufnr('')
 endfunction
 
 function! s:AutoUpdate(fpath) abort
   let s:reload_only = v:true
+  let s:fpath = a:fpath
   call s:RunAsync()
 endfunction
 
@@ -44,12 +51,13 @@ function! s:RunAsync() abort
           \ t:vista.source.winnr(),
           \ function('LanguageClient#textDocument_documentSymbol'),
           \ {'handle': v:false},
-          \ function('s:Handler')
+          \ function('s:HandleLSPResponse')
           \ )
   endif
 endfunction
 
-function! vista#executive#lcn#Run(_fpath) abort
+function! vista#executive#lcn#Run(fpath) abort
+  let s:fpath = a:fpath
   return s:Run()
 endfunction
 
@@ -70,5 +78,5 @@ function! vista#executive#lcn#Execute(bang, should_display, ...) abort
 endfunction
 
 function! vista#executive#lcn#Cache() abort
-  return get(s:, 'data', {})
+  return get(s:, 'cache', {})
 endfunction

@@ -10,6 +10,7 @@ let g:vista_executive_nvim_lsp_fetching = v:true
 
 function! s:AutoUpdate(fpath) abort
   let g:vista_executive_nvim_lsp_reload_only = v:true
+  let s:fpath = a:fpath
   call s:RunAsync()
 endfunction
 
@@ -26,6 +27,11 @@ endfunction
 
 function! vista#executive#nvim_lsp#SetData(data) abort
   let s:data = a:data
+  " Update cache when new data comes.
+  let s:cache = get(s:, 'cache', {})
+  let s:cache[s:fpath] = s:data
+  let s:cache.ftime = getftime(s:fpath)
+  let s:cache.bufnr = bufnr('')
 endfunction
 
 function! s:RunAsync() abort
@@ -73,5 +79,5 @@ function! vista#executive#nvim_lsp#Execute(bang, should_display, ...) abort
 endfunction
 
 function! vista#executive#nvim_lsp#Cache() abort
-  return get(s:, 'data', {})
+  return get(s:, 'cache', {})
 endfunction

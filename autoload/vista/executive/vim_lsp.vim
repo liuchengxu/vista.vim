@@ -22,11 +22,18 @@ function! s:Handler(_server, _req_id, _type, data) abort
   if !empty(s:data)
     let s:ever_done = v:true
     let [s:reload_only, s:should_display] = vista#renderer#LSPProcess(s:data, s:reload_only, s:should_display)
+
+    " Update cache when new data comes.
+    let s:cache = get(s:, 'cache', {})
+    let s:cache[s:fpath] = s:data
+    let s:cache.ftime = getftime(s:fpath)
+    let s:cache.bufnr = bufnr('')
   endif
 endfunction
 
 function! s:AutoUpdate(fpath) abort
   let s:reload_only = v:true
+  let s:fpath = a:fpath
   if s:HasAvaliableServers()
     call s:RunAsync()
   endif
@@ -63,7 +70,8 @@ function! s:RunAsync() abort
   endfor
 endfunction
 
-function! vista#executive#vim_lsp#Run(_fpath) abort
+function! vista#executive#vim_lsp#Run(fpath) abort
+  let s:fpath = a:fpath
   if s:HasAvaliableServers()
     return s:Run()
   endif
@@ -98,5 +106,5 @@ function! vista#executive#vim_lsp#Execute(bang, should_display, ...) abort
 endfunction
 
 function! vista#executive#vim_lsp#Cache() abort
-  return get(s:, 'data', {})
+  return get(s:, 'cache', {})
 endfunction

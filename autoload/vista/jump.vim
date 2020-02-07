@@ -29,7 +29,7 @@ function! vista#jump#TagLine(tag) abort
   call cursor(lnum, start > -1 ? start+1 : 1)
   normal! zz
 
-  call call('vista#util#Blink', get(g:, 'vista_top_level_blink', [2, 100]))
+  call call('vista#util#Blink', get(g:, 'vista_blink', [2, 100]))
 
   call vista#win#CloseFloating()
 

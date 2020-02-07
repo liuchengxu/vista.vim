@@ -7,7 +7,7 @@ let s:provider = fnamemodify(expand('<sfile>'), ':t:r')
 let s:reload_only = v:false
 let s:should_display = v:false
 
-function! s:Handler(data) abort
+function! s:HandleLSPData(data) abort
   let s:fetching = v:false
   if type(a:data) != v:t_dict
         \ || has_key(a:data, 'error')
@@ -20,11 +20,18 @@ function! s:Handler(data) abort
 
   if !empty(s:data)
     let [s:reload_only, s:should_display] = vista#renderer#LSPProcess(s:data, s:reload_only, s:should_display)
+
+    " Update cache when new data comes.
+    let s:cache = get(s:, 'cache', {})
+    let s:cache[s:fpath] = s:data
+    let s:cache.ftime = getftime(s:fpath)
+    let s:cache.bufnr = bufnr('')
   endif
 endfunction
 
 function! s:AutoUpdate(fpath) abort
   let s:reload_only = v:true
+  let s:fpath = a:fpath
   call s:RunAsync()
 endfunction
 
@@ -51,7 +58,7 @@ function! s:RunAsync() abort
     \   }
     \}
   let message = [0, method, params]
-  let Callback = function('s:Handler')
+  let Callback = function('s:HandleLSPData')
 
   for linter in linters
     call ale#lsp_linter#SendRequest(bufnr, linter, message, Callback)
@@ -60,11 +67,12 @@ function! s:RunAsync() abort
 endfunction
 
 function! vista#executive#ale#Cache() abort
-  return get(s:, 'data', {})
+  return get(s:, 'cache', {})
 endfunction
 
 function! vista#executive#ale#Run(fpath) abort
   if exists('g:loaded_ale_dont_use_this_in_other_plugins_please')
+    let s:fpath = a:fpath
     return s:Run()
   endif
 endfunction
