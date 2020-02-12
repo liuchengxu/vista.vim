@@ -20,7 +20,7 @@ syntax match VistaLineNr /\d\+$/
 syntax match VistaKind / \a*:\d*$/ contains=VistaColon,VistaLineNr
 syntax match VistaScopeKind / \a\+\ze:\d\+$/ contains=VistaArgs,VistaColon,VistaLineNr
 syntax match VistaScope /^\S.*$/ contains=VistaPrivate,VistaProtected,VistaPublic,VistaKind,VistaIcon,VistaParenthesis
-syntax region VistaTag start="^" end="$" contains=VistaPublic,VistaProtected,VistaPrivate,VistaArgs,VistaScope,VistaScopeKind,VistaLineNr,VistaColon
+syntax region VistaTag start="^" end="$" contains=VistaPublic,VistaProtected,VistaPrivate,VistaArgs,VistaScope,VistaScopeKind,VistaLineNr,VistaColon,VistaIcon
 
 hi default link VistaParenthesis Operator
 hi default link VistaScope       Function
