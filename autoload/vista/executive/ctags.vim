@@ -236,7 +236,7 @@ function! s:TempnameBasedOnSourceBufname() abort
   return s:TryAppendExtension(tempname)
 endfunction
 
-function! s:Tempdir() abort
+function! s:FromTMPDIR() abort
   let tmpdir = $TMPDIR
   if empty(tmpdir)
     let tmpdir = '/tmp/'
@@ -244,6 +244,19 @@ function! s:Tempdir() abort
     let tmpdir .= '/'
   endif
   return tmpdir
+endfunction
+
+function! s:GetTempDirectory() abort
+  if exists('s:tmpdir')
+    return s:tmpdir
+  else
+    if exists('$TMPDIR')
+      let s:tmpdir = s:FromTMPDIR()
+    else
+      let s:tmpdir = vista#util#CacheDirectory()
+    endif
+    return s:tmpdir
+  endif
 endfunction
 
 " Use a temporary files for ctags processing instead of the original one.
@@ -255,26 +268,10 @@ function! s:IntoTemp(...) abort
   "
   " Ref: https://github.com/liuchengxu/vista.vim/issues/122#issuecomment-511115932
   try
-    if exists('$TMPDIR')
-      let tmpdir = s:Tempdir()
-      let tempname = s:TempnameBasedOnSourceBufname()
-      let tmp = tmpdir.tempname
-    else
-      if s:is_mac || s:is_linux
-        let tmpdir = '/tmp/vista.vim_ctags_tmp/'
-        if !isdirectory(tmpdir)
-          call mkdir(tmpdir)
-        endif
-        let tempname = s:TempnameBasedOnSourceBufname()
-        let tmp = tmpdir.tempname
-      endif
-    endif
+    let tmp = s:GetTempDirectory().s:TempnameBasedOnSourceBufname()
   catch
-  endtry
-
-  if !exists('l:tmp')
     let tmp = s:BuiltinTempname()
-  endif
+  endtry
 
   if get(t:vista, 'on_text_changed', 0)
     let lines = t:vista.source.lines()

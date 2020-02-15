@@ -2,6 +2,8 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
+let s:path_separator = has('win32') ? '\' : '/'
+
 function! vista#util#MaxLen() abort
   let l:maxlen = &columns * &cmdheight - 2
   let l:maxlen = &showcmd ? l:maxlen - 11 : l:maxlen
@@ -247,4 +249,28 @@ function! vista#util#GetPreviewLines(lnum) abort
   let end = begin + range * 2
 
   return [getbufline(t:vista.source.bufnr, begin, end), preview_lnum]
+endfunction
+
+" Return the directory for caching the tmp data.
+" with the ending /.
+function! vista#util#CacheDirectory() abort
+  if has('nvim')
+    let cache_dir = stdpath('cache')
+  elseif exists('$XDG_CACHE_HOME')
+    let cache_dir = $XDG_CACHE_HOME
+  else
+    let cache_dir = $HOME . s:path_separator . '.cache'
+  endif
+
+  if cache_dir !~# s:path_separator.'$'
+    let cache_dir .= s:path_separator
+  endif
+
+  let vista_cache_dir = cache_dir.'vista'.s:path_separator
+
+  if !isdirectory(vista_cache_dir)
+    call mkdir(vista_cache_dir, 'p')
+  endif
+
+  return vista_cache_dir
 endfunction
