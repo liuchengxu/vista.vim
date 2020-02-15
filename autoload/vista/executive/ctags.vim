@@ -165,7 +165,7 @@ endfunction
 
 if has('nvim')
   function! s:on_exit(_job, _data, _event) abort dict
-    if !exists('t:vista') || v:dying
+    if !exists('t:vista') || v:dying || !has_key(self, 'stdout')
       return
     endif
 
