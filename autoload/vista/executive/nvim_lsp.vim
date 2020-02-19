@@ -56,8 +56,9 @@ function! s:RunAsync() abort
 EOF
 endfunction
 
-function! vista#executive#nvim_lsp#Run(_fpath) abort
+function! vista#executive#nvim_lsp#Run(fpath) abort
   " TODO: check if the LSP service is registered for fpath.
+  let s:fpath = a:fpath
   return s:Run()
 endfunction
 
@@ -66,6 +67,9 @@ function! vista#executive#nvim_lsp#RunAsync() abort
 endfunction
 
 function! vista#executive#nvim_lsp#Execute(bang, should_display, ...) abort
+  call vista#source#Update(bufnr('%'), winnr(), expand('%'), expand('%:p'))
+  let s:fpath = expand('%:p')
+
   call vista#OnExecute(s:provider, function('s:AutoUpdate'))
 
   let t:vista.silent = v:false

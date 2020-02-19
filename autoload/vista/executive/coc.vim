@@ -30,7 +30,7 @@ function! s:Extract(symbols) abort
   return s:data
 endfunction
 
-function! s:Cb(error, response) abort
+function! s:HandleLSPResponse(error, response) abort
   if empty(a:error)
     " Refer to coc.nvim 79cb11e
     " No document symbol provider exists when response is null.
@@ -44,7 +44,7 @@ endfunction
 
 function! s:AutoUpdate(_fpath) abort
   let s:reload_only = v:true
-  call vista#AutoUpdateWithDelay(function('CocActionAsync'), ['documentSymbols', function('s:Cb')])
+  call vista#AutoUpdateWithDelay(function('CocActionAsync'), ['documentSymbols', function('s:HandleLSPResponse')])
 endfunction
 
 function! s:Run() abort
@@ -52,7 +52,7 @@ function! s:Run() abort
 endfunction
 
 function! s:RunAsync() abort
-  call CocActionAsync('documentSymbols', function('s:Cb'))
+  call CocActionAsync('documentSymbols', function('s:HandleLSPResponse'))
 endfunction
 
 function! s:Execute(bang, should_display) abort
@@ -66,7 +66,7 @@ function! s:Execute(bang, should_display) abort
     endif
   else
     let s:should_display = a:should_display
-    call CocActionAsync('documentSymbols', function('s:Cb'))
+    call CocActionAsync('documentSymbols', function('s:HandleLSPResponse'))
   endif
 endfunction
 

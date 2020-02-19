@@ -7,16 +7,16 @@ let s:provider = fnamemodify(expand('<sfile>'), ':t:r')
 let s:reload_only = v:false
 let s:should_display = v:false
 
-function! s:HandleLSPData(data) abort
+function! s:HandleLSPResponse(resp) abort
   let s:fetching = v:false
-  if type(a:data) != v:t_dict
-        \ || has_key(a:data, 'error')
-        \ || !has_key(a:data, 'result')
-        \ || empty(get(a:data, 'result', {}))
+  if type(a:resp) != v:t_dict
+        \ || has_key(a:resp, 'error')
+        \ || !has_key(a:resp, 'result')
+        \ || empty(get(a:resp, 'result', {}))
     return
   endif
 
-  let s:data = vista#renderer#LSPPreprocess(a:data.result)
+  let s:data = vista#renderer#LSPPreprocess(a:resp.result)
 
   if !empty(s:data)
     let [s:reload_only, s:should_display] = vista#renderer#LSPProcess(s:data, s:reload_only, s:should_display)
@@ -58,16 +58,12 @@ function! s:RunAsync() abort
     \   }
     \}
   let message = [0, method, params]
-  let Callback = function('s:HandleLSPData')
+  let Callback = function('s:HandleLSPResponse')
 
   for linter in linters
     call ale#lsp_linter#SendRequest(bufnr, linter, message, Callback)
     let s:fetching = v:true
   endfor
-endfunction
-
-function! vista#executive#ale#Cache() abort
-  return get(s:, 'cache', {})
 endfunction
 
 function! vista#executive#ale#Run(fpath) abort
@@ -84,12 +80,21 @@ function! vista#executive#ale#RunAsync() abort
 endfunction
 
 function! vista#executive#ale#Execute(bang, should_display, ...) abort
+  call vista#source#Update(bufnr('%'), winnr(), expand('%'), expand('%:p'))
+  let s:fpath = expand('%:p')
+
+  let t:vista.silent = v:false
   let s:should_display = a:should_display
 
   call vista#OnExecute(s:provider, function('s:AutoUpdate'))
+
   if a:bang
     call s:Run()
   else
     call s:RunAsync()
   endif
+endfunction
+
+function! vista#executive#ale#Cache() abort
+  return get(s:, 'cache', {})
 endfunction

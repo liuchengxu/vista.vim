@@ -9,7 +9,7 @@ let s:should_display = v:false
 
 let s:last_req_id = 0
 
-function! s:Handler(_server, _req_id, _type, data) abort
+function! s:HandleLSPResponse(_server, _req_id, _type, data) abort
   let s:fetching = v:false
   if !has_key(a:data.response, 'result')
     return []
@@ -64,15 +64,15 @@ function! s:RunAsync() abort
         \ 'params': {
         \   'textDocument': lsp#get_text_document_identifier(),
         \ },
-        \ 'on_notification': function('s:Handler', [server, s:last_req_id, 'documentSymbol']),
+        \ 'on_notification': function('s:HandleLSPResponse', [server, s:last_req_id, 'documentSymbol']),
         \ })
     let s:fetching = v:true
   endfor
 endfunction
 
 function! vista#executive#vim_lsp#Run(fpath) abort
-  let s:fpath = a:fpath
   if s:HasAvaliableServers()
+    let s:fpath = a:fpath
     return s:Run()
   endif
 endfunction
@@ -91,9 +91,13 @@ function! vista#executive#vim_lsp#Execute(bang, should_display, ...) abort
     return
   endif
 
-  let s:should_display = a:should_display
+  call vista#source#Update(bufnr('%'), winnr(), expand('%'), expand('%:p'))
+  let s:fpath = expand('%:p')
 
   call vista#OnExecute(s:provider, function('s:AutoUpdate'))
+
+  let t:vista.silent = v:false
+  let s:should_display = a:should_display
 
   if a:bang
     call s:Run()

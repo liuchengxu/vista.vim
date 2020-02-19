@@ -9,7 +9,7 @@ let s:should_display = v:false
 
 let s:fetching = v:true
 
-function! s:Handler(results) abort
+function! s:HandleLSPResponse(results) abort
   let s:fetching = v:false
   if empty(a:results)
     return []
@@ -53,7 +53,7 @@ function! s:RunAsync() abort
     call lsc#file#flushChanges()
     call lsc#server#userCall('textDocument/documentSymbol',
         \ lsc#params#textDocument(),
-        \ function('s:Handler'))
+        \ function('s:HandleLSPResponse'))
   endif
 endfunction
 
@@ -67,6 +67,9 @@ function! vista#executive#vim_lsc#RunAsync() abort
 endfunction
 
 function! vista#executive#vim_lsc#Execute(bang, should_display, ...) abort
+  call vista#source#Update(bufnr('%'), winnr(), expand('%'), expand('%:p'))
+  let s:fpath = expand('%:p')
+
   call vista#OnExecute(s:provider, function('s:AutoUpdate'))
 
   let t:vista.silent = v:false
