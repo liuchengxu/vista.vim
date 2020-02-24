@@ -2,6 +2,9 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
+let s:vista_blink = get(g:, 'vista_blink', [2, 100])
+let s:vista_top_level_blink = get(g:, 'vista_top_level_blink', [2, 100])
+
 " Jump to the source line containing the given tag
 function! vista#jump#TagLine(tag) abort
   let cur_line = split(getline('.'), ':')
@@ -26,10 +29,10 @@ function! vista#jump#TagLine(tag) abort
 
   call vista#source#GotoWin()
   " Move cursor to the column of tag located, otherwise the first column
-  call cursor(lnum, start > -1 ? start+1 : 1)
+  call vista#util#Cursor(lnum, start > -1 ? start+1 : 1)
   normal! zz
 
-  call call('vista#util#Blink', get(g:, 'vista_blink', [2, 100]))
+  call call('vista#util#Blink', s:vista_blink)
 
   call vista#win#CloseFloating()
 
@@ -72,9 +75,9 @@ endfunction
 
 function! s:ApplyJump(lnum) abort
   if a:lnum > 0
-    call cursor(a:lnum, 1)
+    call vista#util#Cursor(a:lnum, 1)
     normal! zz
-    call call('vista#util#Blink', get(g:, 'vista_top_level_blink', [2, 100]))
+    call call('vista#util#Blink', s:vista_top_level_blink)
   endif
 endfunction
 

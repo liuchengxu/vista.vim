@@ -274,3 +274,9 @@ function! vista#util#CacheDirectory() abort
 
   return vista_cache_dir
 endfunction
+
+function! vista#util#Cursor(...) abort
+  " Push the current position to the jumplist
+  normal! m'
+  silent call call('cursor', a:000)
+endfunction
