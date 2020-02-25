@@ -70,7 +70,7 @@ function! vista#echo#EchoInCmdline(msg, tag) abort
 
   " Case II:\@ $R^2 \geq Q^3$ :  paragraph:175
   try
-    let [_, start, end] = matchstrpos(msg, '\C'.tag)
+    let start = stridx(msg, tag)
 
     " If couldn't find the tag in the msg
     if start == -1
@@ -92,6 +92,7 @@ function! vista#echo#EchoInCmdline(msg, tag) abort
     echohl Statement | echon msg[0 : start-1] | echohl NONE
   endif
 
+  let end = start + strlen(tag)
   echohl Search    | echon msg[start : end-1] | echohl NONE
   echohl Statement | echon msg[end : ]        | echohl NONE
 endfunction
