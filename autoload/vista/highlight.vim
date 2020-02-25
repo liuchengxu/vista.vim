@@ -24,9 +24,8 @@ function! vista#highlight#Add(lnum, ensure_visible, tag) abort
     " If we know the tag, then what we have to do is to use the length of tag
     " based on the starting point.
     "
-    " start is 0-based, while the column used in stridx or matchstrpos is 1-based.
+    " start is 0-based, while the column used in matchstrpos is 1-based.
     if !empty(a:tag)
-      let start = stridx(cur_line, a:tag)
       let hi_pos = [a:lnum, start+1, strlen(a:tag)]
     else
       let [_, end, _] = matchstrpos(cur_line, ':\d\+$')
