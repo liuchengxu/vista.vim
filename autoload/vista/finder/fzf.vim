@@ -129,13 +129,16 @@ endfunction
 function! s:ProjectRun(...) abort
   let source = s:aligner.project_ctags()
   let prompt = (get(s:, 'using_alternative', v:false) ? '*' : '').s:cur_executive.'> '
-  let opts = {
+  let s:opts = {
           \ 'source': source,
           \ 'sink': function('s:project_sink'),
           \ 'options': ['--prompt', prompt] + get(g:, 'vista_fzf_opt', []),
           \ }
 
-  call s:ApplyRun(opts, 'vista#finder#fzf#Highlight')
+  call s:ApplyRun()
+  if has('nvim')
+    call vista#finder#fzf#Highlight()
+  endif
 endfunction
 
 function! vista#finder#fzf#Highlight() abort
