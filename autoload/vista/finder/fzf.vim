@@ -138,6 +138,7 @@ function! s:ProjectRun(...) abort
   call s:ApplyRun()
   if has('nvim')
     call vista#finder#fzf#Highlight()
+  endif
 endfunction
 
 function! vista#finder#fzf#Highlight() abort
