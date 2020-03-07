@@ -153,8 +153,10 @@ function! vista#finder#PrepareOpts(source, prompt) abort
           \ }
 
   if exists('g:vista_fzf_preview')
+    let object_name_index = g:vista#renderer#enable_icon ? '2' : '1'
+    let extract_line_number = ':$(echo {' . object_name_index . "} | grep -o '[^:]*$')"
     let preview_opts = call('fzf#vim#with_preview', g:vista_fzf_preview).options
-    let preview_opts[-1] = preview_opts[-1][0:-3] . t:vista.source.fpath . (g:vista#renderer#enable_icon ? ':{2}' : ':{1}')
+    let preview_opts[-1] = preview_opts[-1][0:-3] . t:vista.source.fpath . extract_line_number
     call extend(opts.options, preview_opts)
   endif
 
