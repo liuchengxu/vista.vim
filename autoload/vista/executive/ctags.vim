@@ -84,14 +84,14 @@ function! s:BuildCmd(origin_fpath) abort
   let custom_cmd = s:GetCustomCmd(&filetype)
 
   if custom_cmd isnot v:null
-    let cmd = printf('%s %s', custom_cmd, s:tmp_file)
+    let cmd = printf('%s %s 2>/dev/null', custom_cmd, s:tmp_file)
     if stridx(custom_cmd, '--output-format=json') > -1
       let s:TagParser = function('vista#parser#ctags#FromJSON')
     else
       let s:TagParser = function('vista#parser#ctags#FromExtendedRaw')
     endif
   else
-    let cmd = s:GetDefaultCmd(s:tmp_file)
+    let cmd = s:GetDefaultCmd(s:tmp_file) . ' 2>/dev/null'
     let s:TagParser = s:DefaultTagParser
   endif
 
