@@ -103,9 +103,6 @@ function! vista#parser#ctags#FromExtendedRaw(line, container) abort
   if a:line =~# '^!_TAG'
     return
   endif
-  if a:line =~# '^ctags: Warning:'
-    return
-  endif
   let items = split(a:line, '\t')
 
   let line = {}
