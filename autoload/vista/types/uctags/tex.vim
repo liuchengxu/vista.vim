@@ -13,7 +13,9 @@ let s:types.kinds = {
     \ 'b': {'long' : 'subsubsections', 'fold' : 0, 'stl' : 1},
     \ 'P': {'long' : 'paragraphs',     'fold' : 0, 'stl' : 0},
     \ 'G': {'long' : 'subparagraphs',  'fold' : 0, 'stl' : 0},
-    \ 'l': {'long' : 'labels',         'fold' : 0, 'stl' : 0}
+    \ 'l': {'long' : 'labels',         'fold' : 0, 'stl' : 0},
+    \ 'f': {'long' : 'frame',          'fold' : 0, 'stl' : 0},
+    \ 'g': {'long' : 'subframe',       'fold' : 0, 'stl' : 0}
     \ }
 
 let s:types.sro = '""'
@@ -23,7 +25,9 @@ let s:types.kind2scope = {
     \ 'c' : 'chapter',
     \ 's' : 'section',
     \ 'u' : 'subsection',
-    \ 'b' : 'subsubsection'
+    \ 'b' : 'subsubsection',
+    \ 'f' : 'frame',
+    \ 'g' : 'subframe'
     \ }
 
 let s:types.scope2kind = {
@@ -31,7 +35,9 @@ let s:types.scope2kind = {
     \ 'chapter'       : 'c',
     \ 'section'       : 's',
     \ 'subsection'    : 'u',
-    \ 'subsubsection' : 'b'
+    \ 'subsubsection' : 'b',
+    \ 'frame'         : 'f',
+    \ 'subframe'      : 'g'
     \ }
 
 let s:types.sort = 0
