@@ -129,6 +129,9 @@ function! vista#(bang, ...) abort
 
   let [bufnr, winnr, fname, fpath] = [bufnr('%'), winnr(), expand('%'), expand('%:p')]
 
+  let g:__vista_source_winnr = winnr()
+  let g:__vista_source_winid = win_getid()
+
   call vista#source#Update(bufnr, winnr, fname, fpath)
 
   if a:bang

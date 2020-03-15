@@ -2,8 +2,6 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
-let s:use_winid = exists('*bufwinid')
-
 function! s:EnsureExists() abort
   if !exists('t:vista')
     let t:vista = {}
@@ -29,11 +27,20 @@ function! s:EnsureExists() abort
     let t:vista.source = {}
 
     function! t:vista.source.winnr() abort
-      return bufwinnr(self.bufnr)
+      if exists('g:__vista_source_winnr')
+        return g:__vista_source_winnr
+      else
+        return bufwinnr(self.bufnr)
+      endif
     endfunction
 
     function! t:vista.source.winid() abort
-      return bufwinid(self.bufnr)
+      if exists('g:__vista_source_winid')
+        return g:__vista_source_winid
+      else
+        " A buffer can exist in two windows at the same time, this could be inaccurate.
+        return bufwinid(self.bufnr)
+      endif
     endfunction
 
     function! t:vista.source.filetype() abort
@@ -74,15 +81,17 @@ function! s:EnsureExists() abort
   endif
 endfunction
 
-function! vista#source#GotoWin() abort
-  if s:use_winid
+if exists('*bufwinid')
+  function! s:GotoSourceWindow() abort
     let winid = t:vista.source.winid()
     if winid != -1
       noautocmd call win_gotoid(winid)
     else
       return vista#error#('Cannot find the source window id')
     endif
-  else
+  endfunction
+else
+  function! s:GotoSourceWindow() abort
     " t:vista.source.winnr is not always correct.
     let winnr = t:vista.source.winnr()
     if winnr != -1
@@ -90,7 +99,11 @@ function! vista#source#GotoWin() abort
     else
       return vista#error#('Cannot find the target window')
     endif
-  endif
+  endfunction
+endif
+
+function! vista#source#GotoWin() abort
+  call s:GotoSourceWindow()
   " Floating window relys on BufEnter event to be closed automatically.
   if exists('#VistaFloatingWin')
     doautocmd BufEnter VistaFloatingWin

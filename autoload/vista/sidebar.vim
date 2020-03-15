@@ -60,7 +60,7 @@ function! vista#sidebar#OpenOrUpdate(rows) abort
     let t:vista.pos = [winsaveview(), winnr(), winrestcmd()]
   else
     let winnr = t:vista.winnr()
-    if winnr ==  -1
+    if winnr == -1
       call s:NewWindow()
     elseif winnr() != winnr
       noautocmd execute winnr.'wincmd w'
