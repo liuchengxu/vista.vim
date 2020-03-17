@@ -386,27 +386,29 @@ endfunction
 
 " Run ctags recursively.
 function! vista#executive#ctags#ProjectRun() abort
-  " https://github.com/universal-ctags/ctags/issues/2042
-  "
-  " If ctags has the json format feature, we should use the
-  " `--output-format=json` option, which is easier to parse and more reliable.
-  " Otherwise we will use the `--_xformat` option.
-  if s:support_json_format
-    let cmd = s:ctags.' -R -x --output-format=json --fields=+n'
-    let Parser = function('vista#parser#ctags#RecursiveFromJSON')
-  else
-    let cmd = s:ctags." -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
-    let Parser = function('vista#parser#ctags#RecursiveFromXformat')
+  if !exists('s:recursive_ctags_cmd')
+    " https://github.com/universal-ctags/ctags/issues/2042
+    "
+    " If ctags has the json format feature, we should use the
+    " `--output-format=json` option, which is easier to parse and more reliable.
+    " Otherwise we will use the `--_xformat` option.
+    if s:support_json_format
+      let s:recursive_ctags_cmd = s:ctags.' -R -x --output-format=json --fields=+n'
+      let s:RecursiveParser = function('vista#parser#ctags#RecursiveFromJSON')
+    else
+      let s:recursive_ctags_cmd = s:ctags." -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
+      let s:RecursiveParser = function('vista#parser#ctags#RecursiveFromXformat')
+    endif
   endif
 
-  let output = system(cmd)
+  let output = system(s:recursive_ctags_cmd)
   if v:shell_error
-    return vista#error#RunCtags(cmd)
+    return vista#error#RunCtags(s:recursive_ctags_cmd)
   endif
 
   let s:data = {}
 
-  call map(split(output, "\n"), 'call(Parser, [v:val, s:data])')
+  call map(split(output, "\n"), 's:RecursiveParser(v:val, s:data)')
 
   return s:data
 endfunction

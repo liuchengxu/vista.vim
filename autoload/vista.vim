@@ -175,7 +175,7 @@ function! s:HandleArguments(fst, snd) abort
   " Vista finder [finder:executive]
   if stridx(a:snd, ':') > -1
     if !exists('s:finder_args_pattern')
-      let s:finder_args_reg = '^\('.join(g:vista#finders, '\|').'\):\('.join(g:vista#executives, '\|').'\)$'
+      let s:finder_args_pattern = '^\('.join(g:vista#finders, '\|').'\):\('.join(g:vista#executives, '\|').'\)$'
     endif
     if a:snd =~? s:finder_args_pattern
       let matched = matchlist(a:snd, s:finder_args_pattern)
