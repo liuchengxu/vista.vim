@@ -167,12 +167,15 @@ function! vista#util#Retriving(executive) abort
 endfunction
 
 function! vista#util#Complete(A, L, P) abort
-  let cmd = ['coc', 'ctags', 'finder']
   let args = split(a:L)
-  if !empty(args) && args[-1] ==# 'finder'
-    return join(['coc', 'ctags'], "\n")
+  if !empty(args)
+    if args[-1] ==# 'finder'
+      return join(g:vista#executives, "\n")
+    elseif args[-1] ==# 'finder!'
+      return join(['ctags'], "\n")
+    endif
   endif
-  return join(cmd, "\n")
+  return join(g:vista#executives + ['finder', 'finder!'], "\n")
 endfunction
 
 " Return the lower indent line number

@@ -48,7 +48,7 @@ function! s:RunAsync() abort
   if exists('*LanguageClient#textDocument_documentSymbol')
     call vista#SetProvider(s:provider)
     call vista#win#Execute(
-          \ t:vista.source.winnr(),
+          \ t:vista.source.get_winnr(),
           \ function('LanguageClient#textDocument_documentSymbol'),
           \ {'handle': v:false},
           \ function('s:HandleLSPResponse')

@@ -2,88 +2,9 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
-function! s:EnsureExists() abort
-  if !exists('t:vista')
-    let t:vista = {}
-
-    function! t:vista.winnr() abort
-      return bufwinnr('__vista__')
-    endfunction
-
-    function! t:vista.winid() abort
-      return bufwinid('__vista__')
-    endfunction
-
-    " Get original tagline given the lnum in vista sidebar
-    "
-    " Mind the offset
-    function! t:vista.get_tagline_under_cursor() abort
-      return get(t:vista.vlnum_cache, line('.') - g:vista#renderer#default#vlnum_offset, '')
-    endfunction
-
-  endif
-
-  if !has_key(t:vista, 'source')
-    let t:vista.source = {}
-
-    function! t:vista.source.winnr() abort
-      if exists('g:__vista_source_winnr')
-        return g:__vista_source_winnr
-      else
-        return bufwinnr(self.bufnr)
-      endif
-    endfunction
-
-    function! t:vista.source.winid() abort
-      if exists('g:__vista_source_winid')
-        return g:__vista_source_winid
-      else
-        " A buffer can exist in two windows at the same time, this could be inaccurate.
-        return bufwinid(self.bufnr)
-      endif
-    endfunction
-
-    function! t:vista.source.filetype() abort
-      return getbufvar(self.bufnr, '&filetype')
-    endfunction
-
-    function! t:vista.source.lines() abort
-      return getbufline(self.bufnr, 1, '$')
-    endfunction
-
-    function! t:vista.source.line(lnum) abort
-      let bufline = getbufline(self.bufnr, a:lnum)
-      return empty(bufline) ? '' : bufline[0]
-    endfunction
-
-    function! t:vista.source.line_trimmed(lnum) abort
-      let bufline = getbufline(self.bufnr, a:lnum)
-      return empty(bufline) ? '' : vista#util#Trim(bufline[0])
-    endfunction
-
-    function! t:vista.source.extension() abort
-      " Try the extension first, and then the filetype, for ctags relys on the extension name.
-      let e = fnamemodify(self.fpath, ':e')
-      return empty(e) ? getbufvar(self.bufnr, '&ft') : e
-    endfunction
-
-    function! t:vista.source.scope_seperator() abort
-      let filetype = self.filetype()
-      try
-        let type = g:vista#types#uctags#{filetype}#
-      catch /^Vim\%((\a\+)\)\=:E121/
-        let type = {}
-      endtry
-
-      " FIXME use a default value maybe inappropriate.
-      return get(type, 'sro', '.')
-    endfunction
-  endif
-endfunction
-
 if exists('*bufwinid')
   function! s:GotoSourceWindow() abort
-    let winid = t:vista.source.winid()
+    let winid = t:vista.source.get_winid()
     if winid != -1
       noautocmd call win_gotoid(winid)
     else
@@ -93,7 +14,7 @@ if exists('*bufwinid')
 else
   function! s:GotoSourceWindow() abort
     " t:vista.source.winnr is not always correct.
-    let winnr = t:vista.source.winnr()
+    let winnr = t:vista.source.get_winnr()
     if winnr != -1
       noautocmd execute winnr.'wincmd w'
     else
@@ -104,6 +25,7 @@ endif
 
 function! vista#source#GotoWin() abort
   call s:GotoSourceWindow()
+
   " Floating window relys on BufEnter event to be closed automatically.
   if exists('#VistaFloatingWin')
     doautocmd BufEnter VistaFloatingWin
@@ -113,12 +35,8 @@ endfunction
 " Update the infomation of source file to be processed,
 " including whose bufnr, winnr, fname, fpath
 function! vista#source#Update(bufnr, winnr, ...) abort
-  if !exists('t:_vista_initialized')
-    call s:EnsureExists()
-    let t:_vista_initialized = 1
-  endif
-
   let t:vista.source.bufnr = a:bufnr
+  let t:vista.source.winnr = a:winnr
 
   if a:0 == 1
     let t:vista.source.fname = a:1
@@ -136,10 +54,10 @@ endfunction
 
 if exists('*win_execute')
   function! vista#source#PeekSymbol(lnum, tag) abort
-    call win_execute(bufwinid(t:vista.source.bufnr), 'noautocmd call s:ApplyPeek(a:lnum, a:tag)')
+    call win_execute(t:vista.source.winid, 'noautocmd call s:ApplyPeek(a:lnum, a:tag)')
   endfunction
 else
   function! vista#source#PeekSymbol(lnum, tag) abort
-    call vista#win#Execute(t:vista.source.winnr(), function('s:ApplyPeek'), a:lnum, a:tag)
+    call vista#win#Execute(t:vista.source.get_winnr(), function('s:ApplyPeek'), a:lnum, a:tag)
   endfunction
 endif

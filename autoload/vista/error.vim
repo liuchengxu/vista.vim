@@ -27,14 +27,6 @@ function! vista#error#Need(needed) abort
   call s:Echon('Normal', ' installed to continue.')
 endfunction
 
-function! vista#error#InvalidExecutive(exe) abort
-  call s:Echo('ErrorMsg', '[vista.vim]')
-  call s:Echon('Normal', ' The executive')
-  call s:Echon('Underlined', ' '.a:exe.' ')
-  call s:Echon('Normal', 'does not exist. Avaliable: ')
-  call s:Echon('Underlined', string(g:vista#executives))
-endfunction
-
 function! vista#error#RunCtags(cmd) abort
   call s:Echo('ErrorMsg', '[vista.vim]')
   call s:Echon('Normal', 'Fail to run ctags given the command: ')
@@ -47,10 +39,22 @@ function! vista#error#For(cmd, filetype) abort
   call s:Echon('Normal', ' does not support '.a:filetype.' filetype.')
 endfunction
 
+function! vista#error#InvalidExecutive(exe) abort
+  call s:Echo('ErrorMsg', '[vista.vim]')
+  call s:Echon('Normal', ' The executive')
+  call s:Echon('Underlined', ' '.a:exe.' ')
+  call s:Echon('Normal', 'does not exist. Avaliable: ')
+  call s:Echon('Underlined', string(g:vista#executives))
+endfunction
+
 function! vista#error#InvalidOption(opt, ...) abort
   call s:Echo('ErrorMsg', '[vista.vim]')
   call s:Echon('Normal', ' Invalid option '.a:opt.'. Avaliable: ')
   call s:Echon('Underlined', a:0 > 0 ? string(a:1) : '')
+endfunction
+
+function! vista#error#InvalidFinderArgument() abort
+  call vista#error#Expect('Vista finder [FINDER|EXECUTIVE|FINDER:EXECUTIVE]')
 endfunction
 
 " Notify the error message when required.

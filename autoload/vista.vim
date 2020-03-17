@@ -98,18 +98,6 @@ function! vista#GetExplicitExecutiveOrDefault() abort
   return executive
 endfunction
 
-" Used for running vista.vim on startup
-function! vista#RunForNearestMethodOrFunction() abort
-  let [bufnr, winnr, fname, fpath] = [bufnr('%'), winnr(), expand('%'), expand('%:p')]
-  call vista#source#Update(bufnr, winnr, fname, fpath)
-  let executive = get(g:, 'vista_default_executive', 'ctags')
-  call vista#executive#{executive}#Execute(v:false, v:false)
-
-  if !exists('#VistaMOF')
-    call vista#autocmd#InitMOF()
-  endif
-endfunction
-
 function! vista#TryRunTOC() abort
   let executive = vista#GetExplicitExecutiveOrDefault()
   if executive ==# 'toc'
@@ -124,14 +112,95 @@ function! vista#TryRunTOC() abort
   endif
 endfunction
 
+function! s:TryInitializeVista() abort
+  if !exists('t:vista')
+    call vista#init#Api()
+  endif
+endfunction
+
+call s:TryInitializeVista()
+
+" TODO: vista is designed to have an instance per tab, but it does not work as
+" expected now.
+" autocmd TabEnter * ++once call s:TryInitializeVista()
+
+" Used for running vista.vim on startup
+function! vista#RunForNearestMethodOrFunction() abort
+  let [bufnr, winnr, fname, fpath] = [bufnr('%'), winnr(), expand('%'), expand('%:p')]
+  call vista#source#Update(bufnr, winnr, fname, fpath)
+  let executive = get(g:, 'vista_default_executive', 'ctags')
+  call vista#executive#{executive}#Execute(v:false, v:false)
+
+  if !exists('#VistaMOF')
+    call vista#autocmd#InitMOF()
+  endif
+endfunction
+
+function! s:HandleSingleArgument(arg) abort
+  if index(g:vista#executives, a:arg) > -1
+    call vista#executive#{a:arg}#Execute(v:false, v:true)
+    let t:vista.lnum = line('.')
+  elseif a:arg ==# 'finder'
+    call vista#finder#Dispatch(v:false, '', '')
+  elseif a:arg ==# 'finder!'
+    call vista#finder#Dispatch(v:true, '', '')
+  elseif a:arg ==# 'toc'
+    if vista#HasTOCSupport()
+      call vista#TryRunTOC()
+    else
+      return vista#error#For('Vista toc', &filetype)
+    endif
+  elseif a:arg ==# 'focus'
+    call vista#sidebar#ToggleFocus()
+  elseif a:arg ==# 'show'
+    if vista#sidebar#IsOpen()
+      call vista#cursor#ShowTag()
+    else
+      call vista#sidebar#Open()
+      let t:vista.lnum = line('.')
+    endif
+  elseif a:arg ==# 'info'
+    call vista#debugging#Info()
+  elseif a:arg ==# 'info+'
+    call vista#debugging#InfoToClipboard()
+  else
+    return vista#error#Expect('Vista [finder] [EXECUTIVE]')
+  endif
+endfunction
+
+function! s:HandleArguments(fst, snd)
+  if a:fst !~# '^finder'
+    return vista#error#Expect('Vista finder[!] [EXECUTIVE]')
+  endif
+  let finder_args_reg = '^\('.join(g:vista#finders, '\|').'\):\('.join(g:vista#executives, '\|').'\)$'
+  " Vista finder [finder:executive]
+  if stridx(a:snd, ':') > -1
+    if a:snd =~? finder_args_reg
+      let matched = matchlist(a:snd, finder_args_reg)
+      let finder = matched[1]
+      let executive = matched[2]
+    else
+      return vista#error#InvalidFinderArgument()
+    endif
+  else
+    " Vista finder [finder]/[executive]
+    if index(g:vista#finders, a:snd) > -1
+      let finder = a:snd
+      let executive = ''
+    elseif index(g:vista#executives, a:snd) > -1
+      let finder = ''
+      let executive = a:snd
+    else
+      return vista#error#InvalidFinderArgument()
+    endif
+  endif
+  call vista#finder#Dispatch(v:false, finder, executive)
+endfunction
+
 " Main entrance to interact with vista.vim
 function! vista#(bang, ...) abort
-
   let [bufnr, winnr, fname, fpath] = [bufnr('%'), winnr(), expand('%'), expand('%:p')]
-
-  let g:__vista_source_winnr = winnr()
-  let g:__vista_source_winid = win_getid()
-
+  let t:vista.source.winid = win_getid()
   call vista#source#Update(bufnr, winnr, fname, fpath)
 
   if a:bang
@@ -157,61 +226,9 @@ function! vista#(bang, ...) abort
   endif
 
   if a:0 == 1
-    if index(g:vista#executives, a:1) > -1
-      call vista#executive#{a:1}#Execute(v:false, v:true)
-      let t:vista.lnum = line('.')
-    elseif a:1 ==# 'finder'
-      call vista#finder#Dispatch('', '')
-    elseif a:1 ==# 'finder!'
-      call vista#finder#fzf#ProjectRun()
-    elseif a:1 ==# 'toc'
-      if vista#HasTOCSupport()
-        call vista#TryRunTOC()
-      else
-        return vista#error#For('Vista toc', &filetype)
-      endif
-    elseif a:1 ==# 'focus'
-      call vista#sidebar#ToggleFocus()
-    elseif a:1 ==# 'show'
-      if vista#sidebar#IsOpen()
-        call vista#cursor#ShowTag()
-      else
-        call vista#sidebar#Open()
-        let t:vista.lnum = line('.')
-      endif
-    elseif a:1 ==# 'info'
-      call vista#debugging#Info()
-    elseif a:1 ==# 'info+'
-      call vista#debugging#InfoToClipboard()
-    else
-      return vista#error#Expect('Vista [finder] [EXECUTIVE]')
-    endif
+    call s:HandleSingleArgument(a:1)
   elseif a:0 == 2
-    if a:1 !=# 'finder'
-      return vista#error#Expect('Vista finder [EXECUTIVE]')
-    endif
-    let finder_args_reg = '^\('.join(g:vista#finders, '\|').'\):\('.join(g:vista#executives, '\|').'\)$'
-    if stridx(a:2, ':') > -1
-      if a:2 =~? finder_args_reg
-        let matched = matchlist(a:2, finder_args_reg)
-        let finder = matched[1]
-        let executive = matched[2]
-      else
-        return vista#error#Expect('Vista finder [FINDER|EXECUTIVE|FINDER:EXECUTIVE]')
-      endif
-    else
-      if index(g:vista#finders, a:2) > -1
-        let finder = a:2
-        let executive = ''
-      elseif index(g:vista#executives, a:2) > -1
-        let finder = ''
-        let executive = a:2
-      else
-        return vista#error#Expect('Vista finder [FINDER|EXECUTIVE|FINDER:EXECUTIVE]')
-      endif
-    endif
-    call vista#finder#Dispatch(finder, executive)
-    return
+    call s:HandleArguments(a:1, a:2)
   else
     return vista#error#('Too many arguments for Vista')
   endif

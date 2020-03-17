@@ -174,19 +174,6 @@ function! vista#finder#fzf#Highlight() abort
   hi default link FZFVista         Type
 endfunction
 
-" TODO workspace symbols
-function! vista#finder#fzf#ProjectRun() abort
-  let executive = 'ctags'
-  let s:data = vista#executive#{executive}#ProjectRun()
-  let s:cur_executive = executive
-
-  if empty(s:data)
-    return vista#util#Warning('Empty data for finder')
-  endif
-
-  call s:ProjectRun()
-endfunction
-
 " Optional argument: executive, coc or ctags
 " Ctags is the default.
 function! vista#finder#fzf#Run(...) abort
@@ -201,4 +188,20 @@ function! vista#finder#fzf#Run(...) abort
   endif
 
   call s:Run()
+endfunction
+
+" TODO workspace symbols
+function! vista#finder#fzf#ProjectRun(executive) abort
+  if a:executive !=? 'ctags'
+    return vista#error#('Only ctags supports Vista finder!')
+  endif
+
+  let s:data = vista#executive#{a:executive}#ProjectRun()
+  let s:cur_executive = a:executive
+
+  if empty(s:data)
+    return vista#util#Warning('Empty data for finder')
+  endif
+
+  call s:ProjectRun()
 endfunction

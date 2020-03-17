@@ -191,12 +191,16 @@ function! vista#finder#RunFZFOrSkim(apply_run) abort
   endif
 endfunction
 
-function! vista#finder#Dispatch(finder, executive) abort
+function! vista#finder#Dispatch(bang, finder, executive) abort
   let finder = empty(a:finder) ? 'fzf' : a:finder
   if empty(a:executive)
     let executive = vista#GetExplicitExecutiveOrDefault()
   else
     let executive = a:executive
   endif
-  call vista#finder#{finder}#Run(executive)
+  if a:bang
+    call vista#finder#{finder}#ProjectRun(executive)
+  else
+    call vista#finder#{finder}#Run(executive)
+  endif
 endfunction
