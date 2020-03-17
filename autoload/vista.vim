@@ -168,15 +168,17 @@ function! s:HandleSingleArgument(arg) abort
   endif
 endfunction
 
-function! s:HandleArguments(fst, snd)
+function! s:HandleArguments(fst, snd) abort
   if a:fst !~# '^finder'
     return vista#error#Expect('Vista finder[!] [EXECUTIVE]')
   endif
-  let finder_args_reg = '^\('.join(g:vista#finders, '\|').'\):\('.join(g:vista#executives, '\|').'\)$'
   " Vista finder [finder:executive]
   if stridx(a:snd, ':') > -1
-    if a:snd =~? finder_args_reg
-      let matched = matchlist(a:snd, finder_args_reg)
+    if !exists('s:finder_args_pattern')
+      let s:finder_args_reg = '^\('.join(g:vista#finders, '\|').'\):\('.join(g:vista#executives, '\|').'\)$'
+    endif
+    if a:snd =~? s:finder_args_pattern
+      let matched = matchlist(a:snd, s:finder_args_pattern)
       let finder = matched[1]
       let executive = matched[2]
     else
