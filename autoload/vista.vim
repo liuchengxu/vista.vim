@@ -122,7 +122,11 @@ call s:TryInitializeVista()
 
 " TODO: vista is designed to have an instance per tab, but it does not work as
 " expected now.
-" autocmd TabEnter * ++once call s:TryInitializeVista()
+" augroup VistaInitialize
+  " autocmd!
+  " ++once needs 8.1.1113, it's safer but requires newer vim.
+  " autocmd TabNew * ++once call s:TryInitializeVista()
+" augroup END
 
 " Used for running vista.vim on startup
 function! vista#RunForNearestMethodOrFunction() abort

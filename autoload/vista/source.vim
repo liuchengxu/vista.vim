@@ -35,6 +35,10 @@ endfunction
 " Update the infomation of source file to be processed,
 " including whose bufnr, winnr, fname, fpath
 function! vista#source#Update(bufnr, winnr, ...) abort
+  if !exists('t:vista')
+    call vista#init#Api()
+  endif
+
   let t:vista.source.bufnr = a:bufnr
   let t:vista.source.winnr = a:winnr
 
