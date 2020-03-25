@@ -42,7 +42,13 @@ function! s:TryAlternatives(tried, fpath) abort
 endfunction
 
 function! vista#finder#GetSymbols(...) abort
-  let executive = a:0 > 0 ? a:1 : get(g:, 'vista_default_executive', 'ctags')
+  let executive = a:0 > 0 ? a:1 : g:vista_default_executive
+
+  " 'toc' is a special executive supported by extension, we should use ctags
+  " instead for the finder case, ref #255.
+  if executive ==# 'toc'
+    let executive = 'ctags'
+  endif
 
   if index(g:vista#executives, executive) == -1
     call vista#error#InvalidExecutive(executive)

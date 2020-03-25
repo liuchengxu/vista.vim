@@ -14,9 +14,7 @@ let g:vista#extensions = vista#FindItemsUnderDirectory(s:cur_dir.'/vista/extensi
 
 let s:ignore_list = ['vista', 'vista_kind', 'nerdtree', 'startify', 'tagbar', 'fzf', 'gitcommit']
 
-" vimwiki supports the standard markdown syntax.
-" pandoc supports the basic markdown format.
-let s:toc_supported = ['markdown', 'rst', 'vimwiki', 'pandoc']
+let g:vista_default_executive = get(g:, 'vista_default_executive', 'ctags')
 
 " Skip special buffers, filetypes.
 function! vista#ShouldSkip() abort
@@ -28,10 +26,6 @@ endfunction
 " Ignore some kinds of tags/symbols which is done at the parser step.
 function! vista#ShouldIgnore(kind) abort
   return exists('g:vista_ignore_kinds') && index(g:vista_ignore_kinds, a:kind) != -1
-endfunction
-
-function! vista#HasTOCSupport() abort
-  return index(s:toc_supported, &filetype) > -1
 endfunction
 
 function! vista#SetProvider(provider) abort
@@ -92,24 +86,10 @@ function! vista#GetExplicitExecutiveOrDefault() abort
   if explicit_executive isnot# v:null
     let executive = explicit_executive
   else
-    let executive = get(g:, 'vista_default_executive', 'ctags')
+    let executive = g:vista_default_executive
   endif
 
   return executive
-endfunction
-
-function! vista#TryRunTOC() abort
-  let executive = vista#GetExplicitExecutiveOrDefault()
-  if executive ==# 'toc'
-    let extension = &filetype
-  else
-    let extension = executive
-  endif
-  if index(g:vista#extensions, extension) > -1
-    call vista#extension#{extension}#Execute(v:false, v:true)
-  else
-    call vista#executive#{executive}#Execute(v:false, v:true, v:false)
-  endif
 endfunction
 
 function! s:TryInitializeVista() abort
@@ -132,8 +112,7 @@ call s:TryInitializeVista()
 function! vista#RunForNearestMethodOrFunction() abort
   let [bufnr, winnr, fname, fpath] = [bufnr('%'), winnr(), expand('%'), expand('%:p')]
   call vista#source#Update(bufnr, winnr, fname, fpath)
-  let executive = get(g:, 'vista_default_executive', 'ctags')
-  call vista#executive#{executive}#Execute(v:false, v:false)
+  call vista#executive#{g:vista_default_executive}#Execute(v:false, v:false)
 
   if !exists('#VistaMOF')
     call vista#autocmd#InitMOF()
@@ -149,8 +128,8 @@ function! s:HandleSingleArgument(arg) abort
   elseif a:arg ==# 'finder!'
     call vista#finder#Dispatch(v:true, '', '')
   elseif a:arg ==# 'toc'
-    if vista#HasTOCSupport()
-      call vista#TryRunTOC()
+    if vista#toc#IsSupported(&filetype)
+      call vista#toc#Run()
     else
       return vista#error#For('Vista toc', &filetype)
     endif

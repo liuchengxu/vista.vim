@@ -117,8 +117,8 @@ function! vista#sidebar#Open() abort
   call vista#source#Update(bufnr, winnr, fname, fpath)
 
   " Support the builtin markdown toc extension as an executive
-  if vista#HasTOCSupport()
-    call vista#TryRunTOC()
+  if vista#toc#IsSupported(&filetype)
+    call vista#toc#Run()
   else
     let executive = vista#GetExplicitExecutiveOrDefault()
     call vista#executive#{executive}#Execute(v:false, v:true, v:false)
