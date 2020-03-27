@@ -50,8 +50,6 @@ let g:vista#renderer#icons = map(extend(s:icons, get(g:, 'vista#renderer#icons',
 let g:vista#renderer#enable_icon = get(g:, 'vista#renderer#enable_icon',
       \ exists('g:vista#renderer#icons') || exists('g:airline_powerline_fonts'))
 
-let g:vista#renderer#kind_default_icon = ['╰─▸ ', '├─▸ ']
-
 function! vista#renderer#IconFor(kind) abort
   if g:vista#renderer#enable_icon
     let key = tolower(a:kind)

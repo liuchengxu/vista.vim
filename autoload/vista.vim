@@ -14,6 +14,7 @@ let g:vista#extensions = vista#FindItemsUnderDirectory(s:cur_dir.'/vista/extensi
 
 let s:ignore_list = ['vista', 'vista_kind', 'nerdtree', 'startify', 'tagbar', 'fzf', 'gitcommit']
 
+let g:vista_icon_indent = get(g:, 'vista_icon_indent', ['└ ', '│ '])
 let g:vista_default_executive = get(g:, 'vista_default_executive', 'ctags')
 
 " Skip special buffers, filetypes.
