@@ -5,6 +5,7 @@
 scriptencoding utf-8
 
 let s:default_icon = get(g:, 'vista_icon_indent', ['└▸ ', '├▸ '])
+let s:default_icon = get(g:, 'vista_icon_indent', ['└ ', '│ '])
 
 function! s:Join(line, icon) abort
   let line = a:line
