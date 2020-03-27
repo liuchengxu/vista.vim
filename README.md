@@ -8,6 +8,8 @@ View and search LSP symbols, tags in Vim/NeoVim.
     <p align="center">Vista ctags</p>
 </p>
 
+[>>>> More screenshots](https://github.com/liuchengxu/vista.vim/issues/257)
+
 ## Table Of Contents
 <!-- TOC GFM -->
 
@@ -36,12 +38,6 @@ View and search LSP symbols, tags in Vim/NeoVim.
 I initially started [vista.vim](https://github.com/liuchengxu/vista.vim) with an intention of replacing [tagbar](https://github.com/majutsushi/tagbar) as it seemingly doesn't have a plan to support the promising [Language Server Protocol](https://github.com/Microsoft/language-server-protocol) and async processing.
 
 In addition to being a tags viewer, vista.vim can also be a symbol navigator similar to [ctrlp-funky](https://github.com/tacahiroy/ctrlp-funky). Last but not least, one important goal of [vista.vim](https://github.com/liuchengxu/vista.vim) is to support LSP symbols, which understands the semantics instead of the regex only.
-
-<p align="center">
-    <img width="600px" src="https://user-images.githubusercontent.com/8850248/56454822-18d82a80-6389-11e9-80cf-ef7709da3f75.png">
-    <p align="center">Vista ctags</p>
-</p>
-
 
 ## Features
 
