@@ -4,8 +4,6 @@
 
 scriptencoding utf-8
 
-let s:default_icon = get(g:, 'vista_icon_indent', ['└▸ ', '├▸ '])
-
 function! s:Join(line, icon) abort
   let line = a:line
 
@@ -19,9 +17,9 @@ endfunction
 
 function! s:BuildRow(idx, line) abort
   if a:idx+1 == len(s:data) || s:data[a:idx+1].level != a:line.level
-    return s:Join(a:line, s:default_icon[0])
+    return s:Join(a:line, g:vista_icon_indent[0])
   else
-    return s:Join(a:line, s:default_icon[1])
+    return s:Join(a:line, g:vista_icon_indent[1])
   endif
 endfunction
 

@@ -65,11 +65,7 @@ function! vista#autocmd#Init(group_name, AUF) abort
   let s:ApplyAutoUpdate = a:AUF
 
   if exists('#'.a:group_name)
-    let group = ''
-    redir => group
-    silent execute 'autocmd' a:group_name
-    redir END
-    if len(split(group, '\n')) > 1
+    if len(split(execute('autocmd '.a:group_name), '\n')) > 1
       return
     endif
   endif
