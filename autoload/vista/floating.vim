@@ -202,7 +202,7 @@ function! vista#floating#DisplayAt(lnum, tag) abort
   " the displacement of current tag highlighting position.
   let s:cur_tag = a:tag
 
-  let [lines, s:floating_lnum] = vista#util#GetPreviewLines(a:lnum)
+  let [lines, s:floating_lnum] = vista#preview#GetLines(a:lnum)
   call s:DisplayWithDelay(lines)
 endfunction
 

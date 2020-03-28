@@ -12,8 +12,6 @@ let s:visibility_icon = {
       \ 'private': '-',
       \ }
 
-let g:vista_fold_toggle_icons = get(g:, 'vista_fold_toggle_icons', ['▼', '▶'])
-
 let g:vista#renderer#default#vlnum_offset = 3
 
 " Return the rendered row to be displayed given the depth
