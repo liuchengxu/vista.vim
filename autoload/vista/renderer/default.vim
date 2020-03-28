@@ -14,6 +14,8 @@ let s:visibility_icon = {
 
 let g:vista#renderer#default#vlnum_offset = 3
 
+let s:indent_size = g:vista#renderer#enable_icon ? 2 : 4
+
 " Return the rendered row to be displayed given the depth
 function! s:Assemble(line, depth) abort
   let line = a:line
@@ -21,7 +23,7 @@ function! s:Assemble(line, depth) abort
   let kind = get(line, 'kind', '')
 
   let row = vista#util#Join(
-        \ repeat(' ', a:depth * 4),
+        \ repeat(' ', a:depth * s:indent_size),
         \ s:GetVisibility(line),
         \ vista#renderer#IconFor(kind).' ',
         \ get(line, 'name'),

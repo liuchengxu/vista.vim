@@ -2,15 +2,17 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
+let s:indent_size = g:vista#renderer#enable_icon ? 2 : 4
+
 function! s:IntoLSPHirRow(row) abort
-  let indented = repeat(' ', a:row.level * 4).a:row.text
-  let kind = ' : '.vista#renderer#Decorate(a:row.kind)
+  let icon = vista#renderer#IconFor(a:row.kind).' '
+  let indented = repeat(' ', a:row.level * s:indent_size).icon.a:row.text.' '.a:row.kind
   let lnum = ':'.a:row.lnum
-  return indented.kind.lnum
+  return indented.lnum
 endfunction
 
 function! s:IntoLSPNonHirRow(row) abort
-  let indented = repeat(' ', 4).a:row.text
+  let indented = repeat(' ', s:indent_size).a:row.text
   let lnum = ':'.a:row.lnum
   return indented.lnum
 endfunction
@@ -58,8 +60,8 @@ endfunction
 
 " Render the content linewise.
 function! s:TransformDirectly(row) abort
-  let indented = repeat(' ', a:row.level * 4).a:row.text
-  let kind = ' : '.vista#renderer#Decorate(a:row.kind)
+  let icon = vista#renderer#IconFor(a:row.kind)
+  let indented = repeat(' ', a:row.level * s:indent_size).icon.a:row.text
   let lnum = ':'.a:row.lnum
   return indented.kind.lnum
 endfunction
