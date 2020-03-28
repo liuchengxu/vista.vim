@@ -98,8 +98,16 @@ function! s:CloseOnWinEnter() abort
 endfunction
 
 function! s:HighlightTagInFloatinWin() abort
+  if !nvim_win_is_valid(s:floating_win_id)
+    return
+  endif
+
   if exists('s:floating_lnum')
-    let target_line = getbufline(s:floating_bufnr, s:floating_lnum)[0]
+    let target_line = getbufline(s:floating_bufnr, s:floating_lnum)
+    if empty(target_line)
+      return
+    endif
+    let target_line = target_line[0]
     try
       let [_, start, end] = matchstrpos(target_line, '\C'.s:cur_tag)
       if start != -1
