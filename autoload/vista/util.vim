@@ -243,16 +243,16 @@ if s:cache_dir !~# s:path_separator.'$'
   let s:cache_dir .= s:path_separator
 endif
 
+let s:vista_cache_dir = s:cache_dir.'vista'.s:path_separator
+
 " Return the directory for caching the tmp data.
 " with the ending /.
 function! vista#util#CacheDirectory() abort
-  let vista_cache_dir = s:cache_dir.'vista'.s:path_separator
-
-  if !isdirectory(vista_cache_dir)
-    call mkdir(vista_cache_dir, 'p')
+  if !isdirectory(s:vista_cache_dir)
+    call mkdir(s:vista_cache_dir, 'p')
   endif
 
-  return vista_cache_dir
+  return s:vista_cache_dir
 endfunction
 
 " Wrap the native cursor() function, with current position
