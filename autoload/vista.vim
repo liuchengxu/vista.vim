@@ -17,6 +17,8 @@ let s:ignore_list = ['vista', 'vista_kind', 'nerdtree', 'startify', 'tagbar', 'f
 let g:vista_icon_indent = get(g:, 'vista_icon_indent', ['└ ', '│ '])
 let g:vista_default_executive = get(g:, 'vista_default_executive', 'ctags')
 let g:vista_fold_toggle_icons = get(g:, 'vista_fold_toggle_icons', ['▼', '▶'])
+let g:vista_update_on_text_changed = get(g:, 'vista_update_on_text_changed', 0)
+let g:vista_update_on_text_changed_delay = get(g:, 'vista_update_on_text_changed_delay', 500)
 
 " Select the absolute nearest function when using binary search.
 let g:vista_find_absolute_nearest_method_or_function = get(g:, 'vista_find_absolute_nearest_method_or_function', 0)

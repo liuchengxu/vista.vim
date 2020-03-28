@@ -52,14 +52,6 @@ function! s:ApplyAppend(line, row, rows) abort
   call add(s:vlnum_cache, line)
 endfunction
 
-function! s:Insert(container, key, line) abort
-  if has_key(a:container, a:key)
-    call add(a:container[a:key], a:line)
-  else
-    let a:container[a:key] = [a:line]
-  endif
-endfunction
-
 " Return the next root name and line after appending to the rows.
 function! s:AppendChild(line, rows, depth) abort
   if has_key(a:line, 'scope')
@@ -269,7 +261,7 @@ function! s:Render() abort
     else
 
       if has_key(potential_root_line, 'kind')
-        call s:Insert(scope_less, potential_root_line.kind, potential_root_line)
+        call vista#util#TryAdd(scope_less, potential_root_line.kind, potential_root_line)
       endif
 
     endif

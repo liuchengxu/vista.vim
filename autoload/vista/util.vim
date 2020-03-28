@@ -262,3 +262,13 @@ function! vista#util#Cursor(...) abort
   normal! m'
   silent call call('cursor', a:000)
 endfunction
+
+" Try initializing the key of dict to be list with the value,
+" otherwise append the value.
+function! vista#util#TryAdd(dict, key, value) abort
+  if has_key(a:dict, a:key)
+    call add(a:dict[a:key], a:value)
+  else
+    let a:dict[a:key] = [a:value]
+  endif
+endfunction
