@@ -8,10 +8,8 @@ let s:find_timer = -1
 let s:cursor_timer = -1
 let s:highlight_timer = -1
 
-let s:find_delay = get(g:, 'vista_find_nearest_method_or_function_delay', 300)
-let s:cursor_delay = get(g:, 'vista_cursor_delay', 400)
-
 let s:echo_cursor_opts = ['echo', 'floating_win', 'scroll', 'both']
+let s:echo_strategy = get(g:, 'vista_echo_cursor_strategy', 'echo')
 
 let s:last_vlnum = v:null
 
@@ -153,7 +151,7 @@ function! vista#cursor#FindNearestMethodOrFunction() abort
   endif
 
   let s:find_timer = timer_start(
-        \ s:find_delay,
+        \ g:vista_find_nearest_method_or_function_delay,
         \ function('s:FindNearestMethodOrFunction'),
         \ )
 endfunction
@@ -177,18 +175,16 @@ function! vista#cursor#ShowDetail(_timer) abort
     return
   endif
 
-  let strategy = get(g:, 'vista_echo_cursor_strategy', 'echo')
-
   let msg = vista#util#Truncate(source_line)
   let lnum = s:GetTrailingLnum()
 
-  if strategy ==# s:echo_cursor_opts[0]
+  if s:echo_strategy ==# s:echo_cursor_opts[0]
     call vista#echo#EchoInCmdline(msg, tag)
-  elseif strategy ==# s:echo_cursor_opts[1]
+  elseif s:echo_strategy ==# s:echo_cursor_opts[1]
     call vista#win#FloatingDisplay(lnum, tag)
-  elseif strategy ==# s:echo_cursor_opts[2]
+  elseif s:echo_strategy ==# s:echo_cursor_opts[2]
     call vista#source#PeekSymbol(lnum, tag)
-  elseif strategy ==# s:echo_cursor_opts[3]
+  elseif s:echo_strategy ==# s:echo_cursor_opts[3]
     call vista#echo#EchoInCmdline(msg, tag)
     call vista#win#FloatingDisplayOrPeek(msg, tag)
   else
@@ -202,7 +198,7 @@ function! vista#cursor#ShowDetailWithDelay() abort
   call s:StopCursorTimer()
 
   let s:cursor_timer = timer_start(
-        \ s:cursor_delay,
+        \ g:vista_cursor_delay,
         \ function('vista#cursor#ShowDetail'),
         \ )
 endfunction
