@@ -41,7 +41,7 @@ function! vista#ftplugin#Set() abort
     let &l:statusline = vista#statusline#()
   endif
 
-  if !exists('g:vista_no_mappings') || ! g:vista_no_mappings
+  if !g:vista_no_mappings
     nnoremap <buffer> <silent> q    :close<CR>
     nnoremap <buffer> <silent> <CR> :<c-u>call vista#cursor#FoldOrJump()<CR>
     nnoremap <buffer> <silent> s    :<c-u>call vista#Sort()<CR>
@@ -50,7 +50,7 @@ function! vista#ftplugin#Set() abort
 
   augroup VistaCursor
     autocmd!
-    if get(g:, 'vista_echo_cursor', 1)
+    if g:vista_echo_cursor
       autocmd CursorMoved <buffer> call vista#cursor#ShowDetailWithDelay()
     endif
     autocmd BufLeave <buffer> call vista#floating#Close()

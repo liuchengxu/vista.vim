@@ -33,7 +33,7 @@ function! vista#jump#TagLine(tag) abort
 
   call vista#win#CloseFloating()
 
-  if get(g:, 'vista_close_on_jump', 0)
+  if g:vista_close_on_jump
     call vista#sidebar#Close()
   endif
 endfunction
