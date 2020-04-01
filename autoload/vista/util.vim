@@ -191,6 +191,8 @@ function! vista#util#LowerIndentLineNr() abort
   return 0
 endfunction
 
+" Return the nearest method of function.
+"
 " array: List of Dict, composed of Method or Function symbols
 " target: current line number in the source buffer
 function! vista#util#BinarySearch(array, target, cmp_key, ret_key) abort
@@ -203,11 +205,7 @@ function! vista#util#BinarySearch(array, target, cmp_key, ret_key) abort
     let mid = (low + high) / 2
     if array[mid][a:cmp_key] == target
       let found = array[mid]
-      if !empty(a:ret_key)
-        return get(found, a:ret_key, v:null)
-      else
-        return found
-      endif
+      return empty(a:ret_key) ? found : get(found, a:ret_key, v:null)
     elseif array[mid][a:cmp_key] > target
       let high = mid - 1
     else
@@ -220,7 +218,7 @@ function! vista#util#BinarySearch(array, target, cmp_key, ret_key) abort
   endif
 
   " If no exact match, prefer the previous nearest one.
-  if get(g:, 'vista_find_absolute_nearest_method_or_function', 0)
+  if g:vista_find_absolute_nearest_method_or_function
     if abs(array[low][a:cmp_key] - target) < abs(array[low - 1][a:cmp_key] - target)
       let found = array[low]
     else
@@ -230,56 +228,47 @@ function! vista#util#BinarySearch(array, target, cmp_key, ret_key) abort
     let found = array[low - 1]
   endif
 
-  if !empty(a:ret_key)
-    return get(found, a:ret_key, v:null)
-  else
-    return found
-  endif
+  return empty(a:ret_key) ? found : get(found, a:ret_key, v:null)
 endfunction
 
-" Return the lines to preview and the target line number in the preview buffer.
-function! vista#util#GetPreviewLines(lnum) abort
-  " Show 5 lines around the tag source line [lnum-5, lnum+5]
-  let range = 5
+if has('nvim')
+  let s:cache_dir = stdpath('cache')
+elseif exists('$XDG_CACHE_HOME')
+  let s:cache_dir = $XDG_CACHE_HOME
+else
+  let s:cache_dir = $HOME . s:path_separator . '.cache'
+endif
 
-  if a:lnum - range > 0
-    let preview_lnum = range + 1
-  else
-    let preview_lnum = a:lnum
-  endif
+if s:cache_dir !~# s:path_separator.'$'
+  let s:cache_dir .= s:path_separator
+endif
 
-  let begin = max([a:lnum - range, 1])
-  let end = begin + range * 2
-
-  return [getbufline(t:vista.source.bufnr, begin, end), preview_lnum]
-endfunction
+let s:vista_cache_dir = s:cache_dir.'vista'.s:path_separator
 
 " Return the directory for caching the tmp data.
 " with the ending /.
 function! vista#util#CacheDirectory() abort
-  if has('nvim')
-    let cache_dir = stdpath('cache')
-  elseif exists('$XDG_CACHE_HOME')
-    let cache_dir = $XDG_CACHE_HOME
-  else
-    let cache_dir = $HOME . s:path_separator . '.cache'
+  if !isdirectory(s:vista_cache_dir)
+    call mkdir(s:vista_cache_dir, 'p')
   endif
 
-  if cache_dir !~# s:path_separator.'$'
-    let cache_dir .= s:path_separator
-  endif
-
-  let vista_cache_dir = cache_dir.'vista'.s:path_separator
-
-  if !isdirectory(vista_cache_dir)
-    call mkdir(vista_cache_dir, 'p')
-  endif
-
-  return vista_cache_dir
+  return s:vista_cache_dir
 endfunction
 
+" Wrap the native cursor() function, with current position
+" pushed to the jumplist before applying cursor()
 function! vista#util#Cursor(...) abort
   " Push the current position to the jumplist
   normal! m'
   silent call call('cursor', a:000)
+endfunction
+
+" Try initializing the key of dict to be list with the value,
+" otherwise append the value.
+function! vista#util#TryAdd(dict, key, value) abort
+  if has_key(a:dict, a:key)
+    call add(a:dict[a:key], a:value)
+  else
+    let a:dict[a:key] = [a:value]
+  endif
 endfunction

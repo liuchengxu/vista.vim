@@ -32,11 +32,8 @@ not least, one important goal of vista.vim is to support LSP symbols, which
 understands the semantics instead of the regex only.
 
 {1} https://github.com/liuchengxu/vista.vim
-
 {2} https://github.com/majutsushi/tagbar
-
 {3} https://github.com/Microsoft/language-server-protocol
-
 {4} https://github.com/tacahiroy/ctrlp-funky
 
 ================================================================================
@@ -99,57 +96,60 @@ Vista                                                                      *Vist
 
   Open vista window for viewing tags or LSP symbols.
 
-  `:Vista`: same with `:Vista ctags` .
+  `:Vista`           same with `:Vista ctags` .
 
-  `:Vista show`:  jump to the tag nearby the current cursor in vista window.
-                This is for ctags `default` renderer only.
+  `:Vista show`      jump to the tag nearby the current cursor in vista window.
+                   This is for ctags `default` renderer only.
 
-  `:Vista toc`:   show table of contents of the markdown file.
+  `:Vista toc`       show table of contents of the markdown file.
 
-                                                                      *vista-focus*
-  `:Vista focus`: jump back and forth between the vista sidebar and the source
-                code window.
+                                                                     *vista-focus*
+
+  `:Vista focus`     jump back and forth between the vista sidebar and the source
+                   code window.
 
                                                                  *vista-executive*
 
-  `:Vista coc`:     open vista window based on coc.nvim.
+  `:Vista coc`       open vista window based on coc.nvim.
 
-  `:Vista ale`:     open vista window based on ale.
+  `:Vista ale`       open vista window based on ale.
 
-  `:Vista lcn`:     open vista window based on LanguageClient-neovim.
+  `:Vista lcn`       open vista window based on LanguageClient-neovim.
 
-  `:Vista ctags`:   open vista window based on ctags.
+  `:Vista ctags`     open vista window based on ctags.
 
-  `:Vista vim_lsp`: open vista window based on vim-lsp.
+  `:Vista vim_lsp`   open vista window based on vim-lsp.
 
-  `:Vista vim_lsc`: open vista window based on vim-lsc.
+  `:Vista vim_lsc`   open vista window based on vim-lsc.
 
-  `:Vista nvim_lsp`: open vista window based on nvim-lsp.
+  `:Vista nvim_lsp`  open vista window based on nvim-lsp.
 
                                                                     *vista-finder*
 
-  `:Vista finder`:  same with `:Vista finder fzf:ctags` .
+  `:Vista finder`   same with `:Vista finder fzf:ctags` .
 
-  `:Vista finder!`: search tags recursively. Note: it's still experimental.
+  `:Vista finder!`  search tags recursively.
+                  Note: it's still experimental.
                   What's more, it may be very slow to generate all tags
                   in a whole project.
 
-  `:Vista finder [finder:executive]`: You can specify either the finder or the
+  `:Vista finder [finder:executive]`
+                  You can specify either the finder or the
                   executive, or the both, e.g., `:Vista finder skim:ctags` .
 
                   Specify the finder or executive, e.g.,:
 
-  `:Vista finder fzf`: same with `:Vista finder fzf:ctags` .
+                  `:Vista finder fzf`  same with `:Vista finder fzf:ctags` .
 
-  `:Vista finder coc`: same with `:Vista finder fzf:coc` .
+                  `:Vista finder coc`  same with `:Vista finder fzf:coc` .
 
                                                                       *vista-info*
 
-  `:Vista info`: print information about vista.vim, including the explicit
-  global variables, autocmds.
+  `:Vista info`     print information about vista.vim, including the explicit
+                  global variables, autocmds.
 
-  `:Vista info+`: copy the output of `:Vista info` to your clipboard, may
-  fail in some cases.
+  `:Vista info+`    copy the output of `:Vista info` to your clipboard, may
+                  fail in some cases.
 
 Vista!                                                                    *Vista!*
 
@@ -221,14 +221,14 @@ g:vista_update_on_text_changed                    *g:vista_update_on_text_change
   Type: |Number|
   Default: `0`
 
-  Update the vista on `TextChanged` and `TextChangedI`.
+  Update the vista on |TextChanged| and |TextChangedI|.
 
 g:vista_update_on_text_changed_delay         *g:vista_update_on_text_changed_delay*
 
   Type: |Number|
   Default: `500`
 
-  Time delay for updating the vista on `TextChanged` and `TextChangedI`.
+  Time delay for updating the vista on |TextChanged| and |TextChangedI|.
 
 g:vista_close_on_jump                                      *g:vista_close_on_jump*
 
@@ -265,7 +265,7 @@ g:vista_top_level_blink                                  *g:vista_top_level_blin
 g:vista_icon_indent                                          *g:vista_icon_indent*
 
   Type: |List|
-  Default: `['└▸ ', '├▸ ']`
+  Default: `['└ ', '│ ']`
 
   How each level is indented and what to prepend. This could make
   the display more compact or more spacious.
@@ -444,7 +444,7 @@ g:vista#renderer#ctags                                    *g:vista#renderer#ctag
 
   Options:
 
-  `default` - render tags in nestest structure.
+  `default` - render tags in nested structure.
   `kind`    - render tags kindwise.
   `line`    - render tags linewise.
 

@@ -2,20 +2,12 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
-function! s:Insert(container, kind, picked) abort
-  if has_key(a:container, a:kind)
-    call add(a:container[a:kind], a:picked)
-  else
-    let a:container[a:kind] = [a:picked]
-  endif
-endfunction
-
 function! s:LoadData(container, line) abort
   let line = a:line
 
   let kind = line.kind
 
-  call s:Insert(t:vista.raw_by_kind, kind, line)
+  call vista#util#TryAdd(t:vista.raw_by_kind, kind, line)
 
   call add(t:vista.raw, line)
 
@@ -38,7 +30,7 @@ function! s:LoadData(container, line) abort
     call add(t:vista.kinds, kind)
   endif
 
-  call s:Insert(a:container, kind, picked)
+  call vista#util#TryAdd(a:container, kind, picked)
 endfunction
 
 " Parse the output from ctags linewise and feed them into the container
@@ -184,7 +176,7 @@ function! vista#parser#ctags#RecursiveFromXformat(line, container) abort
 
   let picked = {'lnum': lnum, 'text': tagname, 'tagfile': relpath, 'taginfo': pattern[2:-3]}
 
-  call s:Insert(a:container, kind, picked)
+  call vista#util#TryAdd(a:container, kind, picked)
 endfunction
 
 function! vista#parser#ctags#RecursiveFromJSON(line, container) abort
@@ -210,5 +202,5 @@ function! vista#parser#ctags#RecursiveFromJSON(line, container) abort
 
   let picked = {'lnum': line.line, 'text': line.name, 'tagfile': line.path, 'taginfo': line.pattern[2:-3]}
 
-  call s:Insert(a:container, kind, picked)
+  call vista#util#TryAdd(a:container, kind, picked)
 endfunction

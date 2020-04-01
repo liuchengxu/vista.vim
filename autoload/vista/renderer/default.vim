@@ -12,9 +12,9 @@ let s:visibility_icon = {
       \ 'private': '-',
       \ }
 
-let g:vista_fold_toggle_icons = get(g:, 'vista_fold_toggle_icons', ['▼', '▶'])
-
 let g:vista#renderer#default#vlnum_offset = 3
+
+let s:indent_size = g:vista#renderer#enable_icon ? 2 : 4
 
 " Return the rendered row to be displayed given the depth
 function! s:Assemble(line, depth) abort
@@ -23,7 +23,7 @@ function! s:Assemble(line, depth) abort
   let kind = get(line, 'kind', '')
 
   let row = vista#util#Join(
-        \ repeat(' ', a:depth * 4),
+        \ repeat(' ', a:depth * s:indent_size),
         \ s:GetVisibility(line),
         \ vista#renderer#IconFor(kind).' ',
         \ get(line, 'name'),
@@ -52,14 +52,6 @@ function! s:ApplyAppend(line, row, rows) abort
 
   call add(rows, a:row)
   call add(s:vlnum_cache, line)
-endfunction
-
-function! s:Insert(container, key, line) abort
-  if has_key(a:container, a:key)
-    call add(a:container[a:key], a:line)
-  else
-    let a:container[a:key] = [a:line]
-  endif
 endfunction
 
 " Return the next root name and line after appending to the rows.
@@ -271,7 +263,7 @@ function! s:Render() abort
     else
 
       if has_key(potential_root_line, 'kind')
-        call s:Insert(scope_less, potential_root_line.kind, potential_root_line)
+        call vista#util#TryAdd(scope_less, potential_root_line.kind, potential_root_line)
       endif
 
     endif

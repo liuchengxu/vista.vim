@@ -85,7 +85,7 @@ function! s:DisplayAt(lnum, tag, vista_winid) abort
     return
   endif
 
-  let [lines, s:popup_lnum] = vista#util#GetPreviewLines(a:lnum)
+  let [lines, s:popup_lnum] = vista#preview#GetLines(a:lnum)
 
   call s:OpenPopup(lines)
 

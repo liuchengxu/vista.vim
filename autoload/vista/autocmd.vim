@@ -4,7 +4,6 @@
 
 let s:registered = []
 let s:update_timer = -1
-let s:update_delay = get(g:, 'vista_update_on_text_changed_delay', 500)
 
 function! s:ClearOtherEvents(group) abort
   for augroup in s:registered
@@ -46,7 +45,7 @@ function! s:AutoUpdateWithDelay(bufnr, fpath) abort
 
   let t:vista.on_text_changed = 1
   let s:update_timer = timer_start(
-        \ s:update_delay,
+        \ g:vista_update_on_text_changed_delay,
         \ { -> s:GenericAutoUpdate(a:bufnr, a:fpath)}
         \ )
 endfunction
@@ -87,7 +86,7 @@ function! vista#autocmd#Init(group_name, AUF) abort
     autocmd BufEnter *
           \ call s:OnBufEnter(+expand('<abuf>'), fnamemodify(expand('<afile>'), ':p'))
 
-    if get(g:, 'vista_update_on_text_changed', 0)
+    if g:vista_update_on_text_changed
       autocmd TextChanged,TextChangedI *
             \ call s:AutoUpdateWithDelay(+expand('<abuf>'), fnamemodify(expand('<afile>'), ':p'))
     endif

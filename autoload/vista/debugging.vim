@@ -4,6 +4,11 @@
 
 function! s:GetAvaliableExecutives() abort
   let avaliable = []
+
+  if exists('*ale#lsp_linter#SendRequest')
+    call add(avaliable, 'ale')
+  endif
+
   if exists('*CocAction')
     call add(avaliable, 'coc')
   endif
@@ -16,12 +21,12 @@ function! s:GetAvaliableExecutives() abort
     call add(avaliable, 'lcn')
   endif
 
-  if exists('*lsp#get_whitelisted_servers')
-    call add(avaliable, 'vim_lsp')
+  if exists('*lsc#server#userCall')
+    call add(avaliable, 'vim_lsc')
   endif
 
-  if exists('*ale#lsp_linter#SendRequest')
-    call add(avaliable, 'ale')
+  if exists('*lsp#get_whitelisted_servers')
+    call add(avaliable, 'vim_lsp')
   endif
 
   return avaliable
