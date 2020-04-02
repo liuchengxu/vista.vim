@@ -58,6 +58,8 @@ endfunction
 " workaround for #52
 "
 " see also #71
+"
+" NOTE: a:winnr is winnr, not winid. Ref https://github.com/liuchengxu/vim-clap/issues/371
 function! vista#win#Execute(winnr, Run, ...) abort
   if winnr() != a:winnr
     noautocmd execute a:winnr.'wincmd w'
