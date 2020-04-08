@@ -95,6 +95,11 @@ function! vista#parser#ctags#FromExtendedRaw(line, container) abort
   if a:line =~# '^!_TAG'
     return
   endif
+  " Prevent bugs when a:line is all whitespace
+  if a:line =~# '^\s*$'
+    return
+  endif
+
   let items = split(a:line, '\t')
 
   let line = {}
