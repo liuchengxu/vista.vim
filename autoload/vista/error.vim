@@ -59,9 +59,9 @@ endfunction
 
 " Notify the error message when required.
 function! vista#error#Notify(msg) abort
-  if !get(t:vista, 'silent', v:true)
+  if !get(g:vista, 'silent', v:true)
     call vista#error#(a:msg)
-    let t:vista.silent = v:true
+    let g:vista.silent = v:true
   endif
 endfunction
 

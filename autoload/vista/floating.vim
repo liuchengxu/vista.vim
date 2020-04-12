@@ -48,7 +48,7 @@ function! s:CalculatePosition(lines) abort
 endfunction
 
 function! s:ApplyClose() abort
-  if !exists('t:vista')
+  if !exists('g:vista')
     return
   endif
 
@@ -64,7 +64,7 @@ function! s:ApplyClose() abort
     endif
   endif
 
-  let t:vista.floating_visible = v:false
+  let g:vista.floating_visible = v:false
 endfunction
 
 function! s:CloseOnCursorMoved() abort
@@ -94,7 +94,7 @@ function! s:CloseOnWinEnter() abort
   autocmd! VistaFloatingWin
   execute winnr.'wincmd c'
 
-  let t:vista.floating_visible = v:false
+  let g:vista.floating_visible = v:false
 endfunction
 
 function! s:HighlightTagInFloatinWin() abort
@@ -151,7 +151,7 @@ function! s:Display(msg, win_id) abort
 
   call s:HighlightTagInFloatinWin()
 
-  let &l:filetype = getbufvar(t:vista.source.bufnr, '&ft')
+  let &l:filetype = getbufvar(g:vista.source.bufnr, '&ft')
   setlocal
         \ winhl=Normal:Pmenu
         \ buftype=nofile
@@ -171,7 +171,7 @@ function! s:Display(msg, win_id) abort
     autocmd BufEnter,WinEnter,WinLeave  * call s:CloseOnWinEnter()
   augroup END
 
-  let t:vista.floating_visible = v:true
+  let g:vista.floating_visible = v:true
 endfunction
 
 function! vista#floating#Close() abort
@@ -185,7 +185,7 @@ function! s:ShouldSkipDisplay(lnum) abort
   silent! call timer_stop(s:floating_timer)
 
   if a:lnum == s:last_lnum
-        \ && get(t:vista, 'floating_visible', v:false)
+        \ && get(g:vista, 'floating_visible', v:false)
     return 1
   else
     let s:last_lnum = a:lnum

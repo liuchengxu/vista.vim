@@ -14,7 +14,7 @@ function! s:ClearOtherEvents(group) abort
 endfunction
 
 function! s:OnBufEnter(bufnr, fpath) abort
-  if !exists('t:vista')
+  if !exists('g:vista')
     return
   endif
 
@@ -34,7 +34,7 @@ function! s:GenericAutoUpdate(bufnr, fpath) abort
 endfunction
 
 function! s:AutoUpdateWithDelay(bufnr, fpath) abort
-  if !exists('t:vista')
+  if !exists('g:vista')
     return
   endif
 
@@ -43,7 +43,7 @@ function! s:AutoUpdateWithDelay(bufnr, fpath) abort
     let s:update_timer = -1
   endif
 
-  let t:vista.on_text_changed = 1
+  let g:vista.on_text_changed = 1
   let s:update_timer = timer_start(
         \ g:vista_update_on_text_changed_delay,
         \ { -> s:GenericAutoUpdate(a:bufnr, a:fpath)}

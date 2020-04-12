@@ -11,7 +11,7 @@ function! s:ClosePopup() abort
     call popup_hide(s:popup_winid)
     autocmd! VistaPopup
   endif
-  let t:vista.popup_visible = v:false
+  let g:vista.popup_visible = v:false
 endfunction
 
 call prop_type_delete('VistaMatch')
@@ -54,7 +54,7 @@ function! s:OpenPopup(lines) abort
     let s:popup_winid = popup_create(a:lines, pos_opts)
     let s:popup_bufnr = winbufnr(s:popup_winid)
 
-    let filetype = getbufvar(t:vista.source.bufnr, '&ft')
+    let filetype = getbufvar(g:vista.source.bufnr, '&ft')
     call win_execute(s:popup_winid, 'setlocal filetype='.filetype.' nofoldenable')
   else
     silent call deletebufline(s:popup_bufnr, 1, '$')
@@ -69,7 +69,7 @@ function! s:OpenPopup(lines) abort
     autocmd BufEnter,WinEnter,WinLeave * call s:ClosePopup()
   augroup END
 
-  let t:vista.popup_visible = v:true
+  let g:vista.popup_visible = v:true
 endfunction
 
 function! s:DisplayRawAt(lnum, lines, vista_winid) abort
@@ -108,7 +108,7 @@ endfunction
 
 function! s:DispatchDisplayer(Displayer, lnum, tag_or_raw_lines) abort
   if a:lnum == s:last_lnum
-        \ || get(t:vista, 'popup_visible', v:false)
+        \ || get(g:vista, 'popup_visible', v:false)
     return
   endif
 

@@ -46,11 +46,11 @@ function! vista#echo#EchoScopeInCmdlineIsOk() abort
 endfunction
 
 function! vista#echo#EchoScopeFromCacheIsOk() abort
-  if has_key(t:vista, 'vlnum_cache')
+  if has_key(g:vista, 'vlnum_cache')
     " should exclude the first two lines and keep in mind that the 1-based and
     " 0-based.
     " This is really error prone.
-    let tagline = get(t:vista.vlnum_cache, line('.') - 3, '')
+    let tagline = get(g:vista.vlnum_cache, line('.') - 3, '')
     if !empty(tagline)
       if has_key(tagline, 'scope')
         call s:EchoScope(tagline.scope)

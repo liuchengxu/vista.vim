@@ -7,14 +7,14 @@ function! s:LoadData(container, line) abort
 
   let kind = line.kind
 
-  call vista#util#TryAdd(t:vista.raw_by_kind, kind, line)
+  call vista#util#TryAdd(g:vista.raw_by_kind, kind, line)
 
-  call add(t:vista.raw, line)
+  call add(g:vista.raw, line)
 
   if has_key(line, 'scope')
-    call add(t:vista.with_scope, line)
+    call add(g:vista.with_scope, line)
   else
-    call add(t:vista.without_scope, line)
+    call add(g:vista.without_scope, line)
   endif
 
   let picked = {'lnum': line.line, 'text': get(line, 'name', '') }
@@ -23,11 +23,11 @@ function! s:LoadData(container, line) abort
     if has_key(line, 'signature')
       let picked.signature = line.signature
     endif
-    call add(t:vista.functions, picked)
+    call add(g:vista.functions, picked)
   endif
 
-  if index(t:vista.kinds, kind) == -1
-    call add(t:vista.kinds, kind)
+  if index(g:vista.kinds, kind) == -1
+    call add(g:vista.kinds, kind)
   endif
 
   call vista#util#TryAdd(a:container, kind, picked)
@@ -46,7 +46,7 @@ endfunction
 " }
 
 function! s:ShortToLong(short) abort
-  let ft = getbufvar(t:vista.source.bufnr, '&filetype')
+  let ft = getbufvar(g:vista.source.bufnr, '&filetype')
 
   try
 
@@ -71,8 +71,8 @@ function! s:ParseTagfield(tagfields) abort
   else
     let kind = s:ShortToLong(a:tagfields[0])
     let fields.kind = kind
-    if index(t:vista.kinds, kind) == -1
-      call add(t:vista.kinds, kind)
+    if index(g:vista.kinds, kind) == -1
+      call add(g:vista.kinds, kind)
     endif
   endif
 

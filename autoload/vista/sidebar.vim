@@ -4,10 +4,10 @@
 
 " Which filetype the current sidebar should be.
 function! vista#sidebar#WhichFileType() abort
-  if t:vista.provider ==# 'coc'
-        \ || (t:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default')
+  if g:vista.provider ==# 'coc'
+        \ || (g:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default')
     return 'vista'
-  elseif t:vista.provider ==# 'markdown'
+  elseif g:vista.provider ==# 'markdown'
     return 'vista_markdown'
   else
     return 'vista_kind'
@@ -23,7 +23,7 @@ function! s:NewWindow() abort
   execute 'setlocal filetype='.vista#sidebar#WhichFileType()
 
   " FIXME when to delete?
-  if has_key(t:vista.source, 'fpath')
+  if has_key(g:vista.source, 'fpath')
     let w:vista_first_line_hi_id = matchaddpos('MoreMsg', [1])
   endif
 endfunction
@@ -34,32 +34,32 @@ function! vista#sidebar#Reload(data) abort
   "   May be triggered by autocmd event sometimes
   "   e.g., unsupported filetypes for ctags or no related language servers.
   "
-  " !has_key(t:vista, 'bufnr'):
-  "   May opening a new tab if bufnr does not exist in t:vista.
+  " !has_key(g:vista, 'bufnr'):
+  "   May opening a new tab if bufnr does not exist in g:vista.
   "
-  " t:vista.winnr() == -1:
+  " g:vista.winnr() == -1:
   "   vista window is not visible.
   if empty(a:data)
-        \ || !has_key(t:vista, 'bufnr')
-        \ || t:vista.winnr() == -1
+        \ || !has_key(g:vista, 'bufnr')
+        \ || g:vista.winnr() == -1
     return
   endif
 
   let rendered = vista#renderer#Render(a:data)
-  call vista#util#SetBufline(t:vista.bufnr, rendered)
+  call vista#util#SetBufline(g:vista.bufnr, rendered)
 endfunction
 
 " Open or update vista buffer given the rendered rows.
 function! vista#sidebar#OpenOrUpdate(rows) abort
   " (Re)open a window and move to it
-  if !exists('t:vista.bufnr')
+  if !exists('g:vista.bufnr')
     call s:NewWindow()
-    let t:vista = get(t:, 'vista', {})
-    let t:vista.bufnr = bufnr('%')
-    let t:vista.winid = win_getid()
-    let t:vista.pos = [winsaveview(), winnr(), winrestcmd()]
+    let g:vista = get(g:, 'vista', {})
+    let g:vista.bufnr = bufnr('%')
+    let g:vista.winid = win_getid()
+    let g:vista.pos = [winsaveview(), winnr(), winrestcmd()]
   else
-    let winnr = t:vista.winnr()
+    let winnr = g:vista.winnr()
     if winnr == -1
       call s:NewWindow()
     elseif winnr() != winnr
@@ -71,11 +71,11 @@ function! vista#sidebar#OpenOrUpdate(rows) abort
     doautocmd User VistaWinOpen
   endif
 
-  call vista#util#SetBufline(t:vista.bufnr, a:rows)
+  call vista#util#SetBufline(g:vista.bufnr, a:rows)
 
-  if has_key(t:vista, 'lnum')
-    call vista#cursor#ShowTagFor(t:vista.lnum)
-    unlet t:vista.lnum
+  if has_key(g:vista, 'lnum')
+    call vista#cursor#ShowTagFor(g:vista.lnum)
+    unlet g:vista.lnum
   endif
 
   if !get(g:, 'vista_stay_on_open', 1)
@@ -84,8 +84,8 @@ function! vista#sidebar#OpenOrUpdate(rows) abort
 endfunction
 
 function! vista#sidebar#Close() abort
-  if exists('t:vista.bufnr')
-    let winnr = t:vista.winnr()
+  if exists('g:vista.bufnr')
+    let winnr = g:vista.winnr()
     if winnr != -1
       noautocmd execute winnr.'wincmd c'
     endif
@@ -95,8 +95,8 @@ function! vista#sidebar#Close() abort
       wincmd p
     endif
 
-    silent execute  t:vista.bufnr.'bwipe!'
-    unlet t:vista.bufnr
+    silent execute  g:vista.bufnr.'bwipe!'
+    unlet g:vista.bufnr
   endif
 
   call s:ClearAugroups('VistaCoc', 'VistaCtags')
@@ -130,15 +130,15 @@ function! vista#sidebar#IsOpen() abort
 endfunction
 
 function! vista#sidebar#ToggleFocus() abort
-  if !exists('t:vista') || t:vista.winnr() == -1
+  if !exists('g:vista') || g:vista.winnr() == -1
     call vista#sidebar#Open()
     return
   endif
-  let winnr = t:vista.winnr()
+  let winnr = g:vista.winnr()
   if winnr != winnr()
     execute winnr.'wincmd w'
   else
-    execute t:vista.source.get_winnr().'wincmd w'
+    execute g:vista.source.get_winnr().'wincmd w'
   endif
 endfunction
 

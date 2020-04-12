@@ -46,7 +46,7 @@ function! s:viewer.render() abort
 
     if !empty(v)
 
-      if get(t:vista, 'sort', v:false)
+      if get(g:vista, 'sort', v:false)
         let v = sort(copy(v), function('s:Compare'))
       endif
 

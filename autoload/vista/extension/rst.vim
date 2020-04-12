@@ -15,7 +15,7 @@ function! s:GatherHeaderMetadata() abort
   let adornment_levels = {}
   let adornment_id = 2
 
-  let lines = t:vista.source.lines()
+  let lines = g:vista.source.lines()
   while idx < len(lines)
     let line = lines[idx]
     let matched_line = get(lines, idx + 1, '')
@@ -50,10 +50,10 @@ function! vista#extension#rst#GetHeader(lnum) abort
 endfunction
 
 function! s:ApplyAutoUpdate() abort
-  if has_key(t:vista, 'bufnr') && t:vista.winnr() != -1
+  if has_key(g:vista, 'bufnr') && g:vista.winnr() != -1
     call vista#SetProvider(s:provider)
     let rendered = vista#renderer#markdown_like#RST(s:GatherHeaderMetadata())
-    call vista#util#SetBufline(t:vista.bufnr, rendered)
+    call vista#util#SetBufline(g:vista.bufnr, rendered)
   endif
 endfunction
 
@@ -62,9 +62,9 @@ function! vista#extension#rst#AutoUpdate(fpath) abort
 endfunction
 
 function! s:AutoUpdate(fpath) abort
-  if t:vista.source.filetype() ==# 'rst'
+  if g:vista.source.filetype() ==# 'rst'
     call s:ApplyAutoUpdate()
-  elseif t:vista.source.filetype() ==# 'markdown'
+  elseif g:vista.source.filetype() ==# 'markdown'
     call vista#extension#markdown#AutoUpdate(a:fpath)
   else
     call vista#executive#ctags#AutoUpdate(a:fpath)

@@ -3,24 +3,24 @@
 " vim: ts=2 sw=2 sts=2 et
 
 function! vista#init#Api() abort
-  let t:vista = {}
+  let g:vista = {}
 
   " =========================================
   " Api for manipulating the vista buffer.
   " =========================================
-  function! t:vista.winnr() abort
+  function! g:vista.winnr() abort
     return bufwinnr('__vista__')
   endfunction
 
-  function! t:vista.winid() abort
+  function! g:vista.winid() abort
     return bufwinid('__vista__')
   endfunction
 
   " Get original tagline given the lnum in vista sidebar
   "
   " Mind the offset
-  function! t:vista.get_tagline_under_cursor() abort
-    return get(t:vista.vlnum_cache, line('.') - g:vista#renderer#default#vlnum_offset, '')
+  function! g:vista.get_tagline_under_cursor() abort
+    return get(g:vista.vlnum_cache, line('.') - g:vista#renderer#default#vlnum_offset, '')
   endfunction
 
   " =========================================
@@ -81,5 +81,5 @@ function! vista#init#Api() abort
     return get(type, 'sro', '.')
   endfunction
 
-  let t:vista.source = source_handle
+  let g:vista.source = source_handle
 endfunction

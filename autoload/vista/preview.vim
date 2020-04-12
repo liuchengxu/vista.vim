@@ -16,5 +16,5 @@ function! vista#preview#GetLines(lnum) abort
   let begin = max([a:lnum - range, 1])
   let end = begin + range * 2
 
-  return [getbufline(t:vista.source.bufnr, begin, end), preview_lnum]
+  return [getbufline(g:vista.source.bufnr, begin, end), preview_lnum]
 endfunction

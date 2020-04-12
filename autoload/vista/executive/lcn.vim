@@ -48,7 +48,7 @@ function! s:RunAsync() abort
   if exists('*LanguageClient#textDocument_documentSymbol')
     call vista#SetProvider(s:provider)
     call vista#win#Execute(
-          \ t:vista.source.get_winnr(),
+          \ g:vista.source.get_winnr(),
           \ function('LanguageClient#textDocument_documentSymbol'),
           \ {'handle': v:false},
           \ function('s:HandleLSPResponse')
@@ -71,7 +71,7 @@ function! vista#executive#lcn#Execute(bang, should_display, ...) abort
 
   call vista#OnExecute(s:provider, function('s:AutoUpdate'))
 
-  let t:vista.silent = v:false
+  let g:vista.silent = v:false
   let s:should_display = a:should_display
 
   if a:bang

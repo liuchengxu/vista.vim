@@ -12,7 +12,7 @@ function! vista#jump#TagLine(tag) abort
   endif
 
   let lnum = cur_line[-1]
-  let line = getbufline(t:vista.source.bufnr, lnum)
+  let line = getbufline(g:vista.source.bufnr, lnum)
 
   if empty(line)
     return

@@ -51,7 +51,7 @@ function! s:RunAsync() abort
   endif
 
   let method = 'textDocument/documentSymbol'
-  let bufnr = t:vista.source.bufnr
+  let bufnr = g:vista.source.bufnr
   let params = {
     \   'textDocument': {
     \       'uri': ale#path#ToURI(expand('#' . bufnr . ':p')),
@@ -83,7 +83,7 @@ function! vista#executive#ale#Execute(bang, should_display, ...) abort
   call vista#source#Update(bufnr('%'), winnr(), expand('%'), expand('%:p'))
   let s:fpath = expand('%:p')
 
-  let t:vista.silent = v:false
+  let g:vista.silent = v:false
   let s:should_display = a:should_display
 
   call vista#OnExecute(s:provider, function('s:AutoUpdate'))

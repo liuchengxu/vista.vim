@@ -57,7 +57,7 @@ function! vista#finder#GetSymbols(...) abort
 
   let should_skip = vista#ShouldSkip()
   if should_skip
-    let fpath = t:vista.source.fpath
+    let fpath = g:vista.source.fpath
   else
     let fpath = expand('%:p')
   endif
@@ -71,7 +71,7 @@ function! vista#finder#GetSymbols(...) abort
       let [bufnr, winnr, fname] = [bufnr('%'), winnr(), expand('%')]
       call vista#source#Update(bufnr, winnr, fname, fpath)
     endif
-    let t:vista.skip_set_provider = v:true
+    let g:vista.skip_set_provider = v:true
     " In this case, we normally want to run synchronously IMO.
     let s:data = vista#executive#{executive}#Run(fpath)
   endif
@@ -114,7 +114,7 @@ function! s:FindColumnBoundary(grouped_data) abort
 endfunction
 
 function! s:IntoRow(icon, kind, item) abort
-  let line = t:vista.source.line_trimmed(a:item.lnum)
+  let line = g:vista.source.line_trimmed(a:item.lnum)
   let lnum_and_text = printf('%s:%s', a:item.text, a:item.lnum)
   let row = printf('%s%s  [%s]%s  %s',
         \ lnum_and_text, repeat(' ', s:max_len_lnum_and_text- strwidth(lnum_and_text)),
@@ -163,11 +163,11 @@ function! vista#finder#PrepareOpts(source, prompt) abort
 
     if has('win32')
       " keeping old code around since we are not sure if / how preview works on windows
-      let preview_opts[-1] = preview_opts[-1][0:-3] . t:vista.source.fpath . (g:vista#renderer#enable_icon ? ':{2}' : ':{1}')
+      let preview_opts[-1] = preview_opts[-1][0:-3] . g:vista.source.fpath . (g:vista#renderer#enable_icon ? ':{2}' : ':{1}')
     else
       let object_name_index = g:vista#renderer#enable_icon ? '2' : '1'
       let extract_line_number = ':$(echo {' . object_name_index . "} | grep -o '[^:]*$')"
-      let preview_opts[-1] = preview_opts[-1][0:-3] . t:vista.source.fpath . extract_line_number
+      let preview_opts[-1] = preview_opts[-1][0:-3] . g:vista.source.fpath . extract_line_number
     endif
 
     call extend(opts.options, preview_opts)

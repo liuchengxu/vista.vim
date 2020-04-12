@@ -72,7 +72,7 @@ function! vista#executive#nvim_lsp#Execute(bang, should_display, ...) abort
 
   call vista#OnExecute(s:provider, function('s:AutoUpdate'))
 
-  let t:vista.silent = v:false
+  let g:vista.silent = v:false
   let g:vista_executive_nvim_lsp_should_display = a:should_display
 
   if a:bang

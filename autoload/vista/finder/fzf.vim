@@ -81,7 +81,7 @@ endfunction
 
 function! vista#finder#fzf#sink(line) abort
   let [lnum, tag] = vista#finder#fzf#extract(a:line)
-  let col = stridx(t:vista.source.line(lnum), tag)
+  let col = stridx(g:vista.source.line(lnum), tag)
   let col = col == -1 ? 1 : col + 1
   call vista#source#GotoWin()
   call cursor(lnum, col)

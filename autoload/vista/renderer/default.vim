@@ -83,7 +83,7 @@ function! s:RealParentOf(candidate) abort
   let kind = candidate.scopeKind
 
   let parent_candidates = []
-  for pc in t:vista.without_scope
+  for pc in g:vista.without_scope
     if pc.name ==# name && pc.kind ==# kind && pc.line <= candidate.line
       call add(parent_candidates, pc)
     endif
@@ -173,7 +173,7 @@ function! s:RenderDescendants(parent_name, parent_line, descendants, rows, depth
     let child_name = grandchildren[idx]
     let child_line = grandchildren_line[idx]
 
-    let descendants = s:DescendantsOf(t:vista.with_scope, child_line, child_name)
+    let descendants = s:DescendantsOf(g:vista.with_scope, child_line, child_name)
 
     if !empty(descendants)
       call s:RenderDescendants(child_name, child_line, descendants, a:rows, depth)
@@ -201,7 +201,7 @@ function! s:RenderScopeless(scope_less, rows) abort
 
     let lines = scope_less[kind]
 
-    if get(t:vista, 'sort', v:false)
+    if get(g:vista, 'sort', v:false)
       let lines = sort(copy(lines), function('s:SortCompare'))
     endif
 
@@ -229,7 +229,7 @@ function! s:RenderScopeless(scope_less, rows) abort
 endfunction
 
 function! s:Render() abort
-  let s:scope_seperator = t:vista.source.scope_seperator()
+  let s:scope_seperator = g:vista.source.scope_seperator()
 
   let rows = []
 
@@ -244,14 +244,14 @@ function! s:Render() abort
 
   let scope_less = {}
 
-  let without_scope = t:vista.without_scope
+  let without_scope = g:vista.without_scope
 
   " The root of hierarchy structure doesn't have scope field.
   for potential_root_line in without_scope
 
     let root_name = potential_root_line.name
 
-    let descendants = s:DescendantsOfRoot(t:vista.with_scope, potential_root_line)
+    let descendants = s:DescendantsOfRoot(g:vista.with_scope, potential_root_line)
 
     if !empty(descendants)
 
@@ -283,13 +283,13 @@ function! s:Render() abort
     let idx += 1
   endwhile
 
-  let t:vista.vlnum_cache = s:vlnum_cache
+  let g:vista.vlnum_cache = s:vlnum_cache
 
   return rows
 endfunction
 
 function! vista#renderer#default#Render() abort
-  if empty(t:vista.raw)
+  if empty(g:vista.raw)
     return []
   endif
 

@@ -6,7 +6,7 @@
 function! s:MatchTag(trimmed_line) abort
   " Since we include the space ` `, we need to trim the result later.
   " / --> github.com/golang/dep/gps:11
-  if t:vista.provider ==# 'markdown'
+  if g:vista.provider ==# 'markdown'
     let matched = matchlist(a:trimmed_line, '\([a-zA-Z:#_.,/<> ]\-\+\)\(H\d:\d\+\)$')
   else
     let matched = matchlist(a:trimmed_line, '\([a-zA-Z:#_.,/<> ]\-\+\):\(\d\+\)$')
@@ -34,15 +34,15 @@ function! vista#cursor#ctags#GetInfo() abort
   let last_semicoln_idx = strridx(raw_cur_line, ':')
   let lnum = raw_cur_line[last_semicoln_idx+1:]
 
-  let source_line = t:vista.source.line_trimmed(lnum)
+  let source_line = g:vista.source.line_trimmed(lnum)
   if empty(source_line)
     return [v:null, v:null]
   endif
 
   " For scoped tag
   " Currently vlnum_cache is ctags provider only.
-  if has_key(t:vista, 'vlnum_cache') && t:vista.provider ==# 'ctags'
-    let tagline = t:vista.get_tagline_under_cursor()
+  if has_key(g:vista, 'vlnum_cache') && g:vista.provider ==# 'ctags'
+    let tagline = g:vista.get_tagline_under_cursor()
     if !empty(tagline)
       return [tagline.name, source_line]
     endif

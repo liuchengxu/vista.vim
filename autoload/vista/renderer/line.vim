@@ -15,10 +15,10 @@ function! s:RenderLinewise() abort
 
   " FIXME the same kind tags could be in serveral sections
   let idx = 0
-  let raw_len = len(t:vista.raw)
+  let raw_len = len(g:vista.raw)
 
   while idx < raw_len
-    let line = t:vista.raw[idx]
+    let line = g:vista.raw[idx]
 
     if has_key(line, 'access')
       let access = get(s:visibility_icon, line.access, '?')
@@ -42,7 +42,7 @@ function! s:RenderLinewise() abort
 
     " Append a blank line in the last of a section.
     if has_key(line, 'kind') && idx < raw_len - 1
-      if line.kind != get(t:vista.raw[idx+1], 'kind')
+      if line.kind != get(g:vista.raw[idx+1], 'kind')
         call add(rows, '')
       endif
     endif
@@ -56,7 +56,7 @@ function! s:RenderLinewise() abort
 endfunction
 
 function! vista#renderer#line#Render() abort
-  if empty(t:vista.raw)
+  if empty(g:vista.raw)
     return []
   endif
 

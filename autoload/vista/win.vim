@@ -29,7 +29,7 @@ function! vista#win#ShowFoldedDetailInFloatingIsOk() abort
     if s:has_floating_win || s:has_popup
       let foldclosed_end = foldclosedend('.')
       let curlnum = line('.')
-      let lines = getbufline(t:vista.bufnr, curlnum, foldclosed_end)
+      let lines = getbufline(g:vista.bufnr, curlnum, foldclosed_end)
 
       if s:has_floating_win
         call vista#floating#DisplayRawAt(curlnum, lines)

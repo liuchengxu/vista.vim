@@ -29,9 +29,9 @@ endif
 
 " Set the file path as the first line if possible.
 function! s:PrependFpath(lines) abort
-  if exists('t:vista.source.fpath')
-    let width = winwidth(t:vista.winnr())
-    let fpath = t:vista.source.fpath
+  if exists('g:vista.source.fpath')
+    let width = winwidth(g:vista.winnr())
+    let fpath = g:vista.source.fpath
     " Shorten the file path if it's too long
     if len(fpath) > width
       let fpath = '..'.fpath[len(fpath)-width+4 : ]
@@ -89,7 +89,7 @@ function! s:SafeSetBufline(bufnr, lines) abort
   " executives/extensions.
   "
   " rst shares the same syntax with vista_markdown.
-  if t:vista.source.filetype() ==# 'rst'
+  if g:vista.source.filetype() ==# 'rst'
     execute 'runtime! syntax/vista_markdown.vim'
   else
     execute 'runtime! syntax/'.filetype.'vim'
@@ -97,7 +97,7 @@ function! s:SafeSetBufline(bufnr, lines) abort
 endfunction
 
 function! vista#util#SetBufline(bufnr, lines) abort
-  call vista#win#Execute(t:vista.winnr(), function('s:SafeSetBufline'), a:bufnr, a:lines)
+  call vista#win#Execute(g:vista.winnr(), function('s:SafeSetBufline'), a:bufnr, a:lines)
 endfunction
 
 function! vista#util#Join(...) abort

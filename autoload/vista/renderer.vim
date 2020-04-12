@@ -72,9 +72,9 @@ function! vista#renderer#Decorate(kind) abort
 endfunction
 
 function! s:Render(data) abort
-  if t:vista.provider ==# 'coc'
+  if g:vista.provider ==# 'coc'
     return vista#renderer#hir#lsp#Coc(a:data)
-  elseif t:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default'
+  elseif g:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default'
     return vista#renderer#default#Render()
   else
     " The kind renderer applys to the LSP provider.
@@ -98,7 +98,7 @@ function! vista#renderer#LSPPreprocess(lsp_result) abort
   call map(a:lsp_result, 'vista#parser#lsp#KindToSymbol(v:val, lines)')
 
   let processed_data = {}
-  let t:vista.functions = []
+  let g:vista.functions = []
   call map(lines, 'vista#parser#lsp#ExtractSymbol(v:val, processed_data)')
 
   return processed_data

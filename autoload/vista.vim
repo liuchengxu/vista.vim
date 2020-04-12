@@ -27,11 +27,11 @@ function! vista#ShouldIgnore(kind) abort
 endfunction
 
 function! vista#SetProvider(provider) abort
-  if get(t:vista, 'skip_set_provider', v:false)
-    let t:vista.skip_set_provider = v:false
+  if get(g:vista, 'skip_set_provider', v:false)
+    let g:vista.skip_set_provider = v:false
     return
   endif
-  let t:vista.provider = a:provider
+  let g:vista.provider = a:provider
   call vista#statusline#Render()
 endfunction
 
@@ -42,13 +42,13 @@ endfunction
 
 " Sort the items under some kind alphabetically.
 function! vista#Sort() abort
-  if !has_key(t:vista, 'sort')
-    let t:vista.sort = v:true
+  if !has_key(g:vista, 'sort')
+    let g:vista.sort = v:true
   else
-    let t:vista.sort = !t:vista.sort
+    let g:vista.sort = !g:vista.sort
   endif
 
-  let cache = vista#executive#{t:vista.provider}#Cache()
+  let cache = vista#executive#{g:vista.provider}#Cache()
 
   let cur_pos = getpos('.')
 
@@ -91,7 +91,7 @@ function! vista#GetExplicitExecutiveOrDefault() abort
 endfunction
 
 function! s:TryInitializeVista() abort
-  if !exists('t:vista')
+  if !exists('g:vista')
     call vista#init#Api()
   endif
 endfunction
@@ -120,7 +120,7 @@ endfunction
 function! s:HandleSingleArgument(arg) abort
   if index(g:vista#executives, a:arg) > -1
     call vista#executive#{a:arg}#Execute(v:false, v:true)
-    let t:vista.lnum = line('.')
+    let g:vista.lnum = line('.')
   elseif a:arg ==# 'finder'
     call vista#finder#Dispatch(v:false, '', '')
   elseif a:arg ==# 'finder!'
@@ -138,7 +138,7 @@ function! s:HandleSingleArgument(arg) abort
       call vista#cursor#ShowTag()
     else
       call vista#sidebar#Open()
-      let t:vista.lnum = line('.')
+      let g:vista.lnum = line('.')
     endif
   elseif a:arg ==# 'info'
     call vista#debugging#Info()
@@ -183,7 +183,7 @@ endfunction
 " Main entrance to interact with vista.vim
 function! vista#(bang, ...) abort
   let [bufnr, winnr, fname, fpath] = [bufnr('%'), winnr(), expand('%'), expand('%:p')]
-  let t:vista.source.winid = win_getid()
+  let g:vista.source.winid = win_getid()
   call vista#source#Update(bufnr, winnr, fname, fpath)
 
   if a:bang
@@ -192,7 +192,7 @@ function! vista#(bang, ...) abort
       return
     elseif a:0 == 1
       if a:1 ==# '!'
-        let t:vista.lnum = line('.')
+        let g:vista.lnum = line('.')
         call vista#sidebar#Toggle()
         return
       else

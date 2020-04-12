@@ -13,13 +13,13 @@ function! vista#statusline#Render() abort
     return
   endif
 
-  if has_key(t:vista, 'bufnr')
-    call setbufvar(t:vista.bufnr, '&statusline', vista#statusline#())
+  if has_key(g:vista, 'bufnr')
+    call setbufvar(g:vista.bufnr, '&statusline', vista#statusline#())
   endif
 endfunction
 
 function! vista#statusline#RenderOnWinEvent() abort
-  if !exists('t:vista') || vista#statusline#ShouldDisable()
+  if !exists('g:vista') || vista#statusline#ShouldDisable()
     return
   endif
 
@@ -27,8 +27,8 @@ function! vista#statusline#RenderOnWinEvent() abort
 endfunction
 
 function! vista#statusline#() abort
-  let fname = get(t:vista.source, 'fname', '')
-  let provider = get(t:vista, 'provider', '')
+  let fname = get(g:vista.source, 'fname', '')
+  let provider = get(g:vista, 'provider', '')
   if !empty(provider)
     return '[Vista] '.provider.' %<'.fname
   else

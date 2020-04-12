@@ -40,7 +40,7 @@ function! s:GetDefaultCmd(file) abort
 
   " Do not pass --extras for C/CPP in order to let uctags handle the tags for anonymous
   " entities correctly.
-  if t:vista.source.filetype() !=# 'c' && t:vista.source.filetype() !=# 'cpp'
+  if g:vista.source.filetype() !=# 'c' && g:vista.source.filetype() !=# 'cpp'
     let common_opt .= ' --extras= '
   endif
 
@@ -95,21 +95,21 @@ function! s:BuildCmd(origin_fpath) abort
     let s:TagParser = s:DefaultTagParser
   endif
 
-  let t:vista.ctags_cmd = cmd
+  let g:vista.ctags_cmd = cmd
 
   return cmd
 endfunction
 
 function! s:PrepareContainer() abort
   let s:data = {}
-  let t:vista = get(t:, 'vista', {})
-  let t:vista.functions = []
-  let t:vista.raw = []
-  let t:vista.kinds = []
-  let t:vista.raw_by_kind = {}
-  let t:vista.with_scope = []
-  let t:vista.without_scope = []
-  let t:vista.tree = {}
+  let g:vista = get(g:, 'vista', {})
+  let g:vista.functions = []
+  let g:vista.raw = []
+  let g:vista.kinds = []
+  let g:vista.raw_by_kind = {}
+  let g:vista.with_scope = []
+  let g:vista.without_scope = []
+  let g:vista.tree = {}
 endfunction
 
 " Process the preprocessed output by ctags and remove s:jodid.
@@ -135,7 +135,7 @@ function! s:ExtractLinewise(raw_data) abort
 endfunction
 
 function! s:AutoUpdate(fpath) abort
-  if t:vista.source.filetype() ==# 'markdown'
+  if g:vista.source.filetype() ==# 'markdown'
         \ && get(g:, 'vista_enable'.&filetype.'_extension', 1)
     call vista#extension#{&ft}#AutoUpdate(a:fpath)
   else
@@ -165,7 +165,7 @@ endfunction
 
 if has('nvim')
   function! s:on_exit(_job, _data, _event) abort dict
-    if !exists('t:vista') || v:dying || !has_key(self, 'stdout')
+    if !exists('g:vista') || v:dying || !has_key(self, 'stdout')
       return
     endif
 
@@ -218,7 +218,7 @@ else
 endif
 
 function! s:TryAppendExtension(tempname) abort
-  let ext = t:vista.source.extension()
+  let ext = g:vista.source.extension()
   if !empty(ext)
     return join([a:tempname, ext], '.')
   else
@@ -232,7 +232,7 @@ function! s:BuiltinTempname() abort
 endfunction
 
 function! s:TempnameBasedOnSourceBufname() abort
-  let tempname = sha256(fnamemodify(bufname(t:vista.source.bufnr), ':p'))
+  let tempname = sha256(fnamemodify(bufname(g:vista.source.bufnr), ':p'))
   return s:TryAppendExtension(tempname)
 endfunction
 
@@ -273,12 +273,12 @@ function! s:IntoTemp(...) abort
     let tmp = s:BuiltinTempname()
   endtry
 
-  if get(t:vista, 'on_text_changed', 0)
-    let lines = t:vista.source.lines()
-    let t:vista.on_text_changed = 0
+  if get(g:vista, 'on_text_changed', 0)
+    let lines = g:vista.source.lines()
+    let g:vista.on_text_changed = 0
   else
     if empty(a:1)
-      let lines = t:vista.source.lines()
+      let lines = g:vista.source.lines()
     else
       try
         let lines = readfile(a:1)

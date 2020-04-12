@@ -36,7 +36,7 @@ endfunction
 "
 " Return: [tag, source_line]
 function! s:GetInfoUnderCursor() abort
-  if t:vista.provider ==# 'ctags'
+  if g:vista.provider ==# 'ctags'
     return vista#cursor#ctags#GetInfo()
   else
     return vista#cursor#lsp#GetInfo()
@@ -48,17 +48,17 @@ function! s:Compare(s1, s2) abort
 endfunction
 
 function! s:FindNearestMethodOrFunction(_timer) abort
-  if !exists('t:vista')
-        \ || !has_key(t:vista, 'functions')
-        \ || !has_key(t:vista, 'source')
+  if !exists('g:vista')
+        \ || !has_key(g:vista, 'functions')
+        \ || !has_key(g:vista, 'source')
     return
   endif
-  call sort(t:vista.functions, function('s:Compare'))
-  let result = vista#util#BinarySearch(t:vista.functions, line('.'), 'lnum', 'text')
+  call sort(g:vista.functions, function('s:Compare'))
+  let result = vista#util#BinarySearch(g:vista.functions, line('.'), 'lnum', 'text')
   if empty(result)
     let result = ''
   endif
-  call setbufvar(t:vista.source.bufnr, 'vista_nearest_method_or_function', result)
+  call setbufvar(g:vista.source.bufnr, 'vista_nearest_method_or_function', result)
 
   call s:StopHighlightTimer()
 
@@ -68,18 +68,18 @@ function! s:FindNearestMethodOrFunction(_timer) abort
 endfunction
 
 function! s:HasVlnum() abort
-  return exists('t:vista')
-        \ && has_key(t:vista, 'raw')
-        \ && !empty(t:vista.raw)
-        \ && has_key(t:vista.raw[0], 'vlnum')
+  return exists('g:vista')
+        \ && has_key(g:vista, 'raw')
+        \ && !empty(g:vista.raw)
+        \ && has_key(g:vista.raw[0], 'vlnum')
 endfunction
 
 " Highlight the nearest tag in the vista window.
 function! s:HighlightNearestTag(_timer) abort
-  if !exists('t:vista')
+  if !exists('g:vista')
     return
   endif
-  let winnr = t:vista.winnr()
+  let winnr = g:vista.winnr()
 
   if winnr == -1
         \ || vista#ShouldSkip()
@@ -88,7 +88,7 @@ function! s:HighlightNearestTag(_timer) abort
     return
   endif
 
-  let found = vista#util#BinarySearch(t:vista.raw, line('.'), 'line', '')
+  let found = vista#util#BinarySearch(g:vista.raw, line('.'), 'line', '')
   if empty(found)
     return
   endif
@@ -137,16 +137,16 @@ endfunction
 
 " This happens when you are in the window of source file
 function! vista#cursor#FindNearestMethodOrFunction() abort
-  if !exists('t:vista')
-        \ || !has_key(t:vista, 'functions')
-        \ || bufnr('') != t:vista.source.bufnr
+  if !exists('g:vista')
+        \ || !has_key(g:vista, 'functions')
+        \ || bufnr('') != g:vista.source.bufnr
     return
   endif
 
   call s:StopFindTimer()
 
-  if empty(t:vista.functions)
-    call setbufvar(t:vista.source.bufnr, 'vista_nearest_method_or_function', '')
+  if empty(g:vista.functions)
+    call setbufvar(g:vista.source.bufnr, 'vista_nearest_method_or_function', '')
     return
   endif
 
@@ -157,7 +157,7 @@ function! vista#cursor#FindNearestMethodOrFunction() abort
 endfunction
 
 function! vista#cursor#NearestSymbol() abort
-  return vista#util#BinarySearch(t:vista.raw, line('.'), 'line', 'name')
+  return vista#util#BinarySearch(g:vista.raw, line('.'), 'line', 'name')
 endfunction
 
 " Show the detail of current tag/symbol under cursor.
@@ -209,7 +209,7 @@ function! vista#cursor#ShowTagFor(lnum) abort
     return
   endif
 
-  let found = vista#util#BinarySearch(t:vista.raw, a:lnum, 'line', '')
+  let found = vista#util#BinarySearch(g:vista.raw, a:lnum, 'line', '')
   if empty(found)
     return
   endif
@@ -227,13 +227,13 @@ function! vista#cursor#ShowTag() abort
     return
   endif
 
-  let s:vlnum = vista#util#BinarySearch(t:vista.raw, line('.'), 'line', 'vlnum')
+  let s:vlnum = vista#util#BinarySearch(g:vista.raw, line('.'), 'line', 'vlnum')
 
   if empty(s:vlnum)
     return
   endif
 
-  let winnr = t:vista.winnr()
+  let winnr = g:vista.winnr()
 
   if winnr() != winnr
     execute winnr.'wincmd w'
@@ -249,8 +249,8 @@ function! s:GetTrailingLnum() abort
 endfunction
 
 function! vista#cursor#TogglePreview() abort
-  if get(t:vista, 'floating_visible', v:false)
-        \ || get(t:vista, 'popup_visible', v:false)
+  if get(g:vista, 'floating_visible', v:false)
+        \ || get(g:vista, 'popup_visible', v:false)
     call vista#win#CloseFloating()
     return
   endif

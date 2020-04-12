@@ -100,7 +100,7 @@ function! vista#parser#lsp#ExtractSymbol(symbol, container) abort
   endif
 
   if symbol.kind ==? 'Method' || symbol.kind ==? 'Function'
-    call add(t:vista.functions, symbol)
+    call add(g:vista.functions, symbol)
   endif
 
   let picked = {'lnum': symbol.lnum, 'col': symbol.col, 'text': symbol.text}

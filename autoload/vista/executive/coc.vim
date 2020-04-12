@@ -91,7 +91,7 @@ function! vista#executive#coc#Run(fpath) abort
   if exists('*CocAction')
     call vista#SetProvider(s:provider)
     let s:fpath = a:fpath
-    call vista#win#Execute(t:vista.source.get_winnr(), function('s:Run'))
+    call vista#win#Execute(g:vista.source.get_winnr(), function('s:Run'))
     return s:data
   endif
 endfunction
@@ -104,6 +104,6 @@ endfunction
 " outside, where sets the provider and auto update events.
 function! vista#executive#coc#Execute(bang, should_display, ...) abort
   call vista#OnExecute(s:provider, function('s:AutoUpdate'))
-  let t:vista.silent = v:false
+  let g:vista.silent = v:false
   return s:Dispatch('s:Execute', a:bang, a:should_display)
 endfunction
