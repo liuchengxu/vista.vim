@@ -71,7 +71,7 @@ function! vista#GetExplicitExecutive(filetype) abort
     execute 'return' 'g:vista_'.a:filetype.'_executive'
   endif
 
-  if exists('g:vista_executive_for') && has_key(g:vista_executive_for, a:filetype)
+  if has_key(g:vista_executive_for, a:filetype)
     return g:vista_executive_for[a:filetype]
   endif
 

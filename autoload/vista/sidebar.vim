@@ -15,9 +15,7 @@ function! vista#sidebar#WhichFileType() abort
 endfunction
 
 function! s:NewWindow() abort
-  let position = get(g:, 'vista_sidebar_position', 'vertical botright')
-  let width = get(g:, 'vista_sidebar_width', 30)
-  let open = position.' '.width.'new'
+  let open = g:vista_sidebar_position.' '.g:vista_sidebar_width.'new'
   silent execute open '__vista__'
 
   execute 'setlocal filetype='.vista#sidebar#WhichFileType()
@@ -67,10 +65,6 @@ function! vista#sidebar#OpenOrUpdate(rows) abort
     endif
   endif
 
-  if exists('#User#VistaWinOpen')
-    doautocmd User VistaWinOpen
-  endif
-
   call vista#util#SetBufline(g:vista.bufnr, a:rows)
 
   if has_key(g:vista, 'lnum')
@@ -78,7 +72,7 @@ function! vista#sidebar#OpenOrUpdate(rows) abort
     unlet g:vista.lnum
   endif
 
-  if !get(g:, 'vista_stay_on_open', 1)
+  if !g:vista_stay_on_open
     wincmd p
   endif
 endfunction
