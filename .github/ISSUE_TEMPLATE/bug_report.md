@@ -19,7 +19,7 @@ A clear and concise description of what the bug is.
 - OS: <!-- e.g. macOS, Ubuntu 18.04, Windows 10 -->
 - Vim/Neovim version: <!-- first two lines of `:version` command output -->
 - This plugin version: <!-- output of `git rev-parse origin/master` command -->
-- I'm using ctags:
+- I'm using universal-ctags: <!-- exuberant-ctags is unsupported -->
     - Ctags version: <!-- output of `ctags --version` command -->
 - I'm using some LSP client:
     - Related Vim LSP client: <!-- ale,coc,lcn,nvim_lsp,vim_lsc,vim_lsp -->

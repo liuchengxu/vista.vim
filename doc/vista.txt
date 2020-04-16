@@ -428,7 +428,7 @@ g:vista_enable_markdown_extension              *g:vista_enable_markdown_extensio
 g:vista_ignore_kinds                                        *g:vista_ignore_kinds*
 
   Type: |List|
-  Default: `Undefined`
+  Default: `[]`
 
   Ignore some kinds of tags or symbols.
 
