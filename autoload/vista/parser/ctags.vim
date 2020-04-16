@@ -95,8 +95,11 @@ function! vista#parser#ctags#FromExtendedRaw(line, container) abort
   if a:line =~# '^!_TAG'
     return
   endif
-  " Prevent bugs when a:line is all whitespace
-  if a:line =~# '^\s*$'
+  " Prevent bugs when a:line is all whitespace or doesn't contain any tabs
+  " (can't be parsed).
+  if a:line =~# '^\s*$' || stridx(a:line, '\t') == -1
+    " Useful for debugging
+    " echom "Vista.vim: Error parsing ctags output: '" . a:line . "'"
     return
   endif
 
