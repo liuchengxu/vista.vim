@@ -15,6 +15,8 @@ function! s:Extract(symbols) abort
     return
   endif
 
+  let g:vista.functions = []
+  let g:vista.raw = []
   call map(a:symbols, 'vista#parser#lsp#CocSymbols(v:val, s:data)')
 
   if !empty(s:data)

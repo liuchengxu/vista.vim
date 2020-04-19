@@ -82,6 +82,13 @@ function! vista#parser#lsp#CocSymbols(symbol, container) abort
     return
   endif
 
+  let raw = { 'line': a:symbol.lnum, 'kind': a:symbol.kind, 'name': a:symbol.text }
+  call add(g:vista.raw, raw)
+
+  if a:symbol.kind ==? 'Method' || a:symbol.kind ==? 'Function'
+    call add(g:vista.functions, a:symbol)
+  endif
+
   call add(a:container, {
         \ 'lnum': a:symbol.lnum,
         \ 'col': a:symbol.col,

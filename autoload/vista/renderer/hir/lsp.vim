@@ -17,6 +17,11 @@ function! s:IntoLSPNonHirRow(row) abort
   return indented.lnum
 endfunction
 
+function! s:RenderNonHirRow(vs, rendered) abort
+  call add(a:rendered, s:IntoLSPNonHirRow(a:vs.row))
+  let g:vista.raw[a:vs.idx].vlnum = len(a:rendered) + 2
+endfunction
+
 function! s:RenderLSPHirAndThenGroupByKind(data) abort
   let rendered = []
   let level0 = {}
@@ -28,6 +33,7 @@ function! s:RenderLSPHirAndThenGroupByKind(data) abort
     if (row.level == 0 && idx+1 < len && a:data[idx+1].level > 0)
           \ || row.level > 0
       call add(rendered, s:IntoLSPHirRow(row))
+      let g:vista.raw[idx].vlnum = len(rendered) + 2
     endif
     if row.level > 0
       if idx+1 < len && a:data[idx+1].level == 0
@@ -36,9 +42,9 @@ function! s:RenderLSPHirAndThenGroupByKind(data) abort
     else
       if idx+1 < len && a:data[idx+1].level == 0
         if has_key(level0, row.kind)
-          call add(level0[row.kind], row)
+          call add(level0[row.kind], { 'row': row, 'idx': idx })
         else
-          let level0[row.kind] = [row]
+          let level0[row.kind] = [{ 'row': row, 'idx': idx }]
         endif
       endif
     endif
@@ -47,7 +53,7 @@ function! s:RenderLSPHirAndThenGroupByKind(data) abort
 
   for [kind, vs] in items(level0)
     call add(rendered, vista#renderer#Decorate(kind))
-    call map(vs, 'add(rendered, s:IntoLSPNonHirRow(v:val))')
+    call map(vs, 's:RenderNonHirRow(v:val, rendered)')
     call add(rendered, '')
   endfor
 
