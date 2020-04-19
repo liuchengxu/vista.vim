@@ -45,6 +45,10 @@ function! s:RenderLSPHirAndThenGroupByKind(data) abort
     let idx += 1
   endfor
 
+  if len(level0) > 0
+    call add(rendered, '')
+  endif
+
   for [kind, vs] in items(level0)
     call add(rendered, vista#renderer#Decorate(kind))
     call map(vs, 'add(rendered, s:IntoLSPNonHirRow(v:val))')
