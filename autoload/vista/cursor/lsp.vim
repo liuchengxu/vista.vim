@@ -9,6 +9,8 @@ function! s:GetInfoFromLSPAndExtension() abort
   if g:vista.provider ==# 'coc'
     let tag = vista#util#Trim(raw_cur_line[:stridx(raw_cur_line, ':')-1])
     return tag
+  elseif g:vista.provider ==# 'nvim_lsp'
+    return substitute(raw_cur_line, '\v.*\s(.*):.*', '\1', '')
   elseif g:vista.provider ==# 'markdown' || g:vista.provider ==# 'rst'
     if line('.') < 3
       return v:null
