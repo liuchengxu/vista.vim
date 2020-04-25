@@ -132,7 +132,11 @@ function! s:RenderGroupedData(grouped_data) abort
   let source = []
   for [kind, vals] in items(a:grouped_data)
     let icon = vista#renderer#IconFor(kind)
-    call extend(source, map(vals, 's:IntoRow(icon, kind, v:val)'))
+    let rows = []
+    for val in vals
+      call add(rows, s:IntoRow(icon, kind, val))
+    endfor
+    call extend(source, rows)
   endfor
   return source
 endfunction
