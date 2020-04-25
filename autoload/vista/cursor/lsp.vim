@@ -7,8 +7,16 @@ function! s:GetInfoFromLSPAndExtension() abort
 
   " TODO use range info of LSP symbols?
   if g:vista.provider ==# 'coc'
-    let tag = vista#util#Trim(raw_cur_line[:stridx(raw_cur_line, ':')-1])
-    return tag
+    if has_key(g:vista.vlnum2tagname, line('.'))
+      return g:vista.vlnum2tagname[line('.')]
+    else
+      let items = split(raw_cur_line)
+      if g:vista#renderer#enable_icon
+        return join(items[1:-2], ' ')
+      else
+        return join(items[:-2], ' ')
+      endif
+    endif
   elseif g:vista.provider ==# 'nvim_lsp'
     return substitute(raw_cur_line, '\v.*\s(.*):.*', '\1', '')
   elseif g:vista.provider ==# 'markdown' || g:vista.provider ==# 'rst'

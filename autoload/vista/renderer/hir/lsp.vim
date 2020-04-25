@@ -19,7 +19,11 @@ endfunction
 
 function! s:RenderNonHirRow(vs, rendered) abort
   call add(a:rendered, s:IntoLSPNonHirRow(a:vs.row))
-  let g:vista.raw[a:vs.idx].vlnum = len(a:rendered) + 2
+  let vlnum = len(a:rendered) + 2
+  let g:vista.raw[a:vs.idx].vlnum = vlnum
+  if has_key(a:vs.row, 'text')
+    let g:vista.vlnum2tagname[vlnum] = a:vs.row.text
+  endif
 endfunction
 
 function! s:RenderLSPHirAndThenGroupByKind(data) abort
@@ -34,6 +38,9 @@ function! s:RenderLSPHirAndThenGroupByKind(data) abort
           \ || row.level > 0
       call add(rendered, s:IntoLSPHirRow(row))
       let g:vista.raw[idx].vlnum = len(rendered) + 2
+      if has_key(row, 'text')
+        let g:vista.vlnum2tagname[len(rendered)+2] = row.text
+      endif
     endif
     if row.level > 0
       if idx+1 < len && a:data[idx+1].level == 0
@@ -51,7 +58,7 @@ function! s:RenderLSPHirAndThenGroupByKind(data) abort
     let idx += 1
   endfor
 
-  if len(level0) > 0
+  if len(level0) > 0 && rendered[-1] !=# ''
     call add(rendered, '')
   endif
 
@@ -78,6 +85,7 @@ endfunction
 
 " data is a list of items with the level info for the hierarchy purpose.
 function! vista#renderer#hir#lsp#Coc(data) abort
+  let g:vista.vlnum2tagname = {}
   " return map(a:data, 's:Transform(v:val)')
   return s:RenderLSPHirAndThenGroupByKind(a:data)
 endfunction
