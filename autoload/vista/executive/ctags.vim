@@ -284,7 +284,8 @@ function! s:IntoTemp(...) abort
         let lines = readfile(a:1)
       " Vim cannot read a temporary file, this may happen when you open vim with
       " a file which does not exist yet, e.g., 'vim does_exist_yet.txt'
-      catch /E484/
+      catch
+        " catch all readfile exception
         return
       endtry
     endif
