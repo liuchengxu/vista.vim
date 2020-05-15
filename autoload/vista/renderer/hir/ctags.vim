@@ -288,7 +288,7 @@ function! s:Render() abort
   return rows
 endfunction
 
-function! vista#renderer#default#Render() abort
+function! vista#renderer#hir#ctags#Render() abort
   if empty(g:vista.raw)
     return []
   endif

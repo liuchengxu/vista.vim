@@ -29,7 +29,7 @@ function! s:HiTagLine() abort
 endfunction
 
 function! s:OpenPopup(lines) abort
-  if get(g:, 'vista_sidebar_position', 'vertical botright') =~# 'right'
+  if g:vista_sidebar_position =~# 'right'
     let max_length = max(map(copy(a:lines), 'strlen(v:val)')) + 2
     let pos_opts = {
           \ 'pos': 'botleft',

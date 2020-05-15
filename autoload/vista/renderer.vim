@@ -44,9 +44,7 @@ let s:icons = {
 \}
 
 let g:vista#renderer#ctags = get(g:, 'vista#renderer#ctags', 'default')
-
 let g:vista#renderer#icons = map(extend(s:icons, get(g:, 'vista#renderer#icons', {})), 'tolower(v:val)')
-
 let g:vista#renderer#enable_icon = get(g:, 'vista#renderer#enable_icon',
       \ exists('g:vista#renderer#icons') || exists('g:airline_powerline_fonts'))
 
@@ -75,7 +73,7 @@ function! s:Render(data) abort
   if g:vista.provider ==# 'coc'
     return vista#renderer#hir#lsp#Coc(a:data)
   elseif g:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default'
-    return vista#renderer#default#Render()
+    return vista#renderer#hir#ctags#Render()
   else
     " The kind renderer applys to the LSP provider.
     return vista#renderer#kind#Render(a:data)

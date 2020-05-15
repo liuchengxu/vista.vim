@@ -58,7 +58,7 @@ function! s:RenderLSPHirAndThenGroupByKind(data) abort
     let idx += 1
   endfor
 
-  if len(level0) > 0 && rendered[-1] !=# ''
+  if len(level0) > 0 && !empty(rendered) && rendered[-1] !=# ''
     call add(rendered, '')
   endif
 
