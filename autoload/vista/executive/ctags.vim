@@ -14,6 +14,8 @@ let s:support_json_format =
 " Expose this variable for debugging
 let g:vista#executive#ctags#support_json_format = s:support_json_format
 
+let s:ctags_project_opts = get(g:, 'vista_ctags_project_opts', '')
+
 if s:support_json_format
   let s:default_cmd_fmt = '%s %s %s --output-format=json --fields=-PF -f- %s'
   let s:DefaultTagParser = function('vista#parser#ctags#FromJSON')
@@ -394,10 +396,10 @@ function! vista#executive#ctags#ProjectRun() abort
     " `--output-format=json` option, which is easier to parse and more reliable.
     " Otherwise we will use the `--_xformat` option.
     if s:support_json_format
-      let s:recursive_ctags_cmd = s:ctags.' -R -x --output-format=json --fields=+n'
+      let s:recursive_ctags_cmd = s:ctags.' '.s:ctags_project_opts.' -R -x --output-format=json --fields=+n'
       let s:RecursiveParser = function('vista#parser#ctags#RecursiveFromJSON')
     else
-      let s:recursive_ctags_cmd = s:ctags." -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
+      let s:recursive_ctags_cmd = s:ctags.' '.s:ctags_project_opts." -R -x --_xformat='TAGNAME:%N ++++ KIND:%K ++++ LINE:%n ++++ INPUT-FILE:%F ++++ PATTERN:%P'"
       let s:RecursiveParser = function('vista#parser#ctags#RecursiveFromXformat')
     endif
   endif
