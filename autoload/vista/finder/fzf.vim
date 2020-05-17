@@ -118,9 +118,9 @@ function! s:Run(...) abort
 endfunction
 
 function! s:project_sink(line) abort
-  let parts = split(a:line, '\t')
-  let lnum = split(parts[0], ':')[0]
-  let relpath = parts[2]
+  let parts = split(a:line)
+  let lnum = split(parts[1], ':')[0]
+  let relpath = parts[3]
   execute 'edit' relpath
   call cursor(lnum, 1)
   normal! zz
