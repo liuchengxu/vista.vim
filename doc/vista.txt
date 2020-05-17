@@ -350,6 +350,14 @@ g:vista_ctags_cmd                                              *g:vista_ctags_cm
       \ 'haskell': 'hasktags -o - -c',
       \ }
 
+g:vista_ctags_project_opts                                *g:vista_ctags_project_opts*
+
+  Type: |String|
+  Default: ''
+
+  ctags options to use when generating project tags.
+  Note: it's still experimental.
+
 g:vista_fzf_preview                                          *g:vista_fzf_preview*
 
   Type: |List|
