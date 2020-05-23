@@ -4,7 +4,8 @@
 
 " vimwiki supports the standard markdown syntax.
 " pandoc supports the basic markdown format.
-let s:toc_supported = ['markdown', 'rst', 'vimwiki', 'pandoc']
+" API Blueprint is a set of semantic assumptions on top of markdown.
+let s:toc_supported = ['markdown', 'rst', 'vimwiki', 'pandoc', 'apiblueprint']
 
 function! vista#toc#IsSupported(filetype) abort
   return index(s:toc_supported, a:filetype) > -1
