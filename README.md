@@ -241,8 +241,19 @@ The JSON support for ctags is avaliable if u-ctags is linked to libjansson when 
     $ make
     $ sudo make install
     ```
+- Fedora
 
-    Refer to [Compiling and Installing Jansson](https://jansson.readthedocs.io/en/latest/gettingstarted.html#compiling-and-installing-jansson) as well.
+    ```bash
+    $ sudo dnf install jansson-devel autoconf automake
+    $ git clone https://github.com/universal-ctags/ctags.git --depth=1
+    $ cd ctags
+    $ ./autogen.sh
+    $ ./configure
+    $ make
+    $ sudo make install
+    ```
+
+Refer to [Compiling and Installing Jansson](https://jansson.readthedocs.io/en/latest/gettingstarted.html#compiling-and-installing-jansson) as well.
 
 ## Contributing
 
