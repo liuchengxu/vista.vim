@@ -107,6 +107,8 @@ $ git clone https://github.com/liuchengxu/vista.vim.git --depth=1 ~/.local/share
 
 ### Show the nearest method/function in the statusline
 
+Note: This is only supported for ctags and coc executive for now.
+
 You can do the following to show the nearest method/function in your statusline:
 
 ```vim
@@ -119,7 +121,7 @@ set statusline+=%{NearestMethodOrFunction()}
 " By default vista.vim never run if you don't call it explicitly.
 "
 " If you want to show the nearest function in your statusline automatically,
-" you can add the following line to your vimrc 
+" you can add the following line to your vimrc
 autocmd VimEnter * call vista#RunForNearestMethodOrFunction()
 ```
 
