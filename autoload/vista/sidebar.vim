@@ -17,10 +17,10 @@ endfunction
 function! s:NewWindow() abort
   let open = g:vista_sidebar_position.' '.g:vista_sidebar_width.'new'
 
-  if get(g:, 'vista_sidebar_keepalt', 0) == 0
-    silent execute open '__vista__'
-  else
+  if get(g:, 'vista_sidebar_keepalt', 0)
     silent execute 'keepalt '.open '__vista__'
+  else
+    silent execute open '__vista__'
   endif
 
   execute 'setlocal filetype='.vista#sidebar#WhichFileType()
