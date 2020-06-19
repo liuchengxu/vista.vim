@@ -171,7 +171,7 @@ function! vista#finder#PrepareOpts(source, prompt) abort
     else
       let object_name_index = g:vista#renderer#enable_icon ? '2' : '1'
       let extract_line_number = ':$(echo {' . object_name_index . "} | grep -o '[^:]*$')"
-      let preview_opts[-1] = preview_opts[-1][0:-3] . g:vista.source.fpath . extract_line_number
+      let preview_opts[-1] = preview_opts[-1][0:-3] . fnameescape(g:vista.source.fpath) . extract_line_number
     endif
 
     call extend(opts.options, preview_opts)
