@@ -143,6 +143,7 @@ Vista                                                                      *Vist
 
                   `:Vista finder coc`  same with `:Vista finder fzf:coc` .
 
+  `:Vista finder clap` synonysm for `:Clap tags`
                                                                       *vista-info*
 
   `:Vista info`     print information about vista.vim, including the explicit
