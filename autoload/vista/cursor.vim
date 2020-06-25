@@ -186,7 +186,7 @@ function! vista#cursor#ShowDetail(_timer) abort
     call vista#source#PeekSymbol(lnum, tag)
   elseif s:echo_strategy ==# s:echo_cursor_opts[3]
     call vista#echo#EchoInCmdline(msg, tag)
-    call vista#win#FloatingDisplayOrPeek(msg, tag)
+    call vista#win#FloatingDisplayOrPeek(lnum, tag)
   else
     call vista#error#InvalidOption('g:vista_echo_cursor_strategy', s:echo_cursor_opts)
   endif
