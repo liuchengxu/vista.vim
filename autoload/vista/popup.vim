@@ -9,9 +9,7 @@ let s:popup_delay = get(g:, 'vista_floating_delay', 100)
 function! s:ClosePopup() abort
   if exists('s:popup_winid')
     call popup_close(s:popup_winid)
-    try
-      unlet s:popup_winid
-    catch | endtry
+    unlet s:popup_winid
     autocmd! VistaPopup
   endif
   let g:vista.popup_visible = v:false
