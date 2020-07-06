@@ -41,6 +41,23 @@ function! s:IsFileUri(uri) abort
   return stridx(a:uri, 'file:///') == 0
 endfunction
 
+function! s:LspToLocalSymbol(sym, range)
+  return {
+    \ 'lnum': a:range.start.line + 1,
+    \ 'col': a:range.start.character + 1,
+    \ 'kind': s:Kind2Symbol(a:sym.kind),
+    \ 'text': a:sym.name,
+    \ }
+endfunction
+
+function! s:LocalToRawSymbol(sym)
+  return {
+    \ 'line': a:sym.lnum,
+    \ 'kind': a:sym.kind,
+    \ 'name': a:sym.text,
+    \ }
+endfunction
+
 " The kind field in the result is a number instead of a readable text, we
 " should transform the number to the symbol text first.
 function! vista#parser#lsp#KindToSymbol(line, container) abort
@@ -49,26 +66,11 @@ function! vista#parser#lsp#KindToSymbol(line, container) abort
   if has_key(line, 'location')
     let location = line.location
     if s:IsFileUri(location.uri)
-      let lnum = location.range.start.line + 1
-      let col = location.range.start.character + 1
-      call add(a:container, {
-         \ 'lnum': lnum,
-         \ 'col': col,
-         \ 'kind': s:Kind2Symbol(line.kind),
-         \ 'text': line.name,
-         \ })
+      call add(a:container, s:LspToLocalSymbol(line, location.range))
     endif
   " DocumentSymbol class
   elseif has_key(line, 'range')
-    let range = line.range
-    let lnum = range.start.line + 1
-    let col = range.start.character + 1
-    call add(a:container, {
-          \ 'lnum': lnum,
-          \ 'col': col,
-          \ 'kind': s:Kind2Symbol(line.kind),
-          \ 'text': line.name,
-          \ })
+    call add(a:container, s:LspToLocalSymbol(line, line.range))
     if has_key(line, 'children')
       for child in line.children
         call vista#parser#lsp#KindToSymbol(child, a:container)
@@ -82,20 +84,13 @@ function! vista#parser#lsp#CocSymbols(symbol, container) abort
     return
   endif
 
-  let raw = { 'line': a:symbol.lnum, 'kind': a:symbol.kind, 'name': a:symbol.text }
-  call add(g:vista.raw, raw)
+  call add(g:vista.raw, s:LocalToRawSymbol(a:symbol))
 
   if a:symbol.kind ==? 'Method' || a:symbol.kind ==? 'Function'
     call add(g:vista.functions, a:symbol)
   endif
 
-  call add(a:container, {
-        \ 'lnum': a:symbol.lnum,
-        \ 'col': a:symbol.col,
-        \ 'text': a:symbol.text,
-        \ 'kind': a:symbol.kind,
-        \ 'level': a:symbol.level
-        \ })
+  call add(a:container, copy(a:symbol))
 endfunction
 
 " https://microsoft.github.io/language-server-protocol/specification#textDocument_documentSymbol
