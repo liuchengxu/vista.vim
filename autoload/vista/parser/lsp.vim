@@ -79,6 +79,76 @@ function! vista#parser#lsp#KindToSymbol(line, container) abort
   endif
 endfunction
 
+function! s:IsDocumentSymbol(sym)
+  return has_key(a:sym, 'selectionRange')
+endfunction
+
+function! s:ParseSymbolInfoList(outlist, symbols) abort
+  for lspsym in a:symbols
+    let l:loc = lspsym.location
+    if s:IsFileUri(l:loc.uri)
+      call add(a:outlist, s:LspToLocalSymbol(lspsym, l:loc.range))
+    endif
+  endfor
+endfunction
+
+function! s:ParseDocumentSymbolsRec(outlist, symbols, level) abort
+  for lspsym in a:symbols
+    let l:sym = s:LspToLocalSymbol(lspsym, lspsym.selectionRange)
+    let l:sym.level = a:level
+    call add(a:outlist, l:sym)
+    if has_key(lspsym, 'children')
+      call s:ParseDocumentSymbolsRec(a:outlist, lspsym.children, a:level + 1)
+    endif
+  endfor
+endfunction
+
+function! s:GroupSymbolsByKind(symbols) abort
+  let l:groups = {}
+  for l:sym in a:symbols
+    let l:list = get(l:groups, l:sym.kind)
+    if !has_key(l:groups, l:sym.kind)
+      let l:list = []
+      let l:groups[l:sym.kind] = l:list
+    endif
+    call add(l:list, l:sym)
+  endfor
+  return l:groups
+endfunction
+
+function! vista#parser#lsp#ParseDocumentSymbolPayload(resp) abort
+  let l:symbols = []
+  if s:IsDocumentSymbol(a:resp[0])
+    call s:ParseDocumentSymbolsRec(l:symbols, a:resp, 0)
+    call vista#parser#lsp#FilterDocumentSymbols(l:symbols)
+    call vista#parser#lsp#DispatchDocumentSymbols(l:symbols)
+    return l:symbols
+  else
+    call s:ParseSymbolInfoList(l:symbols, a:resp)
+    call vista#parser#lsp#FilterDocumentSymbols(l:symbols)
+    return s:GroupSymbolsByKind(l:symbols)
+  endif
+endfunction
+
+function! vista#parser#lsp#FilterDocumentSymbols(symbols) abort
+  let l:symlist = a:symbols
+  if exists('g:vista_ignore_kinds')
+    call filter(l:symlist, 'index(g:vista_ignore_kinds, v:val) < 0')
+  endif
+  let g:vista.functions = []
+  for l:sym in l:symlist
+    if l:sym.kind ==? 'Method' || l:sym.kind ==? 'Function'
+      call add(g:vista.functions, l:sym)
+    endif
+  endfor
+  return l:symlist
+endfunction
+
+function! vista#parser#lsp#DispatchDocumentSymbols(symbols)
+  let g:vista.raw = map(copy(a:symbols), { _, sym -> s:LocalToRawSymbol(sym) })
+  return g:vista.raw
+endfunction
+
 function! vista#parser#lsp#CocSymbols(symbol, container) abort
   if vista#ShouldIgnore(a:symbol.kind)
     return
