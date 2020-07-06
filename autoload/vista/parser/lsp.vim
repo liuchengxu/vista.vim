@@ -33,6 +33,8 @@ let s:symbol_kind = {
     \ '26': 'TypeParameter',
     \ }
 
+" The kind field in the result is a number instead of a readable text, we
+" should transform the number to the symbol text first.
 function! s:Kind2Symbol(kind) abort
   return has_key(s:symbol_kind, a:kind) ? s:symbol_kind[a:kind] : 'Unknown kind '.a:kind
 endfunction
@@ -56,27 +58,6 @@ function! s:LocalToRawSymbol(sym)
     \ 'kind': a:sym.kind,
     \ 'name': a:sym.text,
     \ }
-endfunction
-
-" The kind field in the result is a number instead of a readable text, we
-" should transform the number to the symbol text first.
-function! vista#parser#lsp#KindToSymbol(line, container) abort
-  let line = a:line
-  " SymbolInformation interface
-  if has_key(line, 'location')
-    let location = line.location
-    if s:IsFileUri(location.uri)
-      call add(a:container, s:LspToLocalSymbol(line, location.range))
-    endif
-  " DocumentSymbol class
-  elseif has_key(line, 'range')
-    call add(a:container, s:LspToLocalSymbol(line, line.range))
-    if has_key(line, 'children')
-      for child in line.children
-        call vista#parser#lsp#KindToSymbol(child, a:container)
-      endfor
-    endif
-  endif
 endfunction
 
 function! s:IsDocumentSymbol(sym)
@@ -161,25 +142,4 @@ function! vista#parser#lsp#CocSymbols(symbol, container) abort
   endif
 
   call add(a:container, copy(a:symbol))
-endfunction
-
-" https://microsoft.github.io/language-server-protocol/specification#textDocument_documentSymbol
-function! vista#parser#lsp#ExtractSymbol(symbol, container) abort
-  let symbol = a:symbol
-
-  if vista#ShouldIgnore(symbol.kind)
-    return
-  endif
-
-  if symbol.kind ==? 'Method' || symbol.kind ==? 'Function'
-    call add(g:vista.functions, symbol)
-  endif
-
-  let picked = {'lnum': symbol.lnum, 'col': symbol.col, 'text': symbol.text}
-
-  if has_key(a:container, symbol.kind)
-    call add(a:container[symbol.kind], picked)
-  else
-    let a:container[symbol.kind] = [picked]
-  endif
 endfunction
