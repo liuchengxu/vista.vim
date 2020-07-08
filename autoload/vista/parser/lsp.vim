@@ -87,12 +87,11 @@ endfunction
 function! s:GroupSymbolsByKind(symbols) abort
   let l:groups = {}
   for l:sym in a:symbols
-    let l:list = get(l:groups, l:sym.kind)
-    if !has_key(l:groups, l:sym.kind)
-      let l:list = []
-      let l:groups[l:sym.kind] = l:list
+    if has_key(l:groups, l:sym.kind)
+      call add(l:groups[l:sym.kind], l:sym)
+    else
+      let l:groups[l:sym.kind] = [ l:sym ]
     endif
-    call add(l:list, l:sym)
   endfor
   return l:groups
 endfunction
