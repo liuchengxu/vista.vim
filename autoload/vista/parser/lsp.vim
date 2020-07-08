@@ -115,12 +115,8 @@ function! vista#parser#lsp#FilterDocumentSymbols(symbols) abort
   if exists('g:vista_ignore_kinds')
     call filter(l:symlist, 'index(g:vista_ignore_kinds, v:val) < 0')
   endif
-  let g:vista.functions = []
-  for l:sym in l:symlist
-    if l:sym.kind ==? 'Method' || l:sym.kind ==? 'Function'
-      call add(g:vista.functions, l:sym)
-    endif
-  endfor
+  let g:vista.functions =
+    \ filter(copy(l:symlist), 'v:val.kind ==? "Method" || v:val.kind ==? "Function"')
   return l:symlist
 endfunction
 
