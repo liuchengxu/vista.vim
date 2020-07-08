@@ -100,17 +100,16 @@ function! vista#parser#lsp#ParseDocumentSymbolPayload(resp) abort
   let symbols = []
   if s:IsDocumentSymbol(a:resp[0])
     call s:ParseDocumentSymbolsRec(symbols, a:resp, 0)
-    call vista#parser#lsp#FilterDocumentSymbols(symbols)
     call vista#parser#lsp#DispatchDocumentSymbols(symbols)
     return symbols
   else
     call s:ParseSymbolInfoList(symbols, a:resp)
-    call vista#parser#lsp#FilterDocumentSymbols(symbols)
+    call s:FilterDocumentSymbols(symbols)
     return s:GroupSymbolsByKind(symbols)
   endif
 endfunction
 
-function! vista#parser#lsp#FilterDocumentSymbols(symbols) abort
+function! s:FilterDocumentSymbols(symbols) abort
   let symlist = a:symbols
   if exists('g:vista_ignore_kinds')
     call filter(symlist, 'index(g:vista_ignore_kinds, v:val) < 0')
@@ -121,8 +120,9 @@ function! vista#parser#lsp#FilterDocumentSymbols(symbols) abort
 endfunction
 
 function! vista#parser#lsp#DispatchDocumentSymbols(symbols)
-  let g:vista.raw = map(copy(a:symbols), { _, sym -> s:LocalToRawSymbol(sym) })
-  return g:vista.raw
+  let symlist = call s:FilterDocumentSymbols(a:symbols)
+  let g:vista.raw = map(copy(symlist), { _, sym -> s:LocalToRawSymbol(sym) })
+  return symlist
 endfunction
 
 function! vista#parser#lsp#CocSymbols(symbol, container) abort
