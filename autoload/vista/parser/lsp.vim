@@ -124,17 +124,3 @@ function! vista#parser#lsp#DispatchDocumentSymbols(symbols)
   let g:vista.raw = map(copy(symlist), { _, sym -> s:LocalToRawSymbol(sym) })
   return symlist
 endfunction
-
-function! vista#parser#lsp#CocSymbols(symbol, container) abort
-  if vista#ShouldIgnore(a:symbol.kind)
-    return
-  endif
-
-  call add(g:vista.raw, s:LocalToRawSymbol(a:symbol))
-
-  if a:symbol.kind ==? 'Method' || a:symbol.kind ==? 'Function'
-    call add(g:vista.functions, a:symbol)
-  endif
-
-  call add(a:container, copy(a:symbol))
-endfunction
