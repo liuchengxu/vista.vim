@@ -66,18 +66,18 @@ endfunction
 
 function! s:ParseSymbolInfoList(outlist, symbols) abort
   for lspsym in a:symbols
-    let l:loc = lspsym.location
-    if s:IsFileUri(l:loc.uri)
-      call add(a:outlist, s:LspToLocalSymbol(lspsym, l:loc.range))
+    let loc = lspsym.location
+    if s:IsFileUri(loc.uri)
+      call add(a:outlist, s:LspToLocalSymbol(lspsym, loc.range))
     endif
   endfor
 endfunction
 
 function! s:ParseDocumentSymbolsRec(outlist, symbols, level) abort
   for lspsym in a:symbols
-    let l:sym = s:LspToLocalSymbol(lspsym, lspsym.selectionRange)
-    let l:sym.level = a:level
-    call add(a:outlist, l:sym)
+    let sym = s:LspToLocalSymbol(lspsym, lspsym.selectionRange)
+    let sym.level = a:level
+    call add(a:outlist, sym)
     if has_key(lspsym, 'children')
       call s:ParseDocumentSymbolsRec(a:outlist, lspsym.children, a:level + 1)
     endif
@@ -85,39 +85,39 @@ function! s:ParseDocumentSymbolsRec(outlist, symbols, level) abort
 endfunction
 
 function! s:GroupSymbolsByKind(symbols) abort
-  let l:groups = {}
-  for l:sym in a:symbols
-    if has_key(l:groups, l:sym.kind)
-      call add(l:groups[l:sym.kind], l:sym)
+  let groups = {}
+  for sym in a:symbols
+    if has_key(groups, sym.kind)
+      call add(groups[sym.kind], sym)
     else
-      let l:groups[l:sym.kind] = [ l:sym ]
+      let groups[sym.kind] = [ sym ]
     endif
   endfor
-  return l:groups
+  return groups
 endfunction
 
 function! vista#parser#lsp#ParseDocumentSymbolPayload(resp) abort
-  let l:symbols = []
+  let symbols = []
   if s:IsDocumentSymbol(a:resp[0])
-    call s:ParseDocumentSymbolsRec(l:symbols, a:resp, 0)
-    call vista#parser#lsp#FilterDocumentSymbols(l:symbols)
-    call vista#parser#lsp#DispatchDocumentSymbols(l:symbols)
-    return l:symbols
+    call s:ParseDocumentSymbolsRec(symbols, a:resp, 0)
+    call vista#parser#lsp#FilterDocumentSymbols(symbols)
+    call vista#parser#lsp#DispatchDocumentSymbols(symbols)
+    return symbols
   else
-    call s:ParseSymbolInfoList(l:symbols, a:resp)
-    call vista#parser#lsp#FilterDocumentSymbols(l:symbols)
-    return s:GroupSymbolsByKind(l:symbols)
+    call s:ParseSymbolInfoList(symbols, a:resp)
+    call vista#parser#lsp#FilterDocumentSymbols(symbols)
+    return s:GroupSymbolsByKind(symbols)
   endif
 endfunction
 
 function! vista#parser#lsp#FilterDocumentSymbols(symbols) abort
-  let l:symlist = a:symbols
+  let symlist = a:symbols
   if exists('g:vista_ignore_kinds')
-    call filter(l:symlist, 'index(g:vista_ignore_kinds, v:val) < 0')
+    call filter(symlist, 'index(g:vista_ignore_kinds, v:val) < 0')
   endif
   let g:vista.functions =
-    \ filter(copy(l:symlist), 'v:val.kind ==? "Method" || v:val.kind ==? "Function"')
-  return l:symlist
+    \ filter(copy(symlist), 'v:val.kind ==? "Method" || v:val.kind ==? "Function"')
+  return symlist
 endfunction
 
 function! vista#parser#lsp#DispatchDocumentSymbols(symbols)
