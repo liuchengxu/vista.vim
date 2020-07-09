@@ -120,7 +120,7 @@ function! s:FilterDocumentSymbols(symbols) abort
 endfunction
 
 function! vista#parser#lsp#DispatchDocumentSymbols(symbols)
-  let symlist = call s:FilterDocumentSymbols(a:symbols)
+  let symlist = s:FilterDocumentSymbols(a:symbols)
   let g:vista.raw = map(copy(symlist), { _, sym -> s:LocalToRawSymbol(sym) })
   return symlist
 endfunction
