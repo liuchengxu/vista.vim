@@ -64,7 +64,7 @@ function! s:IsDocumentSymbol(sym)
   return has_key(a:sym, 'selectionRange')
 endfunction
 
-function! s:ParseSymbolInfoList(outlist, symbols) abort
+function! s:ParseSymbolInfoList(symbols) abort
   let filtered = filter(a:symbols, 's:IsFileUri(v:val.location.uri)')
   return map(filtered, 's:LspToLocalSymbol(v:val, v:val.location.range)')
 endfunction
