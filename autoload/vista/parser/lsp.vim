@@ -66,7 +66,7 @@ endfunction
 
 function! s:ParseSymbolInfoList(outlist, symbols) abort
   let filtered = filter(a:symbols, 's:IsFileUri(v:val.location.uri)')
-  extend(a:outlist, map(filtered, 's:LspToLocalSymbol(v:val, v:val.location.range)'))
+  return map(filtered, 's:LspToLocalSymbol(v:val, v:val.location.range)')
 endfunction
 
 function! s:ParseDocumentSymbolsRec(outlist, symbols, level) abort
@@ -78,6 +78,7 @@ function! s:ParseDocumentSymbolsRec(outlist, symbols, level) abort
       call s:ParseDocumentSymbolsRec(a:outlist, lspsym.children, a:level + 1)
     endif
   endfor
+  return a:outlist
 endfunction
 
 function! s:GroupSymbolsByKind(symbols) abort
@@ -93,13 +94,11 @@ function! s:GroupSymbolsByKind(symbols) abort
 endfunction
 
 function! vista#parser#lsp#ParseDocumentSymbolPayload(resp) abort
-  let symbols = []
   if s:IsDocumentSymbol(a:resp[0])
-    call s:ParseDocumentSymbolsRec(symbols, a:resp, 0)
-    call vista#parser#lsp#DispatchDocumentSymbols(symbols)
-    return symbols
+    let symbols = s:ParseDocumentSymbolsRec([], a:resp, 0)
+    return vista#parser#lsp#DispatchDocumentSymbols(symbols)
   else
-    call s:ParseSymbolInfoList(symbols, a:resp)
+    let symbols = s:ParseSymbolInfoList(a:resp)
     call s:FilterDocumentSymbols(symbols)
     return s:GroupSymbolsByKind(symbols)
   endif
