@@ -65,12 +65,8 @@ function! s:IsDocumentSymbol(sym)
 endfunction
 
 function! s:ParseSymbolInfoList(outlist, symbols) abort
-  for lspsym in a:symbols
-    let loc = lspsym.location
-    if s:IsFileUri(loc.uri)
-      call add(a:outlist, s:LspToLocalSymbol(lspsym, loc.range))
-    endif
-  endfor
+  let filtered = filter(a:symbols, 's:IsFileUri(v:val.location.uri)')
+  extend(a:outlist, map(filtered, 's:LspToLocalSymbol(v:val, v:val.location.range)'))
 endfunction
 
 function! s:ParseDocumentSymbolsRec(outlist, symbols, level) abort
