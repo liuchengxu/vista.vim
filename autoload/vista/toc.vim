@@ -16,7 +16,6 @@ function! vista#toc#Run() abort
   let explicit_executive = vista#GetExplicitExecutive(&filetype)
   if explicit_executive isnot v:null
     call vista#executive#{explicit_executive}#Execute(v:false, v:true, v:false)
-    let extension = executive
   else
     if index(['markdown', 'vimwiki', 'pandoc', 'apiblueprint'], &filetype) > -1
       let extension = 'markdown'
