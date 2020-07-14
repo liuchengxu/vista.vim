@@ -20,6 +20,10 @@ function! s:OnBufEnter(bufnr, fpath) abort
   if index(s:did_buf_enter, a:bufnr) == -1
     call add(s:did_buf_enter, a:bufnr)
     " Only ignore the first BufEnter event for a new buffer
+    "
+    " When reading a new buffer, BufReadPost and BufEnter will both be
+    " triggered for the same buffer, therefore BufEnter is needless and might
+    " be problematic.
     if s:last_event == ['BufReadPost', a:bufnr]
       call vista#Debug('event.BufReadPost was just triggered, ignored the first event.BufEnter for bufnr '.a:bufnr)
       return
