@@ -13,15 +13,19 @@ endfunction
 
 " toc is the synonym of markdown like extensions.
 function! vista#toc#Run() abort
-  let executive = vista#GetExplicitExecutiveOrDefault()
-  if executive ==# 'toc'
-    let extension = &filetype
+  let explicit_executive = vista#GetExplicitExecutive(&filetype)
+  if explicit_executive isnot v:null
+    call vista#executive#{explicit_executive}#Execute(v:false, v:true, v:false)
   else
-    let extension = executive
-  endif
-  if index(g:vista#extensions, extension) > -1
-    call vista#extension#{extension}#Execute(v:false, v:true)
-  else
-    call vista#executive#{executive}#Execute(v:false, v:true, v:false)
+    if index(['markdown', 'vimwiki', 'pandoc', 'apiblueprint'], &filetype) > -1
+      let extension = 'markdown'
+    else
+      let extension = &filetype
+    endif
+    if index(g:vista#extensions, extension) > -1
+      call vista#extension#{extension}#Execute(v:false, v:true)
+    else
+      call vista#error#('Cannot find vista extension: '.extension)
+    endif
   endif
 endfunction

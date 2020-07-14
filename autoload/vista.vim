@@ -12,7 +12,7 @@ let g:vista#finders = vista#FindItemsUnderDirectory(s:cur_dir.'/vista/finder')
 let g:vista#executives = vista#FindItemsUnderDirectory(s:cur_dir.'/vista/executive')
 let g:vista#extensions = vista#FindItemsUnderDirectory(s:cur_dir.'/vista/extension')
 
-let s:ignore_list = ['vista', 'vista_kind', 'nerdtree', 'startify', 'tagbar', 'fzf', 'gitcommit']
+let s:ignore_list = ['vista', 'vista_kind', 'nerdtree', 'startify', 'tagbar', 'fzf', 'gitcommit', 'coc-explorer']
 
 " Skip special buffers, filetypes.
 function! vista#ShouldSkip() abort
@@ -114,6 +114,14 @@ function! vista#RunForNearestMethodOrFunction() abort
 
   if !exists('#VistaMOF')
     call vista#autocmd#InitMOF()
+  endif
+endfunction
+
+let s:logging_enabled = exists('g:vista_log_file') && !empty(g:vista_log_file)
+
+function! vista#Debug(...) abort
+  if s:logging_enabled
+    call writefile([strftime('%Y-%m-%d %H:%M:%S ').json_encode(a:000)], g:vista_log_file, 'a')
   endif
 endfunction
 

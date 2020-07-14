@@ -472,6 +472,18 @@ g:vista_no_mappings                                          *g:vista_no_mapping
 
   Disable the default mappings.
 
+g:vista_log_file                                                *g:vista_log_file*
+
+  Type: |String|
+  Default: `Undefined`
+
+  Enable the logging feature for debugging. For example:
+  >
+  let g:vista_log_file = expand('~/vista.log')
+<
+  Note: Do not enable this unless you want to debug vista.vim as this may have
+  a side effect on the performance!
+
 --------------------------------------------------------------------------------
 Key Mappings                                                  *vista-key-mappings*
 

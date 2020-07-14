@@ -104,13 +104,14 @@ endfunction
 
 " React on the preprocessed LSP data
 function! vista#renderer#LSPProcess(processed_data, reload_only, should_display) abort
-  if a:reload_only
-    call vista#sidebar#Reload(a:processed_data)
-    return [v:false, a:should_display]
-  elseif a:should_display
+  " Always reload the data, display the processed data on demand.
+  if a:should_display
+    call vista#Debug('[LSPProcess]should_display, processed_data:'.string(a:processed_data))
     call vista#renderer#RenderAndDisplay(a:processed_data)
     return [a:reload_only, v:false]
   else
-    return [a:reload_only, a:should_display]
+    call vista#Debug('[LSPProcess]reload_only, processed_data:'.string(a:processed_data))
+    call vista#sidebar#Reload(a:processed_data)
+    return [v:true, a:should_display]
   endif
 endfunction

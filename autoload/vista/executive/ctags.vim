@@ -67,9 +67,9 @@ function! s:GetLanguageSpecificOptition(filetype) abort
   return opt
 endfunction
 
-function! s:DeleteTemp() abort
+function! s:NoteTemp() abort
   if exists('s:tmp_file')
-    call delete(s:tmp_file)
+    call add(g:vista.tmps, s:tmp_file)
     unlet s:tmp_file
   endif
 endfunction
@@ -81,6 +81,7 @@ function! s:BuildCmd(origin_fpath) abort
     return ''
   endif
 
+  call vista#Debug('executive::ctags::s:BuildCmd origin_fpath:'.a:origin_fpath)
   let s:fpath = a:origin_fpath
 
   let custom_cmd = s:GetCustomCmd(&filetype)
@@ -122,13 +123,14 @@ function! s:ApplyExtracted() abort
   let s:cache.ftime = getftime(s:fpath)
   let s:cache.bufnr = bufnr('')
 
+  call vista#Debug('executive::ctags::s:ApplyExtracted s:fpath:'.s:fpath.', s:reload_only:'.s:reload_only.', s:should_display:'.s:should_display)
   let [s:reload_only, s:should_display] = vista#renderer#LSPProcess(s:data, s:reload_only, s:should_display)
 
   if exists('s:jodid')
     unlet s:jodid
   endif
 
-  call s:DeleteTemp()
+  call s:NoteTemp()
 endfunction
 
 function! s:ExtractLinewise(raw_data) abort
@@ -137,12 +139,14 @@ function! s:ExtractLinewise(raw_data) abort
 endfunction
 
 function! s:AutoUpdate(fpath) abort
+  call vista#Debug('executive::ctags::s:AutoUpdate '.a:fpath)
   if g:vista.source.filetype() ==# 'markdown'
         \ && get(g:, 'vista_enable'.&filetype.'_extension', 1)
     call vista#extension#{&ft}#AutoUpdate(a:fpath)
   else
     call vista#OnExecute(s:provider, function('s:AutoUpdate'))
     let s:reload_only = v:true
+    call vista#Debug('executive::ctags::s:AutoUpdate calling s:ApplyExecute '.a:fpath)
     call s:ApplyExecute(v:false, a:fpath)
   endif
 endfunction
@@ -154,6 +158,7 @@ endfunction
 
 " Run ctags synchronously given the cmd
 function! s:ApplyRun(cmd) abort
+  call vista#Debug('executive::ctags::s:ApplyRun:'.a:cmd)
   let output = system(a:cmd)
   if v:shell_error
     return vista#error#('Fail to run ctags: '.a:cmd)
@@ -171,6 +176,11 @@ if has('nvim')
       return
     endif
 
+    if self.stdout == ['']
+      return
+    endif
+
+    call vista#Debug('ctags::s:on_exit '.string(self.stdout))
     " Second last line is the real last one in neovim
     call s:ExtractLinewise(self.stdout[:-2])
 
@@ -309,6 +319,7 @@ function! s:ApplyExecute(bang, fpath) abort
   if a:bang || !s:can_async
     call s:ApplyRun(cmd)
   else
+    call vista#Debug('executive::ctags::s:ApplyExecute calling s:RunAsyncCommon('.cmd.')')
     call s:RunAsyncCommon(cmd)
   endif
 endfunction
@@ -327,7 +338,7 @@ endfunction
 function! s:RunAsyncCommon(cmd) abort
   if exists('s:jodid')
     call vista#util#JobStop(s:jodid)
-    call s:DeleteTemp()
+    call s:NoteTemp()
   endif
 
   let s:jodid = s:ApplyRunAsync(a:cmd)
