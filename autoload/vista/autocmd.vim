@@ -21,12 +21,12 @@ function! s:OnBufEnter(bufnr, fpath) abort
     call add(s:did_buf_enter, a:bufnr)
     " Only ignore the first BufEnter event for a new buffer
     if s:last_event == ['BufReadPost', a:bufnr]
-      call vista#debugging#Log('event.BufReadPost was just triggered, ignored event.BufEnter for bufnr '.a:bufnr)
+      call vista#Debug('event.BufReadPost was just triggered, ignored event.BufEnter for bufnr '.a:bufnr)
       return
     endif
   endif
 
-  call vista#debugging#Log('event.BufEnter', a:bufnr, a:fpath)
+  call vista#Debug('event.BufEnter', a:bufnr, a:fpath)
   call s:GenericAutoUpdate('BufEnter', a:bufnr, a:fpath)
 endfunction
 
@@ -46,7 +46,7 @@ function! s:GenericAutoUpdate(event, bufnr, fpath) abort
     return
   endif
 
-  call vista#debugging#Log('event.'.a:event. ' processing auto update for buffer '. a:bufnr)
+  call vista#Debug('event.'.a:event. ' processing auto update for buffer '. a:bufnr)
   let [bufnr, winnr, fname] = [a:bufnr, winnr(), expand('%')]
 
   call vista#source#Update(bufnr, winnr, fname, a:fpath)
@@ -56,16 +56,16 @@ endfunction
 
 function! s:TriggerUpdate(event, bufnr, fpath) abort
   if s:last_event == [a:event, a:bufnr]
-    call vista#debugging#Log('same event for bufnr '.a:bufnr.' was just triggered, ignored for this one')
+    call vista#Debug('same event for bufnr '.a:bufnr.' was just triggered, ignored for this one')
     return
   endif
 
   let s:last_event = [a:event, a:bufnr]
 
-  call vista#debugging#Log('new last_event:', s:last_event)
+  call vista#Debug('new last_event:', s:last_event)
 
   if index(s:did_open, a:bufnr) == -1
-    call vista#debugging#Log('tracking new buffer '.a:bufnr)
+    call vista#Debug('tracking new buffer '.a:bufnr)
     call add(s:did_open, a:bufnr)
   endif
 
@@ -87,6 +87,14 @@ function! s:AutoUpdateWithDelay(bufnr, fpath) abort
         \ g:vista_update_on_text_changed_delay,
         \ { -> s:GenericAutoUpdate('TextChanged|TextChangedI', a:bufnr, a:fpath)}
         \ )
+endfunction
+
+function! s:ClearTempData() abort
+  for tmp in g:vista.tmps
+    if filereadable(tmp)
+      call delete(tmp)
+    endif
+  endfor
 endfunction
 
 " Every time we call :Vista foo, we should clear other autocmd events and only
@@ -125,6 +133,8 @@ function! vista#autocmd#Init(group_name, AUF) abort
     autocmd BufEnter     * call s:OnBufEnter(+expand('<abuf>'), fnamemodify(expand('<afile>'), ':p'))
 
     autocmd BufDelete,BufWipeout * call s:OnBufDelete(+expand('<abuf>'))
+
+    autocmd VimLeavePre * call s:ClearTempData()
 
     if g:vista_update_on_text_changed
       autocmd TextChanged,TextChangedI *

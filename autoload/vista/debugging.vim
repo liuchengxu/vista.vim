@@ -73,11 +73,3 @@ function! vista#debugging#InfoToClipboard() abort
   echohl Function | echon 'Vista info'                | echohl NONE
   echohl Normal   | echon ' copied to your clipboard' | echohl NONE
 endfunction
-
-let s:logging_enabled = !empty(g:vista_log_file)
-
-function! vista#debugging#Log(...) abort
-  if s:logging_enabled
-    call writefile([strftime('%Y-%m-%d %H:%M:%S ') . json_encode(a:000)], g:vista_log_file, 'a')
-  endif
-endfunction

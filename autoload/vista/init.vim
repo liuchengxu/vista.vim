@@ -4,6 +4,7 @@
 
 function! vista#init#Api() abort
   let g:vista = {}
+  let g:vista.tmps = []
 
   " =========================================
   " Api for manipulating the vista buffer.

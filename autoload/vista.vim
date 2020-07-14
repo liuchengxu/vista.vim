@@ -117,6 +117,14 @@ function! vista#RunForNearestMethodOrFunction() abort
   endif
 endfunction
 
+let s:logging_enabled = exists('g:vista_log_file') && !empty(g:vista_log_file)
+
+function! vista#Debug(...) abort
+  if s:logging_enabled
+    call writefile([strftime('%Y-%m-%d %H:%M:%S ').json_encode(a:000)], g:vista_log_file, 'a')
+  endif
+endfunction
+
 function! s:HandleSingleArgument(arg) abort
   if index(g:vista#executives, a:arg) > -1
     call vista#executive#{a:arg}#Execute(v:false, v:true)
