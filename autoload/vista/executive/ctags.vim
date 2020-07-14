@@ -68,6 +68,7 @@ function! s:GetLanguageSpecificOptition(filetype) abort
 endfunction
 
 function! s:DeleteTemp() abort
+  return
   if exists('s:tmp_file')
     call delete(s:tmp_file)
     unlet s:tmp_file
@@ -81,6 +82,7 @@ function! s:BuildCmd(origin_fpath) abort
     return ''
   endif
 
+  call vista#debugging#Log('autoload/vista/executive/ctags.vim::s:BuildCmd origin_fpath:'.a:origin_fpath)
   let s:fpath = a:origin_fpath
 
   let custom_cmd = s:GetCustomCmd(&filetype)
@@ -122,6 +124,7 @@ function! s:ApplyExtracted() abort
   let s:cache.ftime = getftime(s:fpath)
   let s:cache.bufnr = bufnr('')
 
+  call vista#debugging#Log('autoload/vista/executive/ctags::s:ApplyExtracted s:fpath:'.s:fpath.', s:reload_only:'.s:reload_only.', s:should_display:'.s:should_display)
   let [s:reload_only, s:should_display] = vista#renderer#LSPProcess(s:data, s:reload_only, s:should_display)
 
   if exists('s:jodid')
@@ -137,12 +140,14 @@ function! s:ExtractLinewise(raw_data) abort
 endfunction
 
 function! s:AutoUpdate(fpath) abort
+  call vista#debugging#Log('autoload/vista/executive/ctags::s:AutoUpdate '.a:fpath)
   if g:vista.source.filetype() ==# 'markdown'
         \ && get(g:, 'vista_enable'.&filetype.'_extension', 1)
     call vista#extension#{&ft}#AutoUpdate(a:fpath)
   else
     call vista#OnExecute(s:provider, function('s:AutoUpdate'))
     let s:reload_only = v:true
+    call vista#debugging#Log('autoload/vista/executive/ctags::s:AutoUpdate calling s:ApplyExecute '.a:fpath)
     call s:ApplyExecute(v:false, a:fpath)
   endif
 endfunction
@@ -154,6 +159,7 @@ endfunction
 
 " Run ctags synchronously given the cmd
 function! s:ApplyRun(cmd) abort
+  call vista#debugging#Log('autoload/vista/executive/ctags::s:ApplyRun:'.cmd)
   let output = system(a:cmd)
   if v:shell_error
     return vista#error#('Fail to run ctags: '.a:cmd)
@@ -171,6 +177,7 @@ if has('nvim')
       return
     endif
 
+    call vista#debugging#Log('s:on_exit '.string(self.stdout))
     " Second last line is the real last one in neovim
     call s:ExtractLinewise(self.stdout[:-2])
 
@@ -309,6 +316,7 @@ function! s:ApplyExecute(bang, fpath) abort
   if a:bang || !s:can_async
     call s:ApplyRun(cmd)
   else
+    call vista#debugging#Log('autoload/vista/executive/ctags::s:ApplyExecute calling s:RunAsyncCommon('.cmd.')')
     call s:RunAsyncCommon(cmd)
   endif
 endfunction

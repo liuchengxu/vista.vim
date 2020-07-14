@@ -4,6 +4,9 @@
 
 let s:registered = []
 let s:update_timer = -1
+let s:did_open = []
+let s:last_event = []
+let s:did_buf_enter = []
 
 function! s:ClearOtherEvents(group) abort
   for augroup in s:registered
@@ -14,23 +17,59 @@ function! s:ClearOtherEvents(group) abort
 endfunction
 
 function! s:OnBufEnter(bufnr, fpath) abort
-  if !exists('g:vista')
-    return
+  if index(s:did_buf_enter, a:bufnr) == -1
+    call add(s:did_buf_enter, a:bufnr)
+    " Only ignore the first BufEnter event for a new buffer
+    if s:last_event == ['BufReadPost', a:bufnr]
+      call vista#debugging#Log('event.BufReadPost was just triggered, ignored event.BufEnter for bufnr '.a:bufnr)
+      return
+    endif
   endif
 
-  call s:GenericAutoUpdate(a:bufnr, a:fpath)
+  call vista#debugging#Log('event.BufEnter', a:bufnr, a:fpath)
+  call s:GenericAutoUpdate('BufEnter', a:bufnr, a:fpath)
 endfunction
 
-function! s:GenericAutoUpdate(bufnr, fpath) abort
+function! s:OnBufDelete(bufnr) abort
+  let idx = index(s:did_open, a:bufnr)
+  if idx != -1
+    unlet s:did_open[idx]
+  endif
+  let idx = index(s:did_buf_enter, a:bufnr)
+  if idx != -1
+    unlet s:did_buf_enter[idx]
+  endif
+endfunction
+
+function! s:GenericAutoUpdate(event, bufnr, fpath) abort
   if vista#ShouldSkip()
     return
   endif
 
+  call vista#debugging#Log('event.'.a:event. ' processing auto update for buffer '. a:bufnr)
   let [bufnr, winnr, fname] = [a:bufnr, winnr(), expand('%')]
 
   call vista#source#Update(bufnr, winnr, fname, a:fpath)
 
   call s:ApplyAutoUpdate(a:fpath)
+endfunction
+
+function! s:TriggerUpdate(event, bufnr, fpath) abort
+  if s:last_event == [a:event, a:bufnr]
+    call vista#debugging#Log('same event for bufnr '.a:bufnr.' was just triggered, ignored for this one')
+    return
+  endif
+
+  let s:last_event = [a:event, a:bufnr]
+
+  call vista#debugging#Log('new last_event:', s:last_event)
+
+  if index(s:did_open, a:bufnr) == -1
+    call vista#debugging#Log('tracking new buffer '.a:bufnr)
+    call add(s:did_open, a:bufnr)
+  endif
+
+  call s:GenericAutoUpdate(a:event, a:bufnr, a:fpath)
 endfunction
 
 function! s:AutoUpdateWithDelay(bufnr, fpath) abort
@@ -46,7 +85,7 @@ function! s:AutoUpdateWithDelay(bufnr, fpath) abort
   let g:vista.on_text_changed = 1
   let s:update_timer = timer_start(
         \ g:vista_update_on_text_changed_delay,
-        \ { -> s:GenericAutoUpdate(a:bufnr, a:fpath)}
+        \ { -> s:GenericAutoUpdate('TextChanged|TextChangedI', a:bufnr, a:fpath)}
         \ )
 endfunction
 
@@ -80,11 +119,12 @@ function! vista#autocmd#Init(group_name, AUF) abort
     "
     " CursorHold and CursorHoldI event have been removed in order to
     " highlight the nearest tag automatically.
-    autocmd BufWritePost,BufReadPost, *
-          \ call s:GenericAutoUpdate(+expand('<abuf>'), fnamemodify(expand('<afile>'), ':p'))
 
-    autocmd BufEnter *
-          \ call s:OnBufEnter(+expand('<abuf>'), fnamemodify(expand('<afile>'), ':p'))
+    autocmd BufReadPost  * call s:TriggerUpdate('BufReadPost', +expand('<abuf>'), fnamemodify(expand('<afile>'), ':p'))
+    autocmd BufWritePost * call s:TriggerUpdate('BufWritePost', +expand('<abuf>'), fnamemodify(expand('<afile>'), ':p'))
+    autocmd BufEnter     * call s:OnBufEnter(+expand('<abuf>'), fnamemodify(expand('<afile>'), ':p'))
+
+    autocmd BufDelete,BufWipeout * call s:OnBufDelete(+expand('<abuf>'))
 
     if g:vista_update_on_text_changed
       autocmd TextChanged,TextChangedI *
