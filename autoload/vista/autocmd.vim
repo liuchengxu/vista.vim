@@ -25,7 +25,7 @@ function! s:OnBufEnter(bufnr, fpath) abort
     " triggered for the same buffer, therefore BufEnter is needless and might
     " be problematic.
     if s:last_event == ['BufReadPost', a:bufnr]
-      call vista#Debug('event.BufReadPost was just triggered, ignored the first event.BufEnter for bufnr '.a:bufnr)
+      call vista#Debug('ignored the first event.BufEnter for bufnr '.a:bufnr.' because event.BufReadPost was just triggered for the same buffer')
       return
     endif
   endif
