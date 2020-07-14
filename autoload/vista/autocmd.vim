@@ -21,7 +21,7 @@ function! s:OnBufEnter(bufnr, fpath) abort
     call add(s:did_buf_enter, a:bufnr)
     " Only ignore the first BufEnter event for a new buffer
     if s:last_event == ['BufReadPost', a:bufnr]
-      call vista#Debug('event.BufReadPost was just triggered, ignored event.BufEnter for bufnr '.a:bufnr)
+      call vista#Debug('event.BufReadPost was just triggered, ignored the first event.BufEnter for bufnr '.a:bufnr)
       return
     endif
   endif
