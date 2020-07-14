@@ -176,7 +176,11 @@ if has('nvim')
       return
     endif
 
-    call vista#Debug('s:on_exit '.string(self.stdout))
+    if self.stdout == ['']
+      return
+    endif
+
+    call vista#Debug('ctags::s:on_exit '.string(self.stdout))
     " Second last line is the real last one in neovim
     call s:ExtractLinewise(self.stdout[:-2])
 
