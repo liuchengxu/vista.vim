@@ -10,6 +10,8 @@ View and search LSP symbols, tags in Vim/NeoVim.
 
 [>>>> More screenshots](https://github.com/liuchengxu/vista.vim/issues/257)
 
+**caveat: There is a major flaw about the tree view renderer of ctags at the moment, see [#320](https://github.com/liuchengxu/vista.vim/issues/320) for more details.**
+
 ## Table Of Contents
 <!-- TOC GFM -->
 
