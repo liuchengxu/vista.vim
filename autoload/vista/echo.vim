@@ -45,7 +45,7 @@ function! vista#echo#EchoScopeInCmdlineIsOk() abort
   return v:false
 endfunction
 
-function! vista#echo#EchoScopeFromCacheIsOk() abort
+function! s:EchoScopeFromCacheIsOk() abort
   if has_key(g:vista, 'vlnum_cache')
     " should exclude the first two lines and keep in mind that the 1-based and
     " 0-based.
@@ -83,7 +83,7 @@ function! vista#echo#EchoInCmdline(msg, tag) abort
   endtry
 
   " Try highlighting the scope of current tag
-  if !vista#echo#EchoScopeFromCacheIsOk()
+  if !s:EchoScopeFromCacheIsOk()
     call s:TryParseAndEchoScope()
   endif
 

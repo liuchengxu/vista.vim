@@ -68,7 +68,7 @@ endfunction
 
 function! vista#GetExplicitExecutive(filetype) abort
   if exists('g:vista_'.a:filetype.'_executive')
-    execute 'return' 'g:vista_'.a:filetype.'_executive'
+    return g:vista_{a:filetype}_executive
   endif
 
   if has_key(g:vista_executive_for, a:filetype)

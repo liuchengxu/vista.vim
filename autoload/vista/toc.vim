@@ -14,7 +14,7 @@ endfunction
 " toc is the synonym of markdown like extensions.
 function! vista#toc#Run() abort
   let explicit_executive = vista#GetExplicitExecutive(&filetype)
-  if explicit_executive isnot v:null
+  if explicit_executive isnot v:null && explicit_executive !=# 'toc'
     call vista#executive#{explicit_executive}#Execute(v:false, v:true, v:false)
   else
     if index(['markdown', 'vimwiki', 'pandoc', 'apiblueprint'], &filetype) > -1
