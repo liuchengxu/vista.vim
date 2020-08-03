@@ -32,6 +32,7 @@ function! s:Extract(symbols) abort
   return s:data
 endfunction
 
+" Deprecated as a lot of people complain the error message.
 function! s:HandleLSPResponse(error, response) abort
   if empty(a:error)
     " Refer to coc.nvim 79cb11e
@@ -44,9 +45,15 @@ function! s:HandleLSPResponse(error, response) abort
   endif
 endfunction
 
+function! s:HandleLSPResponseInSilence(error, response) abort
+  if empty(a:error) && a:response isnot v:null
+    call s:Extract(a:response)
+  endif
+endfunction
+
 function! s:AutoUpdate(_fpath) abort
   let s:reload_only = v:true
-  call vista#AutoUpdateWithDelay(function('CocActionAsync'), ['documentSymbols', function('s:HandleLSPResponse')])
+  call vista#AutoUpdateWithDelay(function('CocActionAsync'), ['documentSymbols', function('s:HandleLSPResponseInSilence')])
 endfunction
 
 function! s:Run() abort
@@ -54,7 +61,7 @@ function! s:Run() abort
 endfunction
 
 function! s:RunAsync() abort
-  call CocActionAsync('documentSymbols', function('s:HandleLSPResponse'))
+  call CocActionAsync('documentSymbols', function('s:HandleLSPResponseInSilence'))
 endfunction
 
 function! s:Execute(bang, should_display) abort
@@ -68,7 +75,7 @@ function! s:Execute(bang, should_display) abort
     endif
   else
     let s:should_display = a:should_display
-    call CocActionAsync('documentSymbols', function('s:HandleLSPResponse'))
+    call s:RunAsync()
   endif
 endfunction
 
