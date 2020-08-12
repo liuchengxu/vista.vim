@@ -85,13 +85,14 @@ endfunction
 function! vista#sidebar#Close() abort
   if exists('g:vista.bufnr')
     let winnr = g:vista.winnr()
-    if winnr != -1
-      noautocmd execute winnr.'wincmd c'
-    endif
 
     " Jump back to the previous window if we are in the vista sidebar atm.
     if winnr == winnr()
       wincmd p
+    endif
+
+    if winnr != -1
+      noautocmd execute winnr.'wincmd c'
     endif
 
     silent execute  g:vista.bufnr.'bwipe!'
