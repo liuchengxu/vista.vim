@@ -76,7 +76,7 @@ I don't know the mimimal supported version. But if you only care about the ctags
 
 Otherwise, if you want to try any LSP related features, then you certainly need some plugins to retrive the LSP symbols, e.g., [coc.nvim](https://github.com/neoclide/coc.nvim). When you have these LSP plugins set up, vista.vim should be ok to go as well.
 
-In addition, if you want to search the symbols via [fzf](https://github.com/junegunn/fzf), you will have to install it first.
+In addition, if you want to search the symbols via [fzf](https://github.com/junegunn/fzf), you will have to install it first. Note that fzf 0.22.0 or above is required.
 
 ## Installation
 
