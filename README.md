@@ -148,6 +148,30 @@ let g:lightline = {
       \ },
       \ }
 ```
+### Show the nearest method/function's scope in the statusline
+
+```vim
+function! NearestScope() abort
+  return get(b:, 'vista_nearest_scope', '')
+endfunction
+
+set statusline+=%{NearestScope()}
+```
+#### [lightline.vim](https://github.com/itchyny/lightline.vim)
+
+```vim
+let g:lightline = {
+	  \...
+      \ 'active': {
+      \   'left': [ [...],
+      \             [ ..., 'scope', 'method'] ]
+      \ },
+      \ 'component_function': {
+	  \	  ...
+      \   'scope': 'NearestScope',
+      \ },
+      \ }
+```
 
 ### Commands
 
