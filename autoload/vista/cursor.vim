@@ -203,7 +203,7 @@ function! vista#cursor#ShowDetailWithDelay() abort
   call s:StopCursorTimer()
 
   let s:cursor_timer = timer_start(
-        \ g:vista_update_scope_delay,
+        \ g:vista_cursor_delay,
         \ function('vista#cursor#ShowDetail'),
         \ )
 endfunction
@@ -243,7 +243,7 @@ endfunction
 function! vista#cursor#FindDetailWithDelay() abort
   call s:StopFindDetailTimer()
   let s:find_detail_timer = timer_start(
-        \ g:vista_cursor_delay,
+        \ g:vista_update_scope_delay,
         \ function('vista#cursor#FindDetail'),
         \ )
 endfunction
