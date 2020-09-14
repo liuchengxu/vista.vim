@@ -212,6 +212,8 @@ endfunction
 function! vista#cursor#FindDetail(_timer) abort
   if empty(getline('.'))
         \ || !exists('g:vista')
+        \ || !has_key(g:vista, 'functions')
+        \ || !has_key(g:vista, 'source')
     call setbufvar(g:vista.source.bufnr, 'vista_nearest_scope', '')
     call setbufvar(g:vista.source.bufnr, 'vista_nearest_symbol', '')
     return
