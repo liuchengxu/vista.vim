@@ -214,8 +214,7 @@ function! vista#cursor#FindDetail(_timer) abort
         \ || !exists('g:vista')
         \ || !has_key(g:vista, 'functions')
         \ || !has_key(g:vista, 'source')
-    call setbufvar(g:vista.source.bufnr, 'vista_nearest_scope', '')
-    call setbufvar(g:vista.source.bufnr, 'vista_nearest_symbol', '')
+    call setbufvar(g:vista.source.bufnr, 'vista_cursor_info', {})
     return
   endif
 
@@ -235,10 +234,11 @@ function! vista#cursor#FindDetail(_timer) abort
     if !empty(access)
       let scope = scope.' '.access
     endif
+  else
+    let scope = vista#util#Trim(get(found, 'namespace', '').' '.get(found, 'class', ''))
   endif
   let symbolname = vista#util#Trim(get(found, 'name', ''))
-  call setbufvar(g:vista.source.bufnr, 'vista_nearest_scope', scope)
-  call setbufvar(g:vista.source.bufnr, 'vista_nearest_symbol', symbolname)
+  call setbufvar(g:vista.source.bufnr, 'vista_cursor_info', {'scope': scope, 'symbol': symbolname})
   
 endfunction
 

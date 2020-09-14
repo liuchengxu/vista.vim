@@ -152,7 +152,8 @@ let g:lightline = {
 
 ```vim
 function! NearestScope() abort
-  return get(b:, 'vista_nearest_scope', '')
+  let info = get(b:, 'vista_cursor_info', {})
+  return get(info, 'scope', '')
 endfunction
 
 set statusline+=%{NearestScope()}
