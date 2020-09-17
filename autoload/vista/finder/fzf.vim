@@ -79,11 +79,18 @@ function! vista#finder#fzf#extract(line) abort
   return [lnum, tag]
 endfunction
 
-function! vista#finder#fzf#sink(line) abort
+" Optional argument: winid for the origin tags window
+function! vista#finder#fzf#sink(line, ...) abort
   let [lnum, tag] = vista#finder#fzf#extract(a:line)
   let col = stridx(g:vista.source.line(lnum), tag)
   let col = col == -1 ? 1 : col + 1
-  call vista#source#GotoWin()
+  if a:0 > 0
+    if win_getid() != a:1
+      noautocmd call win_gotoid(a:1)
+    endif
+  else
+    call vista#source#GotoWin()
+  endif
   call cursor(lnum, col)
   normal! zz
   call call('vista#util#Blink', get(g:, 'vista_blink', [2, 100]))
