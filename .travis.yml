@@ -1,7 +1,0 @@
----
-sudo: required
-services:
-    - docker
-language: generic
-script: |
-    ./run-vint
