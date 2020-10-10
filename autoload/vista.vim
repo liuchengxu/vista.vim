@@ -190,6 +190,12 @@ endfunction
 
 " Main entrance to interact with vista.vim
 function! vista#(bang, ...) abort
+  " `:Vista focus` should be handled before updating the source buffer info.
+  if a:0 == 1 && a:1 ==# 'focus'
+    call vista#sidebar#ToggleFocus()
+    return
+  endif
+
   let [bufnr, winnr, fname, fpath] = [bufnr('%'), winnr(), expand('%'), expand('%:p')]
   let g:vista.source.winid = win_getid()
   call vista#source#Update(bufnr, winnr, fname, fpath)
