@@ -6,6 +6,7 @@ let s:floating_timer = -1
 let s:last_lnum = -1
 
 let s:floating_delay = get(g:, 'vista_floating_delay', 100)
+let s:floating_highlight = get(g:, 'vista_floating_highlight', 'PMenu')
 
 " Vista sidebar window usually sits at the right side.
 " TODO improve me!
@@ -152,8 +153,10 @@ function! s:Display(msg, win_id) abort
   call s:HighlightTagInFloatinWin()
 
   let &l:filetype = getbufvar(g:vista.source.bufnr, '&ft')
+
+  call setwinvar(s:floating_win_id, '&winhl', 'Normal:'.s:floating_highlight)
+
   setlocal
-        \ winhl=Normal:Pmenu
         \ buftype=nofile
         \ nobuflisted
         \ bufhidden=hide

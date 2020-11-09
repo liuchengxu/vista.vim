@@ -225,6 +225,13 @@ g:vista_echo_cursor_strategy                        *g:vista_echo_cursor_strateg
   `both`         - both `echo` and `floating_win` if it's avaliable otherwise
                  `scroll` will be used.
 
+g:vista_floating_highlight                    *g:vista_floating_highlight*
+
+  Type: |String|
+  Default: `Pmenu`
+
+  Update the highlighting for the floating window.
+
 g:vista_update_on_text_changed                    *g:vista_update_on_text_changed*
 
   Type: |Number|
