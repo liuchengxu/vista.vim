@@ -41,7 +41,8 @@ function! s:RunAsync() abort
   call vista#SetProvider(s:provider)
   lua << EOF
     local params = vim.lsp.util.make_position_params()
-    local callback = function(_, _, result)
+    local callback = function(err, _, result)
+        if err then print(tostring(err)) return end
         if not result then return end
         vim.g.vista_executive_nvim_lsp_fetching = false
         data = vim.fn['vista#renderer#LSPPreprocess'](result)
