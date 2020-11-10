@@ -32,6 +32,8 @@ function! s:PrependFpath(lines) abort
   if exists('g:vista.source.fpath')
     let width = winwidth(g:vista.winnr())
     let fpath = g:vista.source.fpath
+    " Make the path relative to current directory.
+    let fpath = fnamemodify(fpath, ':p:.')
     " Shorten the file path if it's too long
     if len(fpath) > width
       let fpath = '..'.fpath[len(fpath)-width+4 : ]
