@@ -83,4 +83,6 @@ function! vista#init#Api() abort
   endfunction
 
   let g:vista.source = source_handle
+
+  hi default link VistaFloat Pmenu
 endfunction

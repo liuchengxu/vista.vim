@@ -500,6 +500,21 @@ searching by adding the following autocommand in your vimrc:
  >
  autocmd FileType vista,vista_kind nnoremap <buffer> <silent> \
              / :<c-u>call vista#finder#fzf#Run()<CR>
+
+--------------------------------------------------------------------------------
+Highlights                                                      *vista-highlights*
+
+Use |:hi| command in your vimrc to change the default highlights in vista.vim,
+e.g.:
+  >
+  hi VistaFloat ctermbg=237 guibg=#3a3a3a
+
+VistaFloat                                                            *VistaFloat*
+
+  Default: `hi default link VistaFloat Pmenu`
+
+  The highlight used for the floating window.
+
 ================================================================================
 CONTRIBUTING                                                  *vista-contributing*
 

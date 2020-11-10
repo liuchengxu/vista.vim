@@ -153,7 +153,7 @@ function! s:Display(msg, win_id) abort
 
   let &l:filetype = getbufvar(g:vista.source.bufnr, '&ft')
   setlocal
-        \ winhl=Normal:Pmenu
+        \ winhl=Normal:VistaFloat
         \ buftype=nofile
         \ nobuflisted
         \ bufhidden=hide
