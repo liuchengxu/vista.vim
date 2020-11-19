@@ -6,8 +6,8 @@ if exists('b:current_syntax') && b:current_syntax ==# 'vista'
   finish
 endif
 
-let icons = join(values(g:vista#renderer#icons), '\|')
-execute 'syntax match VistaIcon' '/'.icons.'/' 'contained'
+let s:icons = join(values(g:vista#renderer#icons), '\|')
+execute 'syntax match VistaIcon' '/'.s:icons.'/' 'contained'
 
 syntax match VistaPublic /^\s*+\</ contained
 syntax match VistaProtected /^\s*\~\</ contained
