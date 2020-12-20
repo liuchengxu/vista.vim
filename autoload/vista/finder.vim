@@ -125,8 +125,6 @@ function! s:IntoRow(icon, kind, item) abort
     let row = printf('%s %s', a:icon, row)
   endif
 
-  let row = printf('%s %s', row, a:item.lnum)
-
   return row
 endfunction
 
@@ -161,7 +159,7 @@ function! vista#finder#PrepareOpts(source, prompt) abort
   let opts = {
           \ 'source': a:source,
           \ 'sink': function('vista#finder#fzf#sink'),
-          \ 'options': ['--prompt', a:prompt] + get(g:, 'vista_fzf_opt', []),
+          \ 'options': ['--prompt', a:prompt, '--nth', '1', '--delimiter', ':'] + get(g:, 'vista_fzf_opt', []),
           \ }
 
   if len(g:vista_fzf_preview) > 0
@@ -183,8 +181,8 @@ function! vista#finder#PrepareOpts(source, prompt) abort
       " keeping old code around since we are not sure if / how preview works on windows
       let preview_opts[-1] = preview_opts[-1][0:-3] . g:vista.source.fpath . (g:vista#renderer#enable_icon ? ':{2}' : ':{1}')
     else
-      let object_name_index = g:vista#renderer#enable_icon ? '2' : '1'
-      let extract_line_number = ':$(echo {' . object_name_index . "} | grep -o '[^:]*$')"
+      let object_name_index = g:vista#renderer#enable_icon ? '3' : '2'
+      let extract_line_number = printf(':$(echo {%s})', object_name_index)
       let preview_opts[-1] = preview_opts[-1][0:-3] . fnameescape(g:vista.source.fpath) . extract_line_number
     endif
 
