@@ -18,7 +18,7 @@ let s:icons = {
 \    'package': "\ue612",
 \    'packages': "\ue612",
 \    'enum': "\uf702",
-\    'enummember': "e",
+\    'enummember': "\uf282",
 \    'enumerator': "\uf702",
 \    'module': "\uf136",
 \    'modules': "\uf136",
