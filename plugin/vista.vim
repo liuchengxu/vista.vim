@@ -26,6 +26,7 @@ let g:vista_cursor_delay = get(g:, 'vista_cursor_delay', 400)
 let g:vista_ignore_kinds = get(g:, 'vista_ignore_kinds', [])
 let g:vista_executive_for = get(g:, 'vista_executive_for', {})
 let g:vista_default_executive = get(g:, 'vista_default_executive', 'ctags')
+let g:vista_enable_centering_jump = get(g:, 'vista_enable_centering_jump', 1)
 let g:vista_find_nearest_method_or_function_delay = get(g:, 'vista_find_nearest_method_or_function_delay', 300)
 " Select the absolute nearest function when using binary search.
 let g:vista_find_absolute_nearest_method_or_function = get(g:, 'vista_find_absolute_nearest_method_or_function', 0)

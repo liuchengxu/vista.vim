@@ -484,6 +484,14 @@ g:vista_log_file                                                *g:vista_log_fil
   Note: Do not enable this unless you want to debug vista.vim as this may have
   a side effect on the performance!
 
+g:vista_enable_centering_jump                      *g:vista_enable_centering_jump*
+
+  Type: |Number|
+  Default: `1`
+
+  Set this variable to `0` to not make the line at center of window when you
+  jump to the tag.
+
 --------------------------------------------------------------------------------
 Key Mappings                                                  *vista-key-mappings*
 
