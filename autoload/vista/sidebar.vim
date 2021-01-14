@@ -15,7 +15,11 @@ function! vista#sidebar#WhichFileType() abort
 endfunction
 
 function! s:NewWindow() abort
-  let open = g:vista_sidebar_position.' '.g:vista_sidebar_width.'new'
+  if exists('g:vista_sidebar_open_cmd')
+    let open = g:vista_sidebar_open_cmd
+  else
+    let open = g:vista_sidebar_position.' '.g:vista_sidebar_width.'new'
+  endif
 
   if get(g:, 'vista_sidebar_keepalt', 0)
     silent execute 'keepalt '.open '__vista__'

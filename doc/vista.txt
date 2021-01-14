@@ -168,16 +168,34 @@ g:vista_sidebar_position                                *g:vista_sidebar_positio
   Type: |String|
   Default: `vertical botright`
 
-  Position to open the vista sidebar. On the right by default.
-  Change to `vertical topleft` to open on the left.
+  This variable controls the position to open the vista sidebar only.
+  On the right by default. Change to `vertical topleft` to open on the left.
+
+  Please use |g:vista_sidebar_open_cmd| if you want to have a full control of
+  the window opening.
 
 g:vista_sidebar_width                                      *g:vista_sidebar_width*
 
   Type: |Number|
   Default: `30`
 
-  Width of vista sidebar.
+  This variable controls the width of vista sidebar only.
 
+  Please use |g:vista_sidebar_open_cmd| if you want to have a full control of
+  the window opening.
+
+g:vista_sidebar_open_cmd                                *g:vista_sidebar_open_cmd*
+
+  Type: |String|
+  Default: `undefined`
+
+  This variable controls the command used for openning the vista sidebar
+  window.
+
+  Open the sidebar in current split with width 30:
+>
+  let g:vista_sidebar_open_cmd = '30vsplit'
+<
 g:vista_sidebar_keepalt                                  *g:vista_sidebar_keepalt*
 
   Type: |Number|
