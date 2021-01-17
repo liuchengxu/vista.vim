@@ -162,6 +162,11 @@ endfunction
 
 " Show the detail of current tag/symbol under cursor.
 function! vista#cursor#ShowDetail(_timer) abort
+  " Skip if in visual mode
+  if mode() ==? 'v' || mode() ==# "\<C-V>"
+    return
+  endif
+
   if empty(getline('.'))
         \ || vista#echo#EchoScopeInCmdlineIsOk()
         \ || vista#win#ShowFoldedDetailInFloatingIsOk()
