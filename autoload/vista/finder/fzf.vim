@@ -94,6 +94,9 @@ function! vista#finder#fzf#sink(line, ...) abort
   call cursor(lnum, col)
   normal! zz
   call call('vista#util#Blink', get(g:, 'vista_blink', [2, 100]))
+  if g:vista_close_on_fzf_select
+    call vista#sidebar#Close()
+  endif
 endfunction
 
 " Actually call fzf#run() with a highlighter given the opts

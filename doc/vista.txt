@@ -264,6 +264,13 @@ g:vista_close_on_jump                                      *g:vista_close_on_jum
 
   Set this option to `1` to close the vista window automatically
   close when you jump to a symbol.
+
+g:vista_close_on_fzf_select                          *g:vista_close_on_fzf_select*
+
+  Type: |Number|
+  Default: `0`
+
+  Close the vista window when you select an item from the fzf search window.
 >
 g:vista_stay_on_open                                        *g:vista_stay_on_open*
 
