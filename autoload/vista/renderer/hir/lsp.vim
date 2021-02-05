@@ -47,7 +47,7 @@ function! s:RenderLSPHirAndThenGroupByKind(data) abort
         call add(rendered, '')
       endif
     else
-      if idx+1 < len && a:data[idx+1].level == 0
+      if idx < len && a:data[idx].level == 0
         if has_key(level0, row.kind)
           call add(level0[row.kind], { 'row': row, 'idx': idx })
         else
