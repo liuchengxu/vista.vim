@@ -153,7 +153,7 @@ let g:lightline = {
 
 Command   | Description
 :----     | :----
-`Vista`   | Open vista window for viewing tags or LSP symbols
+`Vista`   | Open/Close vista window for viewing tags or LSP symbols
 `Vista!`  | Close vista view window if already opened
 `Vista!!` | Toggle vista view window
 
