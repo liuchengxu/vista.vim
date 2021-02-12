@@ -228,7 +228,7 @@ function! vista#(bang, ...) abort
     call s:HandleSingleArgument(a:1)
   elseif a:0 == 2
     call s:HandleArguments(a:1, a:2)
-  else
+  elseif a:0 > 0
     return vista#error#('Too many arguments for Vista')
   endif
 endfunction
