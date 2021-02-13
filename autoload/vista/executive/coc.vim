@@ -9,15 +9,11 @@ let s:should_display = v:false
 
 " Extract fruitful infomation from raw symbols
 function! s:Extract(symbols) abort
-  let s:data = []
-
   if empty(a:symbols)
     return
   endif
 
-  let g:vista.functions = []
-  let g:vista.raw = []
-  call map(a:symbols, 'vista#parser#lsp#CocSymbols(v:val, s:data)')
+  let s:data = vista#parser#lsp#DispatchDocumentSymbols(a:symbols)
 
   if !empty(s:data)
     let [s:reload_only, s:should_display] = vista#renderer#LSPProcess(s:data, s:reload_only, s:should_display)

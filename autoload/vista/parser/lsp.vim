@@ -33,6 +33,8 @@ let s:symbol_kind = {
     \ '26': 'TypeParameter',
     \ }
 
+" The kind field in the result is a number instead of a readable text, we
+" should transform the number to the symbol text first.
 function! s:Kind2Symbol(kind) abort
   return has_key(s:symbol_kind, a:kind) ? s:symbol_kind[a:kind] : 'Unknown kind '.a:kind
 endfunction
@@ -41,80 +43,79 @@ function! s:IsFileUri(uri) abort
   return stridx(a:uri, 'file:///') == 0
 endfunction
 
-" The kind field in the result is a number instead of a readable text, we
-" should transform the number to the symbol text first.
-function! vista#parser#lsp#KindToSymbol(line, container) abort
-  let line = a:line
-  " SymbolInformation interface
-  if has_key(line, 'location')
-    let location = line.location
-    if s:IsFileUri(location.uri)
-      let lnum = location.range.start.line + 1
-      let col = location.range.start.character + 1
-      call add(a:container, {
-         \ 'lnum': lnum,
-         \ 'col': col,
-         \ 'kind': s:Kind2Symbol(line.kind),
-         \ 'text': line.name,
-         \ })
-    endif
-  " DocumentSymbol class
-  elseif has_key(line, 'range')
-    let range = line.range
-    let lnum = range.start.line + 1
-    let col = range.start.character + 1
-    call add(a:container, {
-          \ 'lnum': lnum,
-          \ 'col': col,
-          \ 'kind': s:Kind2Symbol(line.kind),
-          \ 'text': line.name,
-          \ })
-    if has_key(line, 'children')
-      for child in line.children
-        call vista#parser#lsp#KindToSymbol(child, a:container)
-      endfor
-    endif
-  endif
+function! s:LspToLocalSymbol(sym, range)
+  return {
+    \ 'lnum': a:range.start.line + 1,
+    \ 'col': a:range.start.character + 1,
+    \ 'kind': s:Kind2Symbol(a:sym.kind),
+    \ 'text': a:sym.name,
+    \ }
 endfunction
 
-function! vista#parser#lsp#CocSymbols(symbol, container) abort
-  if vista#ShouldIgnore(a:symbol.kind)
-    return
-  endif
-
-  let raw = { 'line': a:symbol.lnum, 'kind': a:symbol.kind, 'name': a:symbol.text }
-  call add(g:vista.raw, raw)
-
-  if a:symbol.kind ==? 'Method' || a:symbol.kind ==? 'Function'
-    call add(g:vista.functions, a:symbol)
-  endif
-
-  call add(a:container, {
-        \ 'lnum': a:symbol.lnum,
-        \ 'col': a:symbol.col,
-        \ 'text': a:symbol.text,
-        \ 'kind': a:symbol.kind,
-        \ 'level': a:symbol.level
-        \ })
+function! s:LocalToRawSymbol(sym)
+  return {
+    \ 'line': a:sym.lnum,
+    \ 'kind': a:sym.kind,
+    \ 'name': a:sym.text,
+    \ }
 endfunction
 
-" https://microsoft.github.io/language-server-protocol/specification#textDocument_documentSymbol
-function! vista#parser#lsp#ExtractSymbol(symbol, container) abort
-  let symbol = a:symbol
+function! s:IsDocumentSymbol(sym)
+  return has_key(a:sym, 'selectionRange')
+endfunction
 
-  if vista#ShouldIgnore(symbol.kind)
-    return
-  endif
+function! s:ParseSymbolInfoList(symbols) abort
+  let filtered = filter(a:symbols, 's:IsFileUri(v:val.location.uri)')
+  return map(filtered, 's:LspToLocalSymbol(v:val, v:val.location.range)')
+endfunction
 
-  if symbol.kind ==? 'Method' || symbol.kind ==? 'Function'
-    call add(g:vista.functions, symbol)
-  endif
+function! s:ParseDocumentSymbolsRec(outlist, symbols, level) abort
+  for lspsym in a:symbols
+    let sym = s:LspToLocalSymbol(lspsym, lspsym.selectionRange)
+    let sym.level = a:level
+    call add(a:outlist, sym)
+    if has_key(lspsym, 'children')
+      call s:ParseDocumentSymbolsRec(a:outlist, lspsym.children, a:level + 1)
+    endif
+  endfor
+  return a:outlist
+endfunction
 
-  let picked = {'lnum': symbol.lnum, 'col': symbol.col, 'text': symbol.text}
+function! s:GroupSymbolsByKind(symbols) abort
+  let groups = {}
+  for sym in a:symbols
+    if has_key(groups, sym.kind)
+      call add(groups[sym.kind], sym)
+    else
+      let groups[sym.kind] = [ sym ]
+    endif
+  endfor
+  return groups
+endfunction
 
-  if has_key(a:container, symbol.kind)
-    call add(a:container[symbol.kind], picked)
+function! vista#parser#lsp#ParseDocumentSymbolPayload(resp) abort
+  if s:IsDocumentSymbol(a:resp[0])
+    let symbols = s:ParseDocumentSymbolsRec([], a:resp, 0)
+    return vista#parser#lsp#DispatchDocumentSymbols(symbols)
   else
-    let a:container[symbol.kind] = [picked]
+    let symbols = s:ParseSymbolInfoList(a:resp)
+    call s:FilterDocumentSymbols(symbols)
+    return s:GroupSymbolsByKind(symbols)
   endif
+endfunction
+
+function! s:FilterDocumentSymbols(symbols) abort
+  let symlist = a:symbols
+  if exists('g:vista_ignore_kinds')
+    call filter(symlist, 'index(g:vista_ignore_kinds, v:val) < 0')
+  endif
+  let g:vista.functions =
+    \ filter(copy(symlist), 'v:val.kind ==? "Method" || v:val.kind ==? "Function"')
+  return symlist
+endfunction
+
+function! vista#parser#lsp#DispatchDocumentSymbols(symbols)
+  let symlist = s:FilterDocumentSymbols(a:symbols)
+  let g:vista.raw = map(copy(symlist), 's:LocalToRawSymbol(v:val)')
+  return symlist
 endfunction

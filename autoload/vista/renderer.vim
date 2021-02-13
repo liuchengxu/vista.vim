@@ -71,13 +71,17 @@ function! vista#renderer#Decorate(kind) abort
   endif
 endfunction
 
+function! s:HasNestingLevel(data)
+  return !empty(a:data) && type(a:data) == v:t_list && has_key(a:data[0], 'level')
+endfunction
+
 function! s:Render(data) abort
-  if g:vista.provider ==# 'coc'
+  if g:vista.provider ==# 'coc' || s:HasNestingLevel(a:data)
     return vista#renderer#hir#lsp#Coc(a:data)
   elseif g:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default'
     return vista#renderer#hir#ctags#Render()
   else
-    " The kind renderer applys to the LSP provider.
+    " The kind renderer applies to the LSP provider.
     return vista#renderer#kind#Render(a:data)
   endif
 endfunction
@@ -94,14 +98,7 @@ endfunction
 " Convert the number kind to the text kind, and then
 " extract the neccessary info from the raw LSP response.
 function! vista#renderer#LSPPreprocess(lsp_result) abort
-  let lines = []
-  call map(a:lsp_result, 'vista#parser#lsp#KindToSymbol(v:val, lines)')
-
-  let processed_data = {}
-  let g:vista.functions = []
-  call map(lines, 'vista#parser#lsp#ExtractSymbol(v:val, processed_data)')
-
-  return processed_data
+  return vista#parser#lsp#ParseDocumentSymbolPayload(a:lsp_result)
 endfunction
 
 " React on the preprocessed LSP data
