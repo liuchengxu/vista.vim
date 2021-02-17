@@ -72,7 +72,7 @@ function! vista#renderer#Decorate(kind) abort
 endfunction
 
 function! s:Render(data) abort
-  if g:vista.provider ==# 'coc'
+  if g:vista.provider ==# 'coc' && type(a:data) == v:t_list
     return vista#renderer#hir#lsp#Coc(a:data)
   elseif g:vista.provider ==# 'ctags' && g:vista#renderer#ctags ==# 'default'
     return vista#renderer#hir#ctags#Render()

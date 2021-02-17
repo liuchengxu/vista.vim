@@ -7,6 +7,9 @@ function! s:GetInfoFromLSPAndExtension() abort
 
   " TODO use range info of LSP symbols?
   if g:vista.provider ==# 'coc'
+    if !has_key(g:vista, 'vlnum2tagname')
+      return v:null
+    endif
     if has_key(g:vista.vlnum2tagname, line('.'))
       return g:vista.vlnum2tagname[line('.')]
     else
