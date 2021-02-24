@@ -217,7 +217,7 @@ function! vista#(bang, ...) abort
     endif
   endif
 
-  if vista#sidebar#IsOpen()
+  if a:0 == 0 || vista#sidebar#IsOpen()
     call vista#sidebar#Close()
     return
   else
