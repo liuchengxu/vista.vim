@@ -217,11 +217,12 @@ function! vista#(bang, ...) abort
     endif
   endif
 
-  if a:0 == 0 || vista#sidebar#IsOpen()
+  if a:0 == 0
+    call vista#sidebar#Open()
+    return
+  elseif vista#sidebar#IsOpen()
     call vista#sidebar#Close()
     return
-  else
-    call vista#sidebar#Open()
   endif
 
   if a:0 == 1
