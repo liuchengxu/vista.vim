@@ -220,9 +220,6 @@ function! vista#(bang, ...) abort
   if a:0 == 0
     call vista#sidebar#Open()
     return
-  elseif vista#sidebar#IsOpen()
-    call vista#sidebar#Close()
-    return
   endif
 
   if a:0 == 1
