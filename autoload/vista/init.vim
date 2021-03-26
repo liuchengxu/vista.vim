@@ -30,11 +30,7 @@ function! vista#init#Api() abort
   let source_handle = {}
 
   function! source_handle.get_winnr() abort
-    if has_key(self, 'winnr')
-      return self.winnr
-    else
-      return bufwinnr(self.bufnr)
-    endif
+    return bufwinnr(self.bufnr)
   endfunction
 
   function! source_handle.get_winid() abort
