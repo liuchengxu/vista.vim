@@ -1,4 +1,5 @@
 # Vista.vim
+
 [![CI](https://github.com/liuchengxu/vista.vim/workflows/ci/badge.svg)](https://github.com/liuchengxu/vista.vim/actions?workflow=ci)
 
 View and search LSP symbols, tags in Vim/NeoVim.
@@ -13,6 +14,7 @@ View and search LSP symbols, tags in Vim/NeoVim.
 **caveat: There is a major flaw about the tree view renderer of ctags at the moment, see [#320](https://github.com/liuchengxu/vista.vim/issues/320) for more details.**
 
 ## Table Of Contents
+
 <!-- TOC GFM -->
 
 * [Introduction](#introduction)
@@ -44,17 +46,17 @@ In addition to being a tags viewer, vista.vim can also be a symbol navigator sim
 ## Features
 
 - [x] View tags and LSP symbols in a sidebar.
-    - [x] [universal-ctags](https://github.com/universal-ctags/ctags)
-    - [x] [ale](https://github.com/w0rp/ale)
-    - [x] [vim-lsp](https://github.com/prabirshrestha/vim-lsp)
-    - [x] [coc.nvim](https://github.com/neoclide/coc.nvim)
-    - [x] [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
-    - [x] [vim-lsc](https://github.com/natebosch/vim-lsc)
-    - [x] [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig)
+  - [x] [universal-ctags](https://github.com/universal-ctags/ctags)
+  - [x] [ale](https://github.com/w0rp/ale)
+  - [x] [vim-lsp](https://github.com/prabirshrestha/vim-lsp)
+  - [x] [coc.nvim](https://github.com/neoclide/coc.nvim)
+  - [x] [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
+  - [x] [vim-lsc](https://github.com/natebosch/vim-lsc)
+  - [x] [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig)
 - [x] Finder for tags and LSP symbols.
-    - [x] [fzf](https://github.com/junegunn/fzf)
-    - [x] [skim](https://github.com/lotabout/skim)
-    - [x] [vim-clap](https://github.com/liuchengxu/vim-clap)
+  - [x] [fzf](https://github.com/junegunn/fzf)
+  - [x] [skim](https://github.com/lotabout/skim)
+  - [x] [vim-clap](https://github.com/liuchengxu/vim-clap)
 - [x] Nested display for ctags, list display for LSP symbols.
 - [x] Highlight the nearby tag in the vista sidebar.
 - [x] Builtin support for displaying markdown's TOC.
@@ -84,9 +86,9 @@ In addition, if you want to search the symbols via [fzf](https://github.com/june
 
 - [vim-plug](https://github.com/junegunn/vim-plug)
 
-    ```vim
-    Plug 'liuchengxu/vista.vim'
-    ```
+  ```vim
+  Plug 'liuchengxu/vista.vim'
+  ```
 
 For other plugin managers please follow their instructions accordingly.
 
@@ -151,11 +153,11 @@ let g:lightline = {
 
 ### Commands
 
-Command   | Description
-:----     | :----
-`Vista`   | Open/Close vista window for viewing tags or LSP symbols
-`Vista!`  | Close vista view window if already opened
-`Vista!!` | Toggle vista view window
+| Command   | Description                                             |
+| :-------- | :------------------------------------------------------ |
+| `Vista`   | Open/Close vista window for viewing tags or LSP symbols |
+| `Vista!`  | Close vista view window if already opened               |
+| `Vista!!` | Toggle vista view window                                |
 
 `:Vista [EXECUTIVE]`: open vista window powered by EXECUTIVE.
 
@@ -169,7 +171,7 @@ See `:help vista-commands` for more information.
 " How each level is indented and what to prepend.
 " This could make the display more compact or more spacious.
 " e.g., more compact: ["▸ ", ""]
-" Note: this option only works the LSP executives, doesn't work for `:Vista ctags`.
+" Note: this option only works for the kind renderer, not the tree renderer.
 let g:vista_icon_indent = ["╰─▸ ", "├─▸ "]
 
 " Executive used when opening vista sidebar without specifying it.
@@ -224,39 +226,40 @@ The JSON support for ctags is avaliable if u-ctags is linked to libjansson when 
 
 - macOS
 
-    ```bash
-    $ brew tap universal-ctags/universal-ctags
-    $ brew install --with-jansson --HEAD universal-ctags/universal-ctags/universal-ctags
-    ```
+  ```bash
+  $ brew tap universal-ctags/universal-ctags
+  $ brew install --with-jansson --HEAD universal-ctags/universal-ctags/universal-ctags
+  ```
 
 - Ubuntu
 
-    ```bash
-    # install libjansson first
-    $ sudo apt-get install libjansson-dev
+  ```bash
+  # install libjansson first
+  $ sudo apt-get install libjansson-dev
 
-    # then compile and install universal-ctags.
-    #
-    # NOTE: Don't use `sudo apt install ctags`, which will install exuberant-ctags and it's not guaranteed to work with vista.vim.
-    #
-    $ git clone https://github.com/universal-ctags/ctags.git --depth=1
-    $ cd ctags
-    $ ./autogen.sh
-    $ ./configure
-    $ make
-    $ sudo make install
-    ```
+  # then compile and install universal-ctags.
+  #
+  # NOTE: Don't use `sudo apt install ctags`, which will install exuberant-ctags and it's not guaranteed to work with vista.vim.
+  #
+  $ git clone https://github.com/universal-ctags/ctags.git --depth=1
+  $ cd ctags
+  $ ./autogen.sh
+  $ ./configure
+  $ make
+  $ sudo make install
+  ```
+
 - Fedora
 
-    ```bash
-    $ sudo dnf install jansson-devel autoconf automake
-    $ git clone https://github.com/universal-ctags/ctags.git --depth=1
-    $ cd ctags
-    $ ./autogen.sh
-    $ ./configure
-    $ make
-    $ sudo make install
-    ```
+  ```bash
+  $ sudo dnf install jansson-devel autoconf automake
+  $ git clone https://github.com/universal-ctags/ctags.git --depth=1
+  $ cd ctags
+  $ ./autogen.sh
+  $ ./configure
+  $ make
+  $ sudo make install
+  ```
 
 Refer to [Compiling and Installing Jansson](https://jansson.readthedocs.io/en/latest/gettingstarted.html#compiling-and-installing-jansson) as well.
 
