@@ -224,11 +224,11 @@ First of all, check if your [universal-ctags](https://github.com/universal-ctags
 
 The JSON support for ctags is avaliable if u-ctags is linked to libjansson when compiling.
 
-- macOS
+- macOS, [included by default since February 23 2021](https://github.com/universal-ctags/homebrew-universal-ctags/commit/82db2cf9cb0cdecf62ca9405e767ec025b5ba8ed)
 
   ```bash
   $ brew tap universal-ctags/universal-ctags
-  $ brew install --with-jansson --HEAD universal-ctags/universal-ctags/universal-ctags
+  $ brew install --HEAD universal-ctags/universal-ctags/universal-ctags
   ```
 
 - Ubuntu
