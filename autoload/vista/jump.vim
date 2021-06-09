@@ -2,6 +2,10 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
+function! s:EscapeForVimRegexp(str)
+  return escape(a:str, '^$.*?/\[]')
+endfunction
+
 " Jump to the source line containing the given tag
 function! vista#jump#TagLine(tag) abort
   let cur_line = split(getline('.'), ':')
@@ -19,7 +23,7 @@ function! vista#jump#TagLine(tag) abort
   endif
 
   try
-    let [_, start, _] = matchstrpos(line[0], a:tag)
+    let [_, start, _] = matchstrpos(line[0], s:EscapeForVimRegexp(a:tag))
   catch /^Vim\%((\a\+)\)\=:E869/
     let start  = -1
   endtry
