@@ -2,7 +2,7 @@
 " MIT License
 " vim: ts=2 sw=2 sts=2 et
 
-function! s:EscapeForVimRegexp(str)
+function! s:EscapeForVimRegexp(str) abort
   return escape(a:str, '^$.*?/\[]')
 endfunction
 
