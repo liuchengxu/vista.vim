@@ -24,6 +24,8 @@ function! s:HandleLSPResponse(output) abort
   let s:cache[s:fpath] = s:data
   let s:cache.ftime = getftime(s:fpath)
   let s:cache.bufnr = bufnr('')
+
+  call vista#cursor#TryInitialRun()
 endfunction
 
 function! s:AutoUpdate(fpath) abort

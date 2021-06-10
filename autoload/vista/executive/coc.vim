@@ -39,6 +39,7 @@ function! s:HandleLSPResponse(error, response) abort
     " No document symbol provider exists when response is null.
     if a:response isnot v:null
       call s:Extract(a:response)
+      call vista#cursor#TryInitialRun()
     endif
   else
     call vista#error#Notify("Error when calling CocActionAsync('documentSymbols'): ".string(a:error))

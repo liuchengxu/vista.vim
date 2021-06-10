@@ -131,6 +131,7 @@ function! s:ApplyExtracted() abort
   endif
 
   call s:NoteTemp()
+  call vista#cursor#TryInitialRun()
 endfunction
 
 function! s:ExtractLinewise(raw_data) abort
