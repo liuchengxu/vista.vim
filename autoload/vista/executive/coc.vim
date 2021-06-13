@@ -8,7 +8,7 @@ let s:reload_only = v:false
 let s:should_display = v:false
 
 " Extract fruitful infomation from raw symbols
-function! s:Extract(symbols) abort
+function! s:DoHandleResponse(symbols) abort
   let s:data = []
 
   if empty(a:symbols)
@@ -38,7 +38,8 @@ function! s:HandleLSPResponse(error, response) abort
     " Refer to coc.nvim 79cb11e
     " No document symbol provider exists when response is null.
     if a:response isnot v:null
-      call s:Extract(a:response)
+      call s:DoHandleResponse(a:response)
+      call vista#cursor#TryInitialRun()
     endif
   else
     call vista#error#Notify("Error when calling CocActionAsync('documentSymbols'): ".string(a:error))
@@ -47,7 +48,7 @@ endfunction
 
 function! s:HandleLSPResponseInSilence(error, response) abort
   if empty(a:error) && a:response isnot v:null
-    call s:Extract(a:response)
+    call s:DoHandleResponse(a:response)
   endif
 endfunction
 
@@ -57,7 +58,7 @@ function! s:AutoUpdate(_fpath) abort
 endfunction
 
 function! s:Run() abort
-  return s:Extract(CocAction('documentSymbols'))
+  return s:DoHandleResponse(CocAction('documentSymbols'))
 endfunction
 
 function! s:RunAsync() abort
@@ -69,7 +70,7 @@ function! s:Execute(bang, should_display) abort
   let s:fpath = expand('%:p')
 
   if a:bang
-    call s:Extract(CocAction('documentSymbols'))
+    call s:DoHandleResponse(CocAction('documentSymbols'))
     if a:should_display
       call vista#renderer#RenderAndDisplay(s:data)
     endif

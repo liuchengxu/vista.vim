@@ -271,3 +271,10 @@ function! vista#cursor#TogglePreview() abort
 
   call vista#win#FloatingDisplay(lnum, tag)
 endfunction
+
+function! vista#cursor#TryInitialRun() abort
+  if exists('g:__vista_initial_run_find_nearest_method')
+    call vista#cursor#FindNearestMethodOrFunction()
+    unlet g:__vista_initial_run_find_nearest_method
+  endif
+endfunction

@@ -51,6 +51,7 @@ function! s:RunAsync() abort
           res = vim.fn['vista#renderer#LSPProcess'](data, vim.g.vista_executive_nvim_lsp_reload_only, vim.g.vista_executive_nvim_lsp_should_display)
           vim.g.vista_executive_nvim_lsp_reload_only = res[1]
           vim.g.vista_executive_nvim_lsp_should_display = res[2]
+          vim.fn['vista#cursor#TryInitialRun']()
         end
     end
     vim.lsp.buf_request(0, 'textDocument/documentSymbol', params, callback)
