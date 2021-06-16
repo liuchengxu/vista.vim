@@ -91,7 +91,7 @@ function! vista#finder#fzf#sink(line, ...) abort
   else
     call vista#source#GotoWin()
   endif
-  call cursor(lnum, col)
+  call vista#util#Cursor(lnum, col)
   normal! zz
   call call('vista#util#Blink', get(g:, 'vista_blink', [2, 100]))
 endfunction
@@ -129,7 +129,7 @@ function! s:project_sink(line) abort
   let lnum = split(parts[1], ':')[0]
   let relpath = parts[3]
   execute 'edit' relpath
-  call cursor(lnum, 1)
+  call vista#util#Cursor(lnum, 1)
   normal! zz
 endfunction
 
