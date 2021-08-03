@@ -522,11 +522,13 @@ Key Mappings                                                  *vista-key-mapping
 
 The following mappings are defined by default in the vista window.
 
-<CR>  - jump to the tag under the cursor.
-p     - preview the tag under the context via the floating window if it's
-        avaliable.
-s     - sort the symbol alphabetically or the location they are declared.
-q     - close the vista window.
+<CR>          - jump to the tag under the cursor.
+<2-LeftMouse> - Same as <CR>.
+p             - preview the tag under the context via the floating window if
+                it's avaliable.
+s             - sort the symbol alphabetically or the location they are
+                declared.
+q             - close the vista window.
 
 You can add a mapping to `/` in order to open the vista finder for
 searching by adding the following autocommand in your vimrc:
