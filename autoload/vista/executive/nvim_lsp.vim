@@ -41,7 +41,18 @@ function! s:RunAsync() abort
   call vista#SetProvider(s:provider)
   lua << EOF
     local params = vim.lsp.util.make_position_params()
-    local callback = function(err, _, result)
+    local callback = function(err, method_or_result, result_or_context)
+        -- signature for the handler changed in neovim 0.6/master. The block
+        -- below allows users to check the compatibility.
+        local result
+        if type(method_or_result) == 'string' then
+          -- neovim 0.5.x
+          result = result_or_context
+        else
+          -- neovim 0.6+
+          result = method_or_result
+        end
+
         if err then print(tostring(err)) return end
         if not result then return end
         vim.g.vista_executive_nvim_lsp_fetching = false
