@@ -21,14 +21,18 @@ function! s:Assemble(line, depth) abort
   let line = a:line
 
   let kind = get(line, 'kind', '')
+  let kind_icon = vista#renderer#IconFor(kind)
+  let kind_icon = empty(kind_icon) ? '' : kind_icon.' '
+  let kind_text = vista#renderer#KindFor(kind)
+  let kind_text = empty(kind_text) ? '' : ' '.kind_text
 
   let row = vista#util#Join(
         \ repeat(' ', a:depth * s:indent_size),
         \ s:GetVisibility(line),
-        \ vista#renderer#IconFor(kind).' ',
+        \ kind_icon,
         \ get(line, 'name'),
         \ get(line, 'signature', ''),
-        \ ' '.kind,
+        \ kind_text,
         \ ':'.get(line, 'line', '')
         \ )
 

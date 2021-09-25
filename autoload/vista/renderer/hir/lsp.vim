@@ -5,10 +5,20 @@
 let s:indent_size = g:vista#renderer#enable_icon ? 2 : 4
 
 function! s:IntoLSPHirRow(row) abort
-  let icon = vista#renderer#IconFor(a:row.kind).' '
-  let indented = repeat(' ', a:row.level * s:indent_size).icon.a:row.text.' '.a:row.kind
-  let lnum = ':'.a:row.lnum
-  return indented.lnum
+  let indent = repeat(' ', a:row.level * s:indent_size)
+  let kind_icon = vista#renderer#IconFor(a:row.kind)
+  let kind_text = vista#renderer#KindFor(a:row.kind)
+
+  " indent + kind_icon? + name + kind_text? + lnum
+  let line = indent
+  if !empty(kind_icon)
+    let line = line.kind_icon.' '
+  endif
+  let line = line.a:row.text
+  if !empty(kind_text)
+    let line = line.' '.kind_text
+  endif
+  return line.':'.a:row.lnum
 endfunction
 
 function! s:IntoLSPNonHirRow(row) abort
