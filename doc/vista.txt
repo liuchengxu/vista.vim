@@ -460,6 +460,13 @@ g:vista#renderer#enable_icon                        *g:vista#renderer#enable_ico
 
   Add pretty symbols for the kind of tags or LSP symbols.
 
+g:vista#renderer#enable_kind                        g:vista#renderer#enable_kind
+
+  Type: |Number|
+  Default: !g:vista#renderer#enable_icon
+
+  Show textual kind of tags or LSP symbols.
+
 g:vista_enable_markdown_extension              *g:vista_enable_markdown_extension*
 
   Type: |Number|
