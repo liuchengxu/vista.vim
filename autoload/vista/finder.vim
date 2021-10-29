@@ -159,7 +159,7 @@ function! vista#finder#PrepareOpts(source, prompt) abort
   let opts = {
           \ 'source': a:source,
           \ 'sink': function('vista#finder#fzf#sink'),
-          \ 'options': ['--prompt', a:prompt, '--nth', '1', '--delimiter', ':'] + get(g:, 'vista_fzf_opt', []),
+          \ 'options': ['--prompt', a:prompt, '--nth', '..-2', '--delimiter', ':'] + get(g:, 'vista_fzf_opt', []),
           \ }
 
   if len(g:vista_fzf_preview) > 0
