@@ -161,6 +161,7 @@ function! s:Display(msg, win_id) abort
         \ norelativenumber
         \ signcolumn=no
         \ nofoldenable
+        \ nospell
         \ wrap
 
   wincmd p
