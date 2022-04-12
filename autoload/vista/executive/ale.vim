@@ -56,7 +56,7 @@ function! s:RunAsync() abort
   let bufnr = g:vista.source.bufnr
   let params = {
     \   'textDocument': {
-    \       'uri': ale#path#ToURI(expand('#' . bufnr . ':p')),
+    \       'uri': ale#path#ToFileURI(expand('#' . bufnr . ':p')),
     \   }
     \}
   let message = [0, method, params]
