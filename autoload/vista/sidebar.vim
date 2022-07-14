@@ -142,6 +142,7 @@ function! vista#sidebar#ToggleFocus() abort
   if winnr != winnr()
     execute winnr.'wincmd w'
   else
+    let g:vista.skip_once_flag = v:true
     execute g:vista.source.get_winnr().'wincmd w'
   endif
 endfunction
