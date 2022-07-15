@@ -27,6 +27,7 @@ else
 endif
 
 function! vista#source#GotoWin() abort
+  let g:vista.skip_once_flag = v:true
   call s:GotoSourceWindow()
 
   " Floating window relys on BufEnter event to be closed automatically.
