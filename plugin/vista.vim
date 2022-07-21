@@ -9,6 +9,7 @@ endif
 
 let g:loaded_vista = 1
 
+let g:vista_floating_border = get(g:, 'vista_floating_border', 'none')
 let g:vista_sidebar_width = get(g:, 'vista_sidebar_width', 30)
 let g:vista_sidebar_position = get(g:, 'vista_sidebar_position', 'vertical botright')
 let g:vista_blink = get(g:, 'vista_blink', [2, 100])

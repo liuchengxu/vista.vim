@@ -135,6 +135,8 @@ function! s:Display(msg, win_id) abort
   let s:floating_opened_pos = getpos('.')
   let [width, height, anchor, row, col] = s:CalculatePosition(a:msg)
 
+  let border = g:vista_floating_border
+
   " silent is neccessary for the both strategy!
   silent let s:floating_win_id = nvim_open_win(
         \ s:floating_bufnr, v:true, {
@@ -145,6 +147,7 @@ function! s:Display(msg, win_id) abort
         \   'row': row + 0.4,
         \   'col': col - 5,
         \   'focusable': v:false,
+        \   'border': border,
         \ })
 
   call nvim_buf_set_lines(s:floating_bufnr, 0, -1, 0, a:msg)
