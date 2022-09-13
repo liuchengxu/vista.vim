@@ -18,6 +18,7 @@ function! s:Run() abort
   if !has('nvim-0.5')
     return
   endif
+  let g:vista_executive_nvim_lsp_fetching = v:true
   call s:RunAsync()
   while g:vista_executive_nvim_lsp_fetching
     sleep 100m
@@ -55,9 +56,9 @@ function! s:RunAsync() abort
 
         if err then print(tostring(err)) return end
         if not result then return end
-        vim.g.vista_executive_nvim_lsp_fetching = false
         data = vim.fn['vista#renderer#LSPPreprocess'](result)
         vim.fn['vista#executive#nvim_lsp#SetData'](data)
+        vim.g.vista_executive_nvim_lsp_fetching = false
         if next(data) ~= nil then
           res = vim.fn['vista#renderer#LSPProcess'](data, vim.g.vista_executive_nvim_lsp_reload_only, vim.g.vista_executive_nvim_lsp_should_display)
           vim.g.vista_executive_nvim_lsp_reload_only = res[1]
