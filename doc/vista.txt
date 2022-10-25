@@ -445,6 +445,14 @@ g:vista_highlight_whole_line                        *g:vista_highlight_whole_lin
   By default vista.vim will try to highlight the tag precisely in the vista window.
   Set this to `1` to always higlight the whole line.
 
+
+g:vista_floating_border                      *g:vista_floating_border*
+
+  Type: |String|
+  Default: `none`
+
+  See `nvim_open_win` for border options that may be used.
+
 g:vista_floating_delay                                    *g:vista_floating_delay*
 
   Type: |Number|
