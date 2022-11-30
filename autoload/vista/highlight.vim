@@ -9,7 +9,11 @@
 " optional: tag - accurate tag
 function! vista#highlight#Add(lnum, ensure_visible, tag) abort
   if exists('w:vista_highlight_id')
-    call matchdelete(w:vista_highlight_id)
+    try
+      call matchdelete(w:vista_highlight_id)
+    catch /E803/
+      " ignore E803 error: ID not found
+    endtry
     unlet w:vista_highlight_id
   endif
 
