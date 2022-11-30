@@ -61,17 +61,15 @@ function! s:aligner.project_ctags() abort
 endfunction
 
 function! vista#finder#fzf#extract(line) abort
-  let icon_tag_lnum = split(a:line, '[')[0]
-  " [a-zA-Z:#_.,<>]
-  " matching tag can't contain whitespace, but a tag does have a chance to contain whitespace?
-
   if g:vista#renderer#enable_icon
     " icon tag:lnum
-    let icon_stripped = join(split(icon_tag_lnum)[1:], ' ')
+    let icon_stripped = join(split(a:line)[1:], ' ')
   else
-    let icon_stripped = icon_tag_lnum
+    let icon_stripped = a:line
   end
 
+  " [a-zA-Z:#_.,<>]
+  " matching tag can't contain whitespace, but a tag does have a chance to contain whitespace?
   let items = matchlist(icon_stripped, '\([a-zA-Z:#_.,<>]*\):\(\d\+\)')
   let tag = items[1]
   let lnum = items[2]
@@ -169,8 +167,8 @@ function! vista#finder#fzf#Highlight() abort
   endfor
 
   execute 'syntax match FZFVistaTag    /\s*.*\(:\d\+\s\)\@=/' 'contains=FZFVistaIcon,'.join(icon_groups, ',')
-  execute 'syntax match FZFVistaNumber /^[^\[]*\(\s\s\[\)\@=/' 'contains=FZFVistaTag,FZFVistaIcon,'.join(icon_groups, ',')
-  syntax match FZFVistaScope  /^[^]│]*]/ contains=FZFVistaNumber,FZFVistaBracket
+  execute 'syntax match FZFVistaNumber /^.*\(\s\s\[\)\@=/' 'contains=FZFVistaTag,FZFVistaIcon,'.join(icon_groups, ',')
+  syntax match FZFVistaScope  /^.*\]\s\s/ contains=FZFVistaNumber,FZFVistaBracket
   syntax match FZFVista /^[^│┌└]*/ contains=FZFVistaBracket,FZFVistaTag,FZFVistaNumber,FZFVistaScope
   syntax match FZFVistaBracket /\s\s\[\|\]\s\s/ contained
 
