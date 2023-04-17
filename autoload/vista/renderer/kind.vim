@@ -44,7 +44,7 @@ function! s:viewer.render() abort
     " Parent
     call add(self.rows, parent)
 
-    if !empty(v)
+    if !empty(v) && type(v) == type([])
 
       if get(g:vista, 'sort', v:false)
         let v = sort(copy(v), function('s:Compare'))
