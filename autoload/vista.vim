@@ -16,9 +16,14 @@ let s:ignore_list = ['vista', 'vista_kind', 'nerdtree', 'startify', 'tagbar', 'f
 
 " Skip special buffers, filetypes.
 function! vista#ShouldSkip() abort
-  return !empty(&buftype)
-        \ || empty(&filetype)
-        \ || index(s:ignore_list, &filetype) > -1
+  if exists('g:vista.skip_once_flag') && g:vista.skip_once_flag
+    let g:vista.skip_once_flag = v:false
+    return v:true
+  else
+    return !empty(&buftype)
+          \ || empty(&filetype)
+          \ || index(s:ignore_list, &filetype) > -1
+  endif
 endfunction
 
 " Ignore some kinds of tags/symbols which is done at the parser step.

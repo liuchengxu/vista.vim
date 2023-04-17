@@ -80,5 +80,8 @@ function! vista#init#Api() abort
 
   let g:vista.source = source_handle
 
+  " Skip an update once with this flag
+  let g:vista.skip_once_flag = v:false
+
   hi default link VistaFloat Pmenu
 endfunction

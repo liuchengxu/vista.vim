@@ -142,7 +142,7 @@ function! vista#sidebar#ToggleFocus() abort
   if winnr != winnr()
     execute winnr.'wincmd w'
   else
-    execute g:vista.source.get_winnr().'wincmd w'
+    call vista#source#GotoWin()
   endif
 endfunction
 
