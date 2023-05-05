@@ -177,6 +177,11 @@ if has('nvim')
       return
     endif
 
+    if self.stderr != ['']
+      call vista#error#(join(self.stderr, "\n"))
+      return
+    endif
+
     if self.stdout == ['']
       return
     endif
@@ -202,6 +207,12 @@ else
 
   function! s:close_cb(channel) abort
     call s:PrepareContainer()
+
+    if ch_status(a:channel, {'part': 'err'}) ==# 'buffered'
+      let line = ch_read(a:channel, {'part': 'err'})
+      call vista#error#(line)
+      return
+    endif
 
     while ch_status(a:channel, {'part': 'out'}) ==# 'buffered'
       let line = ch_read(a:channel)
