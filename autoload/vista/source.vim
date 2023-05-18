@@ -4,7 +4,8 @@
 
 if exists('*bufwinid')
   function! s:GotoSourceWindow() abort
-    let winid = g:vista.source.get_winid()
+    let bufid = g:vista.source.bufnr
+    let winid = bufwinid(bufid)
     if winid != -1
       if win_getid() != winid
         " No use noautocmd here. Ref #362
