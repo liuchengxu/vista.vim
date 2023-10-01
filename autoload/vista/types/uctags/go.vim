@@ -15,7 +15,6 @@ let type_go.kinds = {
     \ 'm': {'long' : 'struct members', 'fold' : 0, 'stl' : 0},
     \ 'M': {'long' : 'struct anonymous members',     'fold' : 0, 'stl' : 0},
     \ 'n': {'long' : 'interface method specification', 'fold' : 0, 'stl' : 0},
-    \ 'Y': {'long' : 'unknown',        'fold' : 0, 'stl' : 0},
     \ 'P': {'long' : 'imports',        'fold' : 0, 'stl' : 0},
     \ 'a': {'long' : 'type aliases',        'fold' : 0, 'stl' : 0},
     \ }
