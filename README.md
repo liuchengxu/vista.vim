@@ -218,6 +218,8 @@ See `:help vista-options` for more information.
 
 ### Other tips
 
+The ctags provided by the OS distribution may present issues, such as the ones described in #467. It is strongly recommended to use the newer version of ctags. The nightly build of ctags can be obtained from https://github.com/universal-ctags/ctags-nightly-build/releases. Alternatively, you can compile it yourself if you prefer.
+
 #### Compile ctags with JSON format support
 
 First of all, check if your [universal-ctags](https://github.com/universal-ctags/ctags) supports JSON format via `ctags --list-features`. If not, I recommend you to install ctags with JSON format support that would make vista's parser easier and more reliable. And we are able to reduce some overhead in JSON mode by [disabling the fixed fields](https://github.com/universal-ctags/ctags/pull/2080).
