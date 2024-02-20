@@ -163,29 +163,40 @@ function! vista#finder#PrepareOpts(source, prompt) abort
           \ }
 
   if len(g:vista_fzf_preview) > 0
+    let s:vista_fzf_preview = copy(g:vista_fzf_preview)
     let idx = 0
+    let placehold = ':+{-1}-5'
     let opt_preview_window_processed = v:false
-    while idx < len(g:vista_fzf_preview)
-      if g:vista_fzf_preview[idx] =~# '^\(left\|up\|right\|down\)'
-        let g:vista_fzf_preview[idx] = g:vista_fzf_preview[idx] . ':+{-1}-5'
+    while idx < len(s:vista_fzf_preview)
+      if s:vista_fzf_preview[idx] =~# '^\(left\|up\|right\|down\)'
+        let s:list = split(s:vista_fzf_preview[idx], ',')
+        if len(s:list) == 1
+          let s:vista_fzf_preview[idx] .= placehold
+        else
+          let s:vista_fzf_preview[idx] = join([s:list[0] . placehold] + s:list[1:], ',')
+        endif
         let opt_preview_window_processed = v:true
       endif
       let idx = idx + 1
     endwhile
     if !opt_preview_window_processed
-      call extend(g:vista_fzf_preview, ['right:+{-1}-5'])
+      call extend(s:vista_fzf_preview, ['right' . placehold])
     endif
-    let preview_opts = call('fzf#vim#with_preview', g:vista_fzf_preview).options
+    let preview_opts = call('fzf#vim#with_preview', s:vista_fzf_preview).options
+    if preview_opts[-1] =~# 'toggle-preview'
+      let idx = -3
+    else
+      let idx = -1
+    endif
 
     if has('win32')
       " keeping old code around since we are not sure if / how preview works on windows
-      let preview_opts[-1] = preview_opts[-1][0:-3] . g:vista.source.fpath . (g:vista#renderer#enable_icon ? ':{2}' : ':{1}')
+      let preview_opts[idx] = preview_opts[idx][0:-3] . g:vista.source.fpath . (g:vista#renderer#enable_icon ? ':{2}' : ':{1}')
     else
       let object_name_index = g:vista#renderer#enable_icon ? '3' : '2'
       let extract_line_number = printf(':$(echo {%s})', object_name_index)
-      let preview_opts[-1] = preview_opts[-1][0:-3] . fnameescape(g:vista.source.fpath) . extract_line_number
+      let preview_opts[idx] = preview_opts[idx][0:-3] . fnameescape(g:vista.source.fpath) . extract_line_number
     endif
-
     call extend(opts.options, preview_opts)
   endif
 
