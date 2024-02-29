@@ -152,5 +152,8 @@ function! vista#autocmd#InitMOF() abort
   augroup VistaMOF
     autocmd!
     autocmd CursorMoved * call vista#cursor#FindNearestMethodOrFunction()
+    if g:vista_update_scope_on_cursor_move
+      autocmd CursorMoved * call vista#cursor#FindDetailWithDelay()
+    endif
   augroup END
 endfunction

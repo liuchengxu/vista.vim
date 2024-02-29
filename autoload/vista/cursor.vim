@@ -6,6 +6,7 @@ scriptencoding utf8
 
 let s:find_timer = -1
 let s:cursor_timer = -1
+let s:find_detail_timer = -1
 let s:highlight_timer = -1
 
 let s:echo_cursor_opts = ['echo', 'floating_win', 'scroll', 'both']
@@ -26,6 +27,10 @@ endfunction
 
 function! s:StopCursorTimer() abort
   call s:GenericStopTimer('s:cursor_timer')
+endfunction
+
+function! s:StopFindDetailTimer() abort
+  call s:GenericStopTimer('s:find_detail_timer')
 endfunction
 
 function! s:StopHighlightTimer() abort
@@ -205,6 +210,48 @@ function! vista#cursor#ShowDetailWithDelay() abort
   let s:cursor_timer = timer_start(
         \ g:vista_cursor_delay,
         \ function('vista#cursor#ShowDetail'),
+        \ )
+endfunction
+
+" Show the detail of current tag/symbol under cursor.
+function! vista#cursor#FindDetail(_timer) abort
+  if empty(getline('.'))
+        \ || !exists('g:vista')
+        \ || !has_key(g:vista, 'functions')
+        \ || !has_key(g:vista, 'source')
+    call setbufvar(g:vista.source.bufnr, 'vista_cursor_info', {})
+    return
+  endif
+
+  let found = vista#util#BinarySearch(g:vista.raw, line('.'), 'line', '')
+  if empty(found)
+    let found = {}
+  endif
+
+  "echo found
+  let scope = vista#util#Trim(get(found, 'scope', ''))
+  if !empty(scope)
+    let scopeKind = get(found, 'scopeKind', '')
+    if !empty(scopeKind)
+      let scope = scopeKind.' '.scope
+    endif
+    let access = get(found, 'access', '')
+    if !empty(access)
+      let scope = scope.' '.access
+    endif
+  else
+    let scope = vista#util#Trim(get(found, 'namespace', '').' '.get(found, 'class', ''))
+  endif
+  let symbolname = vista#util#Trim(get(found, 'name', ''))
+  call setbufvar(g:vista.source.bufnr, 'vista_cursor_info', {'scope': scope, 'symbol': symbolname})
+  
+endfunction
+
+function! vista#cursor#FindDetailWithDelay() abort
+  call s:StopFindDetailTimer()
+  let s:find_detail_timer = timer_start(
+        \ g:vista_update_scope_delay,
+        \ function('vista#cursor#FindDetail'),
         \ )
 endfunction
 
