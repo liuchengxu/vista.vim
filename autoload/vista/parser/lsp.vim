@@ -89,10 +89,16 @@ function! vista#parser#lsp#CocSymbols(symbol, container) abort
     call add(g:vista.functions, a:symbol)
   endif
 
+  let symbol_text = a:symbol.text
+  let line_break_position = stridx(symbol_text, "\n")
+  if line_break_position != -1
+    let symbol_text = symbol_text[ : line_break_position - 1 ]
+  endif
+
   call add(a:container, {
         \ 'lnum': a:symbol.lnum,
         \ 'col': a:symbol.col,
-        \ 'text': a:symbol.text,
+        \ 'text': symbol_text,
         \ 'kind': a:symbol.kind,
         \ 'level': a:symbol.level
         \ })
