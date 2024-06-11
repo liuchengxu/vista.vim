@@ -53,6 +53,7 @@ In addition to being a tags viewer, vista.vim can also be a symbol navigator sim
   - [x] [LanguageClient-neovim](https://github.com/autozimu/LanguageClient-neovim)
   - [x] [vim-lsc](https://github.com/natebosch/vim-lsc)
   - [x] [nvim-lspconfig](https://github.com/neovim/nvim-lspconfig)
+  - [x] [yegappan lsp](https://github.com/yegappan/lsp)
 - [x] Finder for tags and LSP symbols.
   - [x] [fzf](https://github.com/junegunn/fzf)
   - [x] [skim](https://github.com/lotabout/skim)
