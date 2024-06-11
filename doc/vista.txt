@@ -47,6 +47,7 @@ FEATURES                                                          *vista-feature
     [x] LanguageClient-neovim (https://github.com/autozimu/LanguageClient-neovim)
     [x] vim-lsc (https://github.com/natebosch/vim-lsc)
     [x] nvim-lsp (https://github.com/neovim/neovim)
+    [x] yegappan lsp (https://github.com/yegappan/lsp)
 [x] Finder for tags and LSP symbols.
     [x] fzf (https://github.com/junegunn/fzf)
 [x] Display decent detailed symbol info in cmdline.
@@ -123,6 +124,8 @@ Vista                                                                      *Vist
   `:Vista vim_lsc`   open vista window based on vim-lsc.
 
   `:Vista nvim_lsp`  open vista window based on nvim-lsp.
+
+  `:Vista yegappan_lsp`  open vista window based on yeagappan lsp.
 
                                                                     *vista-finder*
 
